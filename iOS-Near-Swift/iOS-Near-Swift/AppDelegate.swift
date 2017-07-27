@@ -8,6 +8,7 @@
 
 import UIKit
 import NearITSDKSwift
+import BRYXBanner
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -64,6 +65,13 @@ extension AppDelegate: NearManagerDelegate {
     
     func manager(_ manager: NearManager, eventWithContent content: Any, recipe: NITRecipe) {
         print("New Near content available")
+        
+        if let simple = content as? NITSimpleNotification {
+            
+            let banner = Banner(title: "Simple notification", subtitle: simple.message, image: UIImage(named: "icona-notifica"), backgroundColor: .black, didTapBlock: nil)
+            banner.dismissesOnTap = true
+            banner.show()
+        }
     }
     
     func manager(_ manager: NearManager, eventFailureWithError error: Error, recipe: NITRecipe) {
