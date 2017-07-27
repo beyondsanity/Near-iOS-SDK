@@ -19,8 +19,13 @@ class HomeViewController: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        self.title = "Home"
+        UIApplication.shared.statusBarStyle = .lightContent
+        
         locationManager.delegate = self
         locationManager.requestAlwaysAuthorization()
+        
+        tabBarController?.tabBar.tintColor = UIColor(red: 159/255, green: 146/255, blue: 255/255, alpha: 1.0)
     }
 
     override func didReceiveMemoryWarning() {
