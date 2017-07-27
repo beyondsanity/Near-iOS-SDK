@@ -32,6 +32,11 @@
     XCTAssertGreaterThan([appId length], 0, @"appId is empty");
 }
 
+- (void)testWrongAppId {
+    NSString *appId = [NITUtils fetchAppIdFromApiKey:@"myApiKey"];
+    XCTAssertTrue([appId isEqualToString:@""]);
+}
+
 - (void)testBundleIdenfitier {
     XCTAssertNotNil([NSBundle bundleWithIdentifier:@"com.nearit.NearITSDK"]);
 }
