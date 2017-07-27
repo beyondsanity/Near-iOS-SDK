@@ -19,6 +19,10 @@
 + (NSString *)fetchAppIdFromApiKey:(NSString *)apiKey {
     NSArray<NSString*> *components = [apiKey componentsSeparatedByString:@"."];
     
+    if ([components count] < 2) {
+        return @"";
+    }
+    
     NSString *payload = [components objectAtIndex:1];
     
     NSInteger module = [payload length] % 4;
