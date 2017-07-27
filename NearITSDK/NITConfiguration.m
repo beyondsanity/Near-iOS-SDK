@@ -93,6 +93,9 @@ static NITConfiguration *defaultConfiguration;
 - (void)setApiKey:(NSString * _Nonnull)apiKey {
     _apiKey = apiKey;
     _appId = [NITUtils fetchAppIdFromApiKey:apiKey];
+    if ([_appId length] == 0) {
+        NSLog(@"[ERROR] - NearIT SDK malformed or invalid Api Key");
+    }
     [self saveParamWithKey:APIKEY value:apiKey];
     [self saveParamWithKey:APPID value:_appId];
 }
