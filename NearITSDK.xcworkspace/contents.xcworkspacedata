@@ -5,6 +5,6 @@
       location = "group:NearITSDK.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:iOS Near Swift/iOS Near Swift.xcodeproj">
+      location = "group:iOS-Near-Swift/iOS Near Swift.xcodeproj">
    </FileRef>
 </Workspace>

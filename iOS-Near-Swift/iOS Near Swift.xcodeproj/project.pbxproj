@@ -16,7 +16,7 @@
 		134088891F29DF960072BA91 /* NearITSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 134088881F29DF960072BA91 /* NearITSDK.framework */; };
 		1340888A1F29DF960072BA91 /* NearITSDK.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 134088881F29DF960072BA91 /* NearITSDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		1340888E1F29E50A0072BA91 /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1340888D1F29E50A0072BA91 /* HomeViewController.swift */; };
-		134088901F29E76C0072BA91 /* keys.plist in Resources */ = {isa = PBXBuildFile; fileRef = 1340888F1F29E76C0072BA91 /* keys.plist */; };
+		134088AA1F2A25290072BA91 /* keys.plist in Resources */ = {isa = PBXBuildFile; fileRef = 134088A91F2A25290072BA91 /* keys.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -44,7 +44,7 @@
 		134088841F29DF910072BA91 /* NearITSDKSwift.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = NearITSDKSwift.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		134088881F29DF960072BA91 /* NearITSDK.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = NearITSDK.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1340888D1F29E50A0072BA91 /* HomeViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HomeViewController.swift; sourceTree = "<group>"; };
-		1340888F1F29E76C0072BA91 /* keys.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = keys.plist; sourceTree = "<group>"; };
+		134088A91F2A25290072BA91 /* keys.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = keys.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,9 +86,10 @@
 				134088791F29DF2A0072BA91 /* Assets.xcassets */,
 				1340887B1F29DF2A0072BA91 /* LaunchScreen.storyboard */,
 				1340887E1F29DF2A0072BA91 /* Info.plist */,
-				1340888F1F29E76C0072BA91 /* keys.plist */,
+				134088A91F2A25290072BA91 /* keys.plist */,
 			);
-			path = "iOS Near Swift";
+			name = "iOS Near Swift";
+			path = "iOS-Near-Swift";
 			sourceTree = "<group>";
 		};
 		1340888C1F29E4DA0072BA91 /* View Controllers */ = {
@@ -170,7 +171,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				134088901F29E76C0072BA91 /* keys.plist in Resources */,
+				134088AA1F2A25290072BA91 /* keys.plist in Resources */,
 				1340887D1F29DF2A0072BA91 /* LaunchScreen.storyboard in Resources */,
 				1340887A1F29DF2A0072BA91 /* Assets.xcassets in Resources */,
 				134088781F29DF2A0072BA91 /* Main.storyboard in Resources */,
@@ -309,7 +310,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = C8YW5Q8LEU;
-				INFOPLIST_FILE = "iOS Near Swift/Info.plist";
+				INFOPLIST_FILE = "iOS-Near-Swift/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.nearit.iOS-Near-Swift";
@@ -323,7 +324,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				DEVELOPMENT_TEAM = C8YW5Q8LEU;
-				INFOPLIST_FILE = "iOS Near Swift/Info.plist";
+				INFOPLIST_FILE = "iOS-Near-Swift/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.nearit.iOS-Near-Swift";
