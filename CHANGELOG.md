@@ -1,3 +1,18 @@
+1.0.5 Release notes (2017-07-28)
+=============================================================
+
+### API Breaking Changes
+
+* Local notifications are now handled like a remote notification, "handleLocal..." methods are removed, use "processRecipe" with userInfo instead.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fixes a crash when the api key is invalid or malformed.
+
 1.0.4 Release notes (2017-07-26)
 =============================================================
 
