@@ -9,6 +9,7 @@
 import UIKit
 import NearITSDKSwift
 import CoreLocation
+import PKHUD
 
 class HomeViewController: UIViewController {
     
@@ -33,6 +34,12 @@ class HomeViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    @IBAction func tapRefreshConfiguration(_ sender: Any) {
+        HUD.show(.progress)
+        nearManager.refreshConfig { (error) in
+            HUD.hide()
+        }
+    }
 
     /*
     // MARK: - Navigation

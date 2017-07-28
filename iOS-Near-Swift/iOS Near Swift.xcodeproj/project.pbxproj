@@ -19,6 +19,11 @@
 		134088AA1F2A25290072BA91 /* keys.plist in Resources */ = {isa = PBXBuildFile; fileRef = 134088A91F2A25290072BA91 /* keys.plist */; };
 		134088C51F2A2EA70072BA91 /* BRYXBanner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 134088C31F2A2D770072BA91 /* BRYXBanner.framework */; };
 		134088C61F2A2EA70072BA91 /* BRYXBanner.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 134088C31F2A2D770072BA91 /* BRYXBanner.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		135F6D781F2B1B0900AB8707 /* NearButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 135F6D771F2B1B0900AB8707 /* NearButton.swift */; };
+		135F6D7B1F2B1DA200AB8707 /* HEXColor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 135F6D791F2B1C3800AB8707 /* HEXColor.framework */; };
+		135F6D7C1F2B1DA200AB8707 /* HEXColor.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 135F6D791F2B1C3800AB8707 /* HEXColor.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		135F6D7F1F2B234700AB8707 /* PKHUD.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 135F6D7D1F2B22DB00AB8707 /* PKHUD.framework */; };
+		135F6D801F2B234700AB8707 /* PKHUD.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 135F6D7D1F2B22DB00AB8707 /* PKHUD.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,7 +34,9 @@
 			dstSubfolderSpec = 10;
 			files = (
 				1340888A1F29DF960072BA91 /* NearITSDK.framework in Embed Frameworks */,
+				135F6D801F2B234700AB8707 /* PKHUD.framework in Embed Frameworks */,
 				134088C61F2A2EA70072BA91 /* BRYXBanner.framework in Embed Frameworks */,
+				135F6D7C1F2B1DA200AB8707 /* HEXColor.framework in Embed Frameworks */,
 				134088861F29DF910072BA91 /* NearITSDKSwift.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
@@ -50,6 +57,9 @@
 		134088A91F2A25290072BA91 /* keys.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = keys.plist; sourceTree = "<group>"; };
 		134088C31F2A2D770072BA91 /* BRYXBanner.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = BRYXBanner.framework; sourceTree = "<group>"; };
 		135F6D741F2B110300AB8707 /* iOS Near Swift.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "iOS Near Swift.entitlements"; sourceTree = SOURCE_ROOT; };
+		135F6D771F2B1B0900AB8707 /* NearButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NearButton.swift; sourceTree = "<group>"; };
+		135F6D791F2B1C3800AB8707 /* HEXColor.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HEXColor.framework; sourceTree = "<group>"; };
+		135F6D7D1F2B22DB00AB8707 /* PKHUD.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PKHUD.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +69,8 @@
 			files = (
 				134088891F29DF960072BA91 /* NearITSDK.framework in Frameworks */,
 				134088851F29DF910072BA91 /* NearITSDKSwift.framework in Frameworks */,
+				135F6D7F1F2B234700AB8707 /* PKHUD.framework in Frameworks */,
+				135F6D7B1F2B1DA200AB8707 /* HEXColor.framework in Frameworks */,
 				134088C51F2A2EA70072BA91 /* BRYXBanner.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -88,6 +100,7 @@
 			children = (
 				135F6D741F2B110300AB8707 /* iOS Near Swift.entitlements */,
 				1340888C1F29E4DA0072BA91 /* View Controllers */,
+				135F6D761F2B1A7700AB8707 /* Views */,
 				134088701F29DF2A0072BA91 /* AppDelegate.swift */,
 				134088761F29DF2A0072BA91 /* Main.storyboard */,
 				134088791F29DF2A0072BA91 /* Assets.xcassets */,
@@ -112,10 +125,20 @@
 			children = (
 				134088881F29DF960072BA91 /* NearITSDK.framework */,
 				134088841F29DF910072BA91 /* NearITSDKSwift.framework */,
+				135F6D7D1F2B22DB00AB8707 /* PKHUD.framework */,
+				135F6D791F2B1C3800AB8707 /* HEXColor.framework */,
 				134088C31F2A2D770072BA91 /* BRYXBanner.framework */,
 			);
 			name = Frameworks;
 			path = "iOS-Near-Swift";
+			sourceTree = "<group>";
+		};
+		135F6D761F2B1A7700AB8707 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				135F6D771F2B1B0900AB8707 /* NearButton.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -199,6 +222,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				134088711F29DF2A0072BA91 /* AppDelegate.swift in Sources */,
+				135F6D781F2B1B0900AB8707 /* NearButton.swift in Sources */,
 				1340888E1F29E50A0072BA91 /* HomeViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

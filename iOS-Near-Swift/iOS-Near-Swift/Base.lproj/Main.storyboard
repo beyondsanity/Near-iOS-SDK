@@ -47,11 +47,25 @@
                                     <constraint firstAttribute="width" secondItem="Ao4-fY-sy6" secondAttribute="height" multiplier="1:1" id="rFO-7l-aZd"/>
                                 </constraints>
                             </imageView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="BNd-zH-Dqf" customClass="NearButton" customModule="iOS_Near_Swift" customModuleProvider="target">
+                                <rect key="frame" x="93.5" y="200" width="187" height="36"/>
+                                <rect key="contentStretch" x="1" y="0.0" width="1" height="1"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="36" id="jNL-eW-Y2Z"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="boldSystem" pointSize="14"/>
+                                <state key="normal" title="REFRESH CONFIGURATION"/>
+                                <connections>
+                                    <action selector="tapRefreshConfiguration:" destination="OIV-3q-y57" eventType="touchUpInside" id="zPS-fx-1eD"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" red="0.65098039215686276" green="0.62352941176470589" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                         <constraints>
+                            <constraint firstItem="BNd-zH-Dqf" firstAttribute="centerX" secondItem="e5a-Rk-OT5" secondAttribute="centerX" id="aZH-Sd-bbX"/>
                             <constraint firstItem="Ao4-fY-sy6" firstAttribute="centerX" secondItem="e5a-Rk-OT5" secondAttribute="centerX" id="lgo-fZ-JGV"/>
                             <constraint firstItem="Ao4-fY-sy6" firstAttribute="top" secondItem="jZ7-Ak-gdT" secondAttribute="bottom" constant="20" id="p10-II-S0w"/>
+                            <constraint firstItem="BNd-zH-Dqf" firstAttribute="top" secondItem="Ao4-fY-sy6" secondAttribute="bottom" constant="20" id="ub2-ts-zVn"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="rLD-fi-Kan"/>
