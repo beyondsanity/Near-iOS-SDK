@@ -5,6 +5,7 @@
     </device>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12088"/>
+        <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -38,7 +39,20 @@
                     <view key="view" contentMode="scaleToFill" id="e5a-Rk-OT5">
                         <rect key="frame" x="0.0" y="64" width="375" height="603"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="NearIT" translatesAutoresizingMaskIntoConstraints="NO" id="Ao4-fY-sy6">
+                                <rect key="frame" x="107" y="20" width="160" height="160"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="160" id="WHK-b6-FC2"/>
+                                    <constraint firstAttribute="width" secondItem="Ao4-fY-sy6" secondAttribute="height" multiplier="1:1" id="rFO-7l-aZd"/>
+                                </constraints>
+                            </imageView>
+                        </subviews>
                         <color key="backgroundColor" red="0.65098039215686276" green="0.62352941176470589" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                        <constraints>
+                            <constraint firstItem="Ao4-fY-sy6" firstAttribute="centerX" secondItem="e5a-Rk-OT5" secondAttribute="centerX" id="lgo-fZ-JGV"/>
+                            <constraint firstItem="Ao4-fY-sy6" firstAttribute="top" secondItem="jZ7-Ak-gdT" secondAttribute="bottom" constant="20" id="p10-II-S0w"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="rLD-fi-Kan"/>
                 </viewController>
@@ -52,7 +66,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="4Do-Ff-fco" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Home" image="near-tab" id="MpD-Rh-hGl"/>
                     <toolbarItems/>
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" misplaced="YES" translucent="NO" id="LbE-Cv-meh">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" translucent="NO" id="LbE-Cv-meh">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <color key="barTintColor" red="0.62352941176470589" green="0.5725490196078431" blue="1" alpha="1" colorSpace="calibratedRGB"/>
@@ -71,6 +85,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="NearIT" width="700" height="700"/>
         <image name="near-tab" width="22" height="22"/>
     </resources>
 </document>

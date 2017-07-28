@@ -9,6 +9,7 @@
 import UIKit
 import NearITSDKSwift
 import BRYXBanner
+import UserNotifications
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -23,6 +24,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         NITLog.setLogEnabled(true)
         NearManager.setup(apiKey: apiKey)
         NearManager.shared.delegate = self
+        
+        requestNotificationPermissions(application: application)
         
         return true
     }
@@ -48,6 +51,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
+    
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        let deviceTokenString = deviceToken.reduce("", {$0 + String(format: "%02X", $1)})
+        print("Push device token: \(deviceTokenString)")
+        
+        NearManager.shared.setDeviceToken(deviceToken)
+    }
 
     func loadApiKey() -> String {
         if let path = Bundle.main.path(forResource: "keys", ofType: "plist") {
@@ -59,13 +69,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
         return ""
     }
-}
-
-extension AppDelegate: NearManagerDelegate {
     
-    func manager(_ manager: NearManager, eventWithContent content: Any, recipe: NITRecipe) {
-        print("New Near content available")
-        
+    func handleNearContent(content: Any, recipe: NITRecipe) {
         if let simple = content as? NITSimpleNotification {
             
             let banner = Banner(title: "Simple notification", subtitle: simple.message, image: UIImage(named: "icona-notifica"), backgroundColor: .black, didTapBlock: nil)
@@ -74,8 +79,69 @@ extension AppDelegate: NearManagerDelegate {
         }
     }
     
+    func requestNotificationPermissions(application: UIApplication) {
+        if #available(iOS 10.0, *) {
+            let center = UNUserNotificationCenter.current()
+            center.requestAuthorization(options:[.badge, .alert, .sound]) { (granted, error) in
+                // Enable or disable features based on authorization.
+            }
+            center.delegate = self
+        } else {
+            // Fallback on earlier versions
+            let settings = UIUserNotificationSettings(types: [.sound, .alert, .badge], categories: nil)
+            application.registerUserNotificationSettings(settings)
+        }
+        
+        application.registerForRemoteNotifications()
+    }
+    
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any]) {
+        let _ = NearManager.shared.processRecipe(userInfo) { (content, recipe, error) in
+            if let content = content, let recipe = recipe {
+                self.handleNearContent(content: content, recipe: recipe)
+            }
+        }
+    }
+    
+    func application(_ application: UIApplication, didReceive notification: UILocalNotification) {
+        let _ = NearManager.shared.handleLocalNotification(notification) { (content, recipe, error) in
+            if let content = content, let recipe = recipe {
+                self.handleNearContent(content: content, recipe: recipe)
+            }
+        }
+    }
+}
+
+extension AppDelegate: NearManagerDelegate {
+    
+    func manager(_ manager: NearManager, eventWithContent content: Any, recipe: NITRecipe) {
+        print("New Near content available")
+        handleNearContent(content: content, recipe: recipe)
+    }
+    
     func manager(_ manager: NearManager, eventFailureWithError error: Error, recipe: NITRecipe) {
         print("Near content failure")
     }
     
+}
+
+extension AppDelegate: UNUserNotificationCenterDelegate {
+    
+    @available(iOS 10.0, *)
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        let userInfo = response.notification.request.content.userInfo
+        let isRemote = NearManager.shared.processRecipe(userInfo) { (content, recipe, error) in
+            if let content = content, let recipe = recipe {
+                self.handleNearContent(content: content, recipe: recipe)
+            }
+        }
+        if !isRemote {
+            let _ = NearManager.shared.handleLocalNotificationResponse(response, completionHandler: { (content, recipe, error) in
+                if let content = content, let recipe = recipe {
+                    self.handleNearContent(content: content, recipe: recipe)
+                }
+            })
+        }
+        completionHandler()
+    }
 }
