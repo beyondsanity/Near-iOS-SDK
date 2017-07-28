@@ -55,7 +55,7 @@
     id alert = [aps objectForKey:@"alert"];
     BOOL isReactionBundleSuccess = NO;
     
-    if ([reactionPluginId isEqualToString:NITSimpleNotificationPluginName] && alert) {
+    if ([reactionPluginId isEqualToString:NITSimpleNotificationPluginName] && alert && recipeId) {
         NITSimpleNotification *simple = [[NITSimpleNotification alloc] init];
         if ([alert isKindOfClass:[NSString class]]) {
             simple.message = (NSString*)alert;
@@ -69,7 +69,7 @@
             }];
         }
         return YES;
-    } else if (reactionBundle && reactionPluginId) {
+    } else if (reactionBundle && reactionPluginId && recipeId) {
         NSData *zipData = [NSData dataFromBase64String:reactionBundle];
         NSData *unzippedData = [zipData zlibInflate];
         NSError *jsonError;
@@ -158,7 +158,7 @@
     NSString *reactionBundle = [userInfo objectForKey:NOTPROC_REACTION_BUNDLE];
     if(reactionPluginId && reactionBundleId && recipeId) {
         return YES;
-    } else if(reactionBundle && reactionPluginId) {
+    } else if(reactionBundle && reactionPluginId && recipeId) {
         return YES;
     } else if(recipeId) {
         return YES;
