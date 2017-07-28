@@ -251,29 +251,49 @@ static NITManager *defaultManager;
  * @param userInfo The remote notification userInfo dictionary
  */
 - (BOOL)processRecipeSimpleWithUserInfo:(NSDictionary<NSString *,id> *)userInfo {
-    return [self.notificationProcessor processNotificationWithUserInfo:userInfo completion:^(id  _Nullable content, NSString * _Nullable recipeId, NSError * _Nullable error) {
-        NITRecipe *recipe = [[NITRecipe alloc] init];
-        recipe.ID = recipeId;
-        if([self.delegate respondsToSelector:@selector(manager:eventFailureWithError:recipe:)] && error) {
-            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [self.delegate manager:self eventFailureWithError:error recipe:recipe];
-            }];
-        } else if ([self.delegate respondsToSelector:@selector(manager:eventWithContent:recipe:)]) {
-            [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                [self.delegate manager:self eventWithContent:content recipe:recipe];
-            }];
-        }
-    }];
+    if ([self.notificationProcessor isRemoteNotificationWithUserInfo:userInfo]) {
+        return [self.notificationProcessor processNotificationWithUserInfo:userInfo completion:^(id  _Nullable content, NSString * _Nullable recipeId, NSError * _Nullable error) {
+            NITRecipe *recipe = [[NITRecipe alloc] init];
+            recipe.ID = recipeId;
+            if([self.delegate respondsToSelector:@selector(manager:eventFailureWithError:recipe:)] && error) {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [self.delegate manager:self eventFailureWithError:error recipe:recipe];
+                }];
+            } else if ([self.delegate respondsToSelector:@selector(manager:eventWithContent:recipe:)]) {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [self.delegate manager:self eventWithContent:content recipe:recipe];
+                }];
+            }
+        }];
+    } else {
+        return [self handleLocalUserInfo:userInfo completionHandler:^(id _Nullable content, NITRecipe * _Nullable recipe, NSError * _Nullable error) {
+            if([self.delegate respondsToSelector:@selector(manager:eventFailureWithError:recipe:)] && error) {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [self.delegate manager:self eventFailureWithError:error recipe:recipe];
+                }];
+            } else if ([self.delegate respondsToSelector:@selector(manager:eventWithContent:recipe:)]) {
+                [[NSOperationQueue mainQueue] addOperationWithBlock:^{
+                    [self.delegate manager:self eventWithContent:content recipe:recipe];
+                }];
+            }
+        }];
+    }
 }
 
 - (BOOL)processRecipeWithUserInfo:(NSDictionary<NSString *,id> *)userInfo completion:(void (^)(id _Nullable, NITRecipe * _Nullable, NSError * _Nullable))completionHandler {
-    return [self.notificationProcessor processNotificationWithUserInfo:userInfo completion:^(id  _Nullable content, NSString * _Nullable recipeId, NSError * _Nullable error) {
-        if (completionHandler) {
-            NITRecipe *recipe = [[NITRecipe alloc] init];
-            recipe.ID = recipeId;
+    if ([self.notificationProcessor isRemoteNotificationWithUserInfo:userInfo]) {
+        return [self.notificationProcessor processNotificationWithUserInfo:userInfo completion:^(id  _Nullable content, NSString * _Nullable recipeId, NSError * _Nullable error) {
+            if (completionHandler) {
+                NITRecipe *recipe = [[NITRecipe alloc] init];
+                recipe.ID = recipeId;
+                completionHandler(content, recipe, error);
+            }
+        }];
+    } else {
+        return [self handleLocalUserInfo:userInfo completionHandler:^(id _Nullable content, NITRecipe * _Nullable recipe, NSError * _Nullable error) {
             completionHandler(content, recipe, error);
-        }
-    }];
+        }];
+    }
 }
 
 - (void)sendTrackingWithRecipeId:(NSString *)recipeId event:(NSString *)event {
@@ -369,34 +389,6 @@ static NITManager *defaultManager;
 
 - (void)setProfileId:(NSString *)profileId {
     [self.profile setProfileId:profileId];
-}
-
-- (BOOL)handleLocalNotificationResponse:(UNNotificationResponse *)response completionHandler:(void (^)(id _Nullable, NITRecipe * _Nullable, NSError * _Nullable))completionHandler {
-    NSDictionary *userInfo = response.notification.request.content.userInfo;
-    BOOL valid = [self handleLocalUserInfo:userInfo completionHandler:^(id _Nullable content, NITRecipe * _Nullable recipe, NSError * _Nullable error) {
-        if (completionHandler) {
-            completionHandler(content, recipe, error);
-        }
-    }];
-    return valid;
-}
-
-- (BOOL)handleLocalNotification:(UILocalNotification*)notification completionHandler:(void (^)(id _Nullable, NITRecipe * _Nullable, NSError * _Nullable))completionHandler {
-    NSDictionary *userInfo = notification.userInfo;
-    if (userInfo) {
-        BOOL valid = [self handleLocalUserInfo:userInfo completionHandler:^(id _Nullable content, NITRecipe * _Nullable recipe, NSError * _Nullable error) {
-            if (completionHandler) {
-                completionHandler(content, recipe, error);
-            }
-        }];
-        return valid;
-    } else {
-        NSError *anError = [NSError errorWithDomain:NITManagerErrorDomain code:101 userInfo:@{NSLocalizedDescriptionKey:@"The notification response has invalid fields for a NearIT notification"}];
-        if (completionHandler) {
-            completionHandler(nil, nil, anError);
-        }
-        return NO;
-    }
 }
 
 - (BOOL)handleLocalUserInfo:(NSDictionary* _Nonnull)userInfo completionHandler:(void (^)(id _Nullable, NITRecipe * _Nullable, NSError * _Nullable))completionHandler {

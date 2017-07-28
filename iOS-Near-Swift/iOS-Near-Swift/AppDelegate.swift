@@ -108,9 +108,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didReceive notification: UILocalNotification) {
-        let _ = NearManager.shared.handleLocalNotification(notification) { (content, recipe, error) in
-            if let content = content, let recipe = recipe {
-                self.handleNearContent(content: content, recipe: recipe)
+        if let userInfo = notification.userInfo {
+            let _ = NearManager.shared.processRecipe(userInfo) { (content, recipe, error) in
+                if let content = content, let recipe = recipe {
+                    self.handleNearContent(content: content, recipe: recipe)
+                }
             }
         }
     }
@@ -134,17 +136,10 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     @available(iOS 10.0, *)
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
-        let isRemote = NearManager.shared.processRecipe(userInfo) { (content, recipe, error) in
+        let _ = NearManager.shared.processRecipe(userInfo) { (content, recipe, error) in
             if let content = content, let recipe = recipe {
                 self.handleNearContent(content: content, recipe: recipe)
             }
-        }
-        if !isRemote {
-            let _ = NearManager.shared.handleLocalNotificationResponse(response, completionHandler: { (content, recipe, error) in
-                if let content = content, let recipe = recipe {
-                    self.handleNearContent(content: content, recipe: recipe)
-                }
-            })
         }
         completionHandler()
     }

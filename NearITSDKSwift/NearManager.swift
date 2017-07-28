@@ -135,24 +135,6 @@ public final class NearManager: NSObject, NITManagerDelegate {
         manager.processRecipe(withId: id)
     }
     
-    @available(iOS 10.0, *)
-    public func handleLocalNotificationResponse(_ response: UNNotificationResponse, completionHandler:((Any?, NITRecipe?, Error?) -> Void)?) -> Bool {
-        return manager.handleLocalNotificationResponse(response) { (content, recipe, error) in
-            if let completionHandler = completionHandler {
-                completionHandler(content, recipe, error);
-            }
-        }
-    }
-    
-    public func handleLocalNotification(_ notification: UILocalNotification, completionHandler:((Any?, NITRecipe?, Error?) -> Void)?) -> Bool {
-        manager.handle(notification) { (content, recipe, error) in
-            if let completionHandler = completionHandler {
-                completionHandler(content, recipe, error);
-            }
-        }
-        return true
-    }
-    
     public func manager(_ manager: NITManager, eventWithContent content: Any, recipe: NITRecipe) {
         delegate?.manager(self, eventWithContent: content, recipe: recipe)
     }

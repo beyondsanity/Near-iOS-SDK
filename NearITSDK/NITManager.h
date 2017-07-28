@@ -54,7 +54,5 @@
 - (void)resetProfile;
 - (NSString* _Nullable)profileId;
 - (void)setProfileId:(NSString * _Nonnull)profileId;
-- (BOOL)handleLocalNotificationResponse:(UNNotificationResponse* _Nonnull)response completionHandler:(void (^_Nullable)(id _Nullable content, NITRecipe * _Nullable recipe, NSError * _Nullable error))completionHandler;
-- (BOOL)handleLocalNotification:(UILocalNotification* _Nonnull)notification completionHandler:(void (^_Nullable)(id _Nullable, NITRecipe * _Nullable, NSError * _Nullable))completionHandler;
 
 @end
