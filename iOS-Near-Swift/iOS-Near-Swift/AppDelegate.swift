@@ -76,6 +76,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             let banner = Banner(title: "Simple notification", subtitle: simple.message, image: UIImage(named: "icona-notifica"), backgroundColor: .black, didTapBlock: nil)
             banner.dismissesOnTap = true
             banner.show()
+        } else if let coupon = content as? NITCoupon {
+            let banner = Banner(title: "Coupon", subtitle: coupon.name, image: UIImage(named: "icona-couponsconto"), backgroundColor: .black, didTapBlock: nil)
+            banner.dismissesOnTap = true
+            banner.show()
         }
     }
     

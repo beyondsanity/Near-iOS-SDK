@@ -49,23 +49,11 @@
     
     NSString *recipeId = [userInfo objectForKey:NOTPROC_RECIPE_ID];
     NSString *reactionPluginId = [userInfo objectForKey:NOTPROC_REACTION_PLUGIN_ID];
-    //NSString *reactionActionId = [userInfo objectForKey:@"reaction_action_id"];
     NSString *reactionBundleId = [userInfo objectForKey:NOTPROC_REACTION_BUNDLE_ID];
     NSString *reactionBundle = [userInfo objectForKey:NOTPROC_REACTION_BUNDLE];
     NSDictionary<NSString*, id> *aps = [userInfo objectForKey:@"aps"];
     id alert = [aps objectForKey:@"alert"];
     BOOL isReactionBundleSuccess = NO;
-    
-    if (recipeId == nil) {
-        NITLogE(LOGTAG, @"Invalid recipeId");
-        if (completionHandler) {
-            NSError *anError = [NSError errorWithDomain:NITNotificationProcessorDomain code:102 userInfo:@{NSLocalizedDescriptionKey:@"Invalid recipeId"}];
-            completionHandler(nil, recipeId, anError);
-        }
-        return NO;
-    } else {
-        [self.recipesManager sendTrackingWithRecipeId:recipeId event:NITRecipeNotified];
-    }
     
     if ([reactionPluginId isEqualToString:NITSimpleNotificationPluginName] && alert) {
         NITSimpleNotification *simple = [[NITSimpleNotification alloc] init];
@@ -148,14 +136,33 @@
         }];
     }
     
-    if(reactionPluginId && reactionBundleId && recipeId && !isReactionBundleSuccess) {
+    BOOL isRemote = [self isRemoteNotificationWithUserInfo:userInfo];
+    
+    if (isRemote) {
+        [self.recipesManager sendTrackingWithRecipeId:recipeId event:NITRecipeNotified];
+        return YES;
+    } else {
+        NITLogE(LOGTAG, @"Invalid recipe");
+        if (completionHandler) {
+            NSError *anError = [NSError errorWithDomain:NITNotificationProcessorDomain code:102 userInfo:@{NSLocalizedDescriptionKey:@"Invalid recipe"}];
+            completionHandler(nil, nil, anError);
+        }
+        return NO;
+    }
+}
+
+- (BOOL)isRemoteNotificationWithUserInfo:(NSDictionary<NSString*, id>*)userInfo {
+    NSString *recipeId = [userInfo objectForKey:NOTPROC_RECIPE_ID];
+    NSString *reactionPluginId = [userInfo objectForKey:NOTPROC_REACTION_PLUGIN_ID];
+    NSString *reactionBundleId = [userInfo objectForKey:NOTPROC_REACTION_BUNDLE_ID];
+    NSString *reactionBundle = [userInfo objectForKey:NOTPROC_REACTION_BUNDLE];
+    if(reactionPluginId && reactionBundleId && recipeId) {
         return YES;
     } else if(reactionBundle && reactionPluginId) {
         return YES;
     } else if(recipeId) {
         return YES;
     }
-    
     return NO;
 }
 

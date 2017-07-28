@@ -20,5 +20,6 @@
 
 - (instancetype _Nonnull)initWithRecipesManager:(NITRecipesManager* _Nonnull)recipesManager reactions:(NSDictionary<NSString*, NITReaction*> * _Nonnull)reactions;
 - (BOOL)processNotificationWithUserInfo:(NSDictionary<NSString *,id> * _Nonnull)userInfo completion:(void (^_Nullable)(id _Nullable object, NSString * _Nullable recipeId, NSError* _Nullable error))completionHandler;
+- (BOOL)isRemoteNotificationWithUserInfo:(NSDictionary<NSString*, id>* _Nonnull)userInfo;
 
 @end
