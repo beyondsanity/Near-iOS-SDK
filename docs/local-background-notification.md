@@ -14,7 +14,7 @@ First you need to set the delegate for the `UNUserNotificationCenter`, with the 
 // Swift
 func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
     let userInfo = response.notification.request.content.userInfo
-    let isNear = NearManager.shared.processRecipe(userInfo) { (content, recipe, error) in
+    let isNear = manager.processRecipe(userInfo) { (content, recipe, error) in
         if let content = content, let recipe = recipe {
             self.handleNearContent(content: content, recipe: recipe)
         }
@@ -48,7 +48,7 @@ In iOS 9 you only need to implement the `didReceiveLocalNotification` (`didRecei
 // Swift
 func application(_ application: UIApplication, didReceive notification: UILocalNotification) {
     if let userInfo = notification.userInfo {
-        let isNear = NearManager.shared.processRecipe(userInfo) { (content, recipe, error) in
+        let isNear = manager.processRecipe(userInfo) { (content, recipe, error) in
         if let content = content, let recipe = recipe {
             self.handleNearContent(content: content, recipe: recipe)
         }
