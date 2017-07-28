@@ -13,11 +13,11 @@ First you need to set the delegate for the `UNUserNotificationCenter`, with the 
 ```swift
 // Swift
 func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-    let isNear = manager.handleLocalNotificationResponse(response) { (content, recipe, error) in
-        if let content = content as? NITContent {
-            // Do something
+    let userInfo = response.notification.request.content.userInfo
+    let isNear = NearManager.shared.processRecipe(userInfo) { (content, recipe, error) in
+        if let content = content, let recipe = recipe {
+            self.handleNearContent(content: content, recipe: recipe)
         }
-        // Code for other content types
     }
     print("Is a Near local notification: \(isNear)");
     completionHandler()
@@ -27,11 +27,11 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
 ```objective-c
 // Objective-C
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)())completionHandler {
-    BOOL isNear = [manager handleLocalNotificationResponse:response completionHandler:^(id  _Nullable content, NITRecipe * _Nullable recipe, NSError * _Nullable error) {
-        if ([content isKindOfClass:[NITContent class]]) {
-            // Do something
+    NSDictionary *userInfo = response.notification.request.content.userInfo;
+    BOOL isNear = [manager processRecipeWithUserInfo:response completionHandler:^(id  _Nullable content, NITRecipe * _Nullable recipe, NSError * _Nullable error) {
+        if (content != nil && recipe != nil) {
+            [self handleNearContentWithContent:content recipe:recipe];
         }
-        // Code for other content types
     }];
     NSLog(@"Is a Near local notification: %d", isNear);
     completionHandler();
@@ -47,25 +47,25 @@ In iOS 9 you only need to implement the `didReceiveLocalNotification` (`didRecei
 ```swift
 // Swift
 func application(_ application: UIApplication, didReceive notification: UILocalNotification) {
-    let isNear = manager.handleLocalNotification(response) { (content, recipe, error) in
-        if let content = content as? NITContent {
-            // Do something
+    if let userInfo = notification.userInfo {
+        let isNear = NearManager.shared.processRecipe(userInfo) { (content, recipe, error) in
+        if let content = content, let recipe = recipe {
+            self.handleNearContent(content: content, recipe: recipe)
         }
-        // Code for other content types
+        print("Is a Near local notification: \(isNear)");
     }
-    print("Is a Near local notification: \(isNear)");
 }
 ```
 
 ```objective-c
 // Objective-C
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification {
-    BOOL isNear = [manager handleLocalNotification:notification completionHandler:^(id  _Nullable content, NITRecipe * _Nullable recipe, NSError * _Nullable error) {
-        if ([content isKindOfClass:[NITContent class]]) {
-            // Do something
+    BOOL isNear = [manager processRecipeWithUserInfo:notification.userInfo completionHandler:^(id  _Nullable content, NITRecipe * _Nullable recipe, NSError * _Nullable error) {
+        if (content != nil && recipe != nil) {
+            [self handleNearContentWithContent:content recipe:recipe];
         }
-        // Code for other content types
     }];
+
     NSLog(@"Is a Near local notification: %d", isNear);
 }
 ```
