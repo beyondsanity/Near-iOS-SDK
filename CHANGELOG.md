@@ -1,3 +1,18 @@
+1.0.6 Release notes (2017-07-31)
+=============================================================
+
+### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fixes set single user data.
+
 1.0.5 Release notes (2017-07-28)
 =============================================================
 
