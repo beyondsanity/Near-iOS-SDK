@@ -155,6 +155,7 @@
 		135CD7D41E9F7ACF005C75A4 /* NITDefaultLogger.h in Headers */ = {isa = PBXBuildFile; fileRef = 135CD7D21E9F7ACF005C75A4 /* NITDefaultLogger.h */; };
 		135CD7D51E9F7ACF005C75A4 /* NITDefaultLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 135CD7D31E9F7ACF005C75A4 /* NITDefaultLogger.m */; };
 		135CD7D71E9FB266005C75A4 /* NearITSDK.podspec in Resources */ = {isa = PBXBuildFile; fileRef = 135CD7D61E9FB266005C75A4 /* NearITSDK.podspec */; };
+		1360A28C1F305EFA00380B14 /* NITGeopolisNodesManagerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 1360A28B1F305EFA00380B14 /* NITGeopolisNodesManagerTest.m */; };
 		1364A4D61EE566F5009F75FA /* manager_datapoint.json in Resources */ = {isa = PBXBuildFile; fileRef = 1364A4D51EE566F5009F75FA /* manager_datapoint.json */; };
 		13746D141EF7D47600D09183 /* schedule_complete_coverage_validity.json in Resources */ = {isa = PBXBuildFile; fileRef = 13746D131EF7D47600D09183 /* schedule_complete_coverage_validity.json */; };
 		13746D161EF7D69B00D09183 /* schedule_only_during_jun_2017.json in Resources */ = {isa = PBXBuildFile; fileRef = 13746D151EF7D69B00D09183 /* schedule_only_during_jun_2017.json */; };
@@ -411,6 +412,7 @@
 		135CD7D21E9F7ACF005C75A4 /* NITDefaultLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NITDefaultLogger.h; sourceTree = "<group>"; };
 		135CD7D31E9F7ACF005C75A4 /* NITDefaultLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITDefaultLogger.m; sourceTree = "<group>"; };
 		135CD7D61E9FB266005C75A4 /* NearITSDK.podspec */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = NearITSDK.podspec; sourceTree = "<group>"; };
+		1360A28B1F305EFA00380B14 /* NITGeopolisNodesManagerTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITGeopolisNodesManagerTest.m; sourceTree = "<group>"; };
 		1364A4D51EE566F5009F75FA /* manager_datapoint.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = manager_datapoint.json; sourceTree = "<group>"; };
 		13746D131EF7D47600D09183 /* schedule_complete_coverage_validity.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = schedule_complete_coverage_validity.json; sourceTree = "<group>"; };
 		13746D151EF7D69B00D09183 /* schedule_only_during_jun_2017.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = schedule_only_during_jun_2017.json; sourceTree = "<group>"; };
@@ -803,6 +805,7 @@
 				1352CA901E78372B00C0E98E /* NITUtilsTest.m */,
 				1349EEA81E793833000B0666 /* NITJSONAPITests.m */,
 				13423EE51E7BD451008CAAC8 /* NITGeopolisManagerTest.m */,
+				1360A28B1F305EFA00380B14 /* NITGeopolisNodesManagerTest.m */,
 				135A70801E8525F700D4C9EC /* NITReactionTest.m */,
 				135BB64E1EFA5DF0005DB5C9 /* NITReactionModelTest.m */,
 				137E38A61E8A4AA6008E83E6 /* NITCacheManagerTest.m */,
@@ -1445,6 +1448,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				134F99921F0BA02300B464B4 /* NITGeopolisRadarTest.m in Sources */,
+				1360A28C1F305EFA00380B14 /* NITGeopolisNodesManagerTest.m in Sources */,
 				1374E1141EB0D2CE00D613A5 /* NITTestDateManager.m in Sources */,
 				137E38AC1E8A94E4008E83E6 /* NITTestCase.m in Sources */,
 				135359091EEFDB6B0056AF7C /* NITTestValidator.m in Sources */,

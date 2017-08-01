@@ -50,6 +50,9 @@
 - (NSArray<NITNode *> *)monitoredNodesOnExitWithId:(NSString *)nodeId {
     NITNode *node = [self nodeWithID:nodeId];
     if (node != nil) {
+        if (![self.enteredNodes containsObject:node] && self.lastEnteredNode) {
+            return [self statelessMonitoredNodesOnEnterWithId:self.lastEnteredNode.ID];
+        }
         [self.enteredNodes removeObject:node];
         if ([node isLeaf] && [node isKindOfClass:[NITBeaconNode class]] && node.identifier == nil) { // Is a beacon
             return [self statelessMonitoredNodesOnEnterWithId:node.parent.ID];
