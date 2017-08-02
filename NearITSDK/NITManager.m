@@ -89,7 +89,7 @@ static NITManager *defaultManager;
     
     NITReachability *internetReachability =  [NITReachability reachabilityForInternetConnection];
     NITInstallation *installation = [[NITInstallation alloc] initWithConfiguration:configuration networkManager:networkManager reachability:internetReachability];
-    NITUserDataBackoff *userDataBackoff = [[NITUserDataBackoff alloc] initWithConfiguration:configuration networkManager:self.networkManager cacheManager:cacheManager];
+    NITUserDataBackoff *userDataBackoff = [[NITUserDataBackoff alloc] initWithConfiguration:configuration networkManager:networkManager cacheManager:cacheManager];
     NITUserProfile *profile = [[NITUserProfile alloc] initWithConfiguration:configuration networkManager:networkManager installation:installation userDataBackoff:userDataBackoff];
     
     NITDateManager *dateManager = [[NITDateManager alloc] init];

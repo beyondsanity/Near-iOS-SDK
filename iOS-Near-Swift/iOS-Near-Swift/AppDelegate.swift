@@ -24,6 +24,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         NITLog.setLogEnabled(true)
         NearManager.setup(apiKey: apiKey)
         NearManager.shared.delegate = self
+        NearManager.shared.setDeferredUserData("gender", value: "m")
         
         requestNotificationPermissions(application: application)
         
