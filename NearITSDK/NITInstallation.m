@@ -152,6 +152,13 @@
         [resource addAttributeObject:[NSNumber numberWithBool:NO] forKey:@"location"];
     }
     
+    NSLocale *locale = [NSLocale currentLocale];
+    NSString *lang = locale.languageCode;
+    if (locale.countryCode) {
+        lang = [lang stringByAppendingString:[NSString stringWithFormat:@"-%@", locale.countryCode]];
+    }
+    [resource addAttributeObject:lang forKey:@"lang"];
+    
     return resource;
 }
 
