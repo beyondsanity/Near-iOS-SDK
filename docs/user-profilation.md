@@ -15,23 +15,18 @@ manager.profileId
 [manager profileId];
 ```
 
-To explicitly register a new user in our platform call the method:
+You can set user data with this method (recommended way), this method can be called multiple times for settings several user data:
 ```swift
 // Swift
-manager.createNewProfile { (profileId, error) in
-    ...
-}
+manager.setDeferredUserData("gender", value: "m")
 ```
 
 ```objective-c
 // Objective-C
-[self createNewProfileWithCompletionHandler:^(NSString * _Nullable profileId, NSError * _Nullable error) {
-    ...
-}];
+[manager setDeferredUserDataWithKey:@"gender" value:@"m"];
 ```
-Calling this method multiple times *will create* multiple profiles.
 
-After the profile is created set user data (data point):
+If you need to know the state of the call you can use this method:
 ```swift
 // Swift
 manager.setUserData("gender", value: "M") { (error) in
