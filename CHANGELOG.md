@@ -1,3 +1,18 @@
+1.0.7 Release notes (2017-08-02)
+=============================================================
+
+### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fixes an issue with beacon monitoring.
+
 1.0.6 Release notes (2017-07-31)
 =============================================================
 
