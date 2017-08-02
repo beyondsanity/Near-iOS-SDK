@@ -1,3 +1,18 @@
+1.0.8 Release notes (2017-08-02)
+=============================================================
+
+### API Breaking Changes
+
+* None.
+
+### Enhancements
+
+* None.
+
+### Bugfixes
+
+* Fixes an issue for deferred user data.
+
 1.0.7 Release notes (2017-08-02)
 =============================================================
 
