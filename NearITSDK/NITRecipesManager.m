@@ -60,26 +60,11 @@ NSString* const RecipesCacheKey = @"Recipes";
 
 - (void)refreshConfigWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler {
     [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] recipesProcessListWithJsonApi:[self buildEvaluationBody]] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
-        if (error) {
-            NSArray<NITRecipe*> *cachedRecipes = [self.cacheManager loadArrayForKey:RecipesCacheKey];
-            if (cachedRecipes) {
-                self.recipes = cachedRecipes;
-                if (completionHandler) {
-                    completionHandler(nil);
-                }
-            } else {
-                if (completionHandler) {
-                    completionHandler(error);
-                }
-            }
-        } else {
-            [json registerClass:[NITRecipe class] forType:@"recipes"];
-            self.recipes = [json parseToArrayOfObjects];
-            [self.cacheManager saveWithObject:self.recipes forKey:RecipesCacheKey];
+        [self refreshRecipesWithJson:json error:error completion:^(NSError * _Nullable cError) {
             if (completionHandler) {
-                completionHandler(error);
+                completionHandler(cError);
             }
-        }
+        }];
     }];
 }
 
@@ -97,6 +82,29 @@ NSString* const RecipesCacheKey = @"Recipes";
             }
         }
     }];
+}
+
+- (void)refreshRecipesWithJson:(NITJSONAPI*)json error:(NSError*)error completion:(void (^_Nullable)(NSError * _Nullable error))completionHandler {
+    if (error) {
+        NSArray<NITRecipe*> *cachedRecipes = [self.cacheManager loadArrayForKey:RecipesCacheKey];
+        if (cachedRecipes) {
+            self.recipes = cachedRecipes;
+            if (completionHandler) {
+                completionHandler(nil);
+            }
+        } else {
+            if (completionHandler) {
+                completionHandler(error);
+            }
+        }
+    } else {
+        [json registerClass:[NITRecipe class] forType:@"recipes"];
+        self.recipes = [json parseToArrayOfObjects];
+        [self.cacheManager saveWithObject:self.recipes forKey:RecipesCacheKey];
+        if (completionHandler) {
+            completionHandler(nil);
+        }
+    }
 }
 
 // MARK: - NITRecipesManaging
