@@ -2,9 +2,9 @@
 
 NearIT allows to engage app users by sending **context-aware targeted content**.
 
-[![CocoaPods](https://img.shields.io/cocoapods/v/NMSDK.svg)]()
-[![CocoaPods](https://img.shields.io/cocoapods/p/NMSDK.svg)]()
-[![CocoaPods](https://img.shields.io/cocoapods/l/NMSDK.svg)]()
+[![CocoaPods](https://img.shields.io/cocoapods/v/NearITSDK.svg)]()
+[![CocoaPods](https://img.shields.io/cocoapods/p/NearITSDK.svg)]()
+[![CocoaPods](https://img.shields.io/cocoapods/l/NearITSDK.svg)]()
 [![Documentation Status](https://readthedocs.org/projects/nearit-ios/badge/?version=latest)](http://nearit-ios.readthedocs.io/en/latest/?badge=latest)
 
 ## Recipes
@@ -31,4 +31,4 @@ Once the settings are configured, **everyone** - even people without technical s
 
 ## Integration guide
 
-For information on how to integrate all NearIT feautures in your app, visit the [documentation website](http://nearit-ios.readthedocs.io/en/3.0.0/?badge=latest)
+For information on how to integrate all NearIT feautures in your app, visit the [documentation website](http://nearit-ios.readthedocs.io/en/latest/)
