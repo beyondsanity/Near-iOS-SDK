@@ -99,4 +99,20 @@
     });
 }
 
+- (NITJSONAPI *)makeTimestampsResponseWithTimeInterval:(NSTimeInterval)timeInterval {
+    NITJSONAPI *json = [[NITJSONAPI alloc] init];
+    
+    NITJSONAPIResource *recipes = [[NITJSONAPIResource alloc] init];
+    recipes.type = @"timestamps";
+    recipes.ID = @"recipes-e3ef7882-c76e-4a9b-a91a-b65a40ab81a1";
+    
+    [recipes addAttributeObject:@"my-app-id" forKey:@"app_id"];
+    [recipes addAttributeObject:@"recipes" forKey:@"what"];
+    [recipes addAttributeObject:[NSNumber numberWithDouble:timeInterval] forKey:@"time"];
+    
+    [json setDataWithResourceObject:recipes];
+    
+    return json;
+}
+
 @end

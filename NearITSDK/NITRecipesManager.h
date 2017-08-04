@@ -16,8 +16,10 @@
 @class NITTrackManager;
 @class NITRecipeHistory;
 @class NITRecipeValidationFilter;
+@class NITDateManager;
 
 extern NSString* _Nonnull const RecipesCacheKey;
+extern NSString* _Nonnull const RecipesLastEditedTimeCacheKey;
 
 @protocol NITRecipesManaging <NSObject>
 
@@ -32,10 +34,11 @@ extern NSString* _Nonnull const RecipesCacheKey;
 
 @property (nonatomic, strong) id<NITManaging> _Nullable manager;
 
-- (instancetype _Nonnull)initWithCacheManager:(NITCacheManager* _Nonnull)cacheManager networkManager:(id<NITNetworkManaging> _Nonnull)networkManager configuration:(NITConfiguration* _Nonnull)configuration trackManager:(NITTrackManager* _Nonnull)trackManager recipeHistory:(NITRecipeHistory* _Nonnull)recipeHistory recipeValidationFilter:(NITRecipeValidationFilter* _Nonnull)recipeValidationFilter;
+- (instancetype _Nonnull)initWithCacheManager:(NITCacheManager* _Nonnull)cacheManager networkManager:(id<NITNetworkManaging> _Nonnull)networkManager configuration:(NITConfiguration* _Nonnull)configuration trackManager:(NITTrackManager* _Nonnull)trackManager recipeHistory:(NITRecipeHistory* _Nonnull)recipeHistory recipeValidationFilter:(NITRecipeValidationFilter* _Nonnull)recipeValidationFilter dateManager:(NITDateManager* _Nonnull)dateManager;
 
 - (void)refreshConfigWithCompletionHandler:(void (^_Nullable)(NSError * _Nullable error))completionHandler;
 - (void)recipesWithCompletionHandler:(void (^_Nullable)(NSArray<NITRecipe*>* _Nullable recipes, NSError * _Nullable error))completionHandler;
+- (void)refreshConfigCheckTimeWithCompletionHandler:(void (^_Nullable)(NSError * _Nullable error))completionHandler;
 - (void)processRecipe:(NSString* _Nonnull)recipeId;
 - (void)processRecipe:(NSString* _Nonnull)recipeId completion:(void (^_Nullable)(NITRecipe * _Nullable recipe, NSError * _Nullable error))completionHandler;
 - (void)sendTrackingWithRecipeId:(NSString * _Nonnull)recipeId event:(NSString* _Nonnull)event;

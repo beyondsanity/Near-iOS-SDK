@@ -194,6 +194,10 @@ static NITNetworkProvider *sharedProvider;
     return request;
 }
 
+- (NSURLRequest *)timestamps {
+    return [self requestWithPath:[NSString stringWithFormat:@"/timestamps/%@", self.configuration.appId]];
+}
+
 // MARK: - Private functions
 
 - (NSDictionary*)buildCoreObject {

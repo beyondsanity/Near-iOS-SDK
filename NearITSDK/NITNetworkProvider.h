@@ -37,5 +37,6 @@
 - (NSURLRequest* _Nonnull)customJSONWithBundleId:(NSString* _Nonnull)bundleId;
 - (NSURLRequest* _Nonnull)customJSONs;
 - (NSURLRequest* _Nonnull)setUserDataWithJsonApi:(NITJSONAPI* _Nonnull)jsonApi profileId:(NSString* _Nonnull)profileId;
+- (NSURLRequest* _Nonnull)timestamps;
 
 @end

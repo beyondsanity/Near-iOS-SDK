@@ -12,6 +12,7 @@
 #import "NITImage.h"
 #import "NITCoupon.h"
 #import "NITJSONAPI.h"
+#import "NITJSONAPIResource.h"
 #import "NITFeedback.h"
 #import "NITConfiguration.h"
 #import "NITNetworkMockManger.h"
@@ -24,5 +25,6 @@
 - (NITJSONAPI*)jsonApiWithContentsOfFile:(NSString*)filename;
 - (NSDictionary*)jsonWithContentsOfFile:(NSString*)filename;
 - (void)executeOnClientRunLoopAfterDelay:(NSTimeInterval)delayInSeconds block:(dispatch_block_t)block;
+- (NITJSONAPI*)makeTimestampsResponseWithTimeInterval:(NSTimeInterval)timeInterval;
 
 @end

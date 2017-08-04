@@ -21,9 +21,11 @@
 #import "NITDateManager.h"
 #import "NITRecipeHistory.h"
 #import "NITRecipeValidationFilter.h"
+#import "NITTimestampsManager.h"
 
 #define LOGTAG @"RecipesManager"
 NSString* const RecipesCacheKey = @"Recipes";
+NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
 
 @interface NITRecipesManager()
 
@@ -34,12 +36,14 @@ NSString* const RecipesCacheKey = @"Recipes";
 @property (nonatomic, strong) NITTrackManager *trackManager;
 @property (nonatomic, strong) NITRecipeHistory *recipeHistory;
 @property (nonatomic, strong) NITRecipeValidationFilter *recipeValidationFilter;
+@property (nonatomic, strong) NITDateManager *dateManager;
+@property (nonatomic, strong) NSNumber *lastEditedTime;
 
 @end
 
 @implementation NITRecipesManager
 
-- (instancetype)initWithCacheManager:(NITCacheManager*)cacheManager networkManager:(id<NITNetworkManaging>)networkManager configuration:(NITConfiguration *)configuration trackManager:(NITTrackManager * _Nonnull)trackManager recipeHistory:(NITRecipeHistory * _Nonnull)recipeHistory recipeValidationFilter:(NITRecipeValidationFilter * _Nonnull)recipeValidationFilter {
+- (instancetype)initWithCacheManager:(NITCacheManager*)cacheManager networkManager:(id<NITNetworkManaging>)networkManager configuration:(NITConfiguration *)configuration trackManager:(NITTrackManager * _Nonnull)trackManager recipeHistory:(NITRecipeHistory * _Nonnull)recipeHistory recipeValidationFilter:(NITRecipeValidationFilter * _Nonnull)recipeValidationFilter dateManager:(NITDateManager * _Nonnull)dateManager {
     self = [super init];
     if (self) {
         self.cacheManager = cacheManager;
@@ -48,7 +52,9 @@ NSString* const RecipesCacheKey = @"Recipes";
         self.trackManager = trackManager;
         self.recipeHistory = recipeHistory;
         self.recipeValidationFilter = recipeValidationFilter;
+        self.dateManager = dateManager;
         self.recipes = [self.cacheManager loadArrayForKey:RecipesCacheKey];
+        self.lastEditedTime = [self.cacheManager loadNumberForKey:RecipesLastEditedTimeCacheKey];
     }
     return self;
 }
@@ -84,6 +90,27 @@ NSString* const RecipesCacheKey = @"Recipes";
     }];
 }
 
+- (void)refreshConfigCheckTimeWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler {
+    // TODO: Implementation
+    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] timestamps] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
+        if (error) {
+            [self refreshConfigWithCompletionHandler:^(NSError * _Nullable error) {
+                completionHandler(error);
+            }];
+        } else {
+            NITTimestampsManager *timestampsManager = [[NITTimestampsManager alloc] initWithJsonApi:json];
+            NSTimeInterval recipesTime = [timestampsManager timeForType:@"recipes"];
+            if (self.lastEditedTime == nil || recipesTime == TimestampInvalidTime || (recipesTime != TimestampInvalidTime && recipesTime > self.lastEditedTime.doubleValue)) {
+                [self refreshConfigWithCompletionHandler:^(NSError * _Nullable error) {
+                    completionHandler(error);
+                }];
+            } else {
+                completionHandler(nil);
+            }
+        }
+    }];
+}
+
 - (void)refreshRecipesWithJson:(NITJSONAPI*)json error:(NSError*)error completion:(void (^_Nullable)(NSError * _Nullable error))completionHandler {
     if (error) {
         NSArray<NITRecipe*> *cachedRecipes = [self.cacheManager loadArrayForKey:RecipesCacheKey];
@@ -98,6 +125,9 @@ NSString* const RecipesCacheKey = @"Recipes";
             }
         }
     } else {
+        NSDate *today = [self.dateManager currentDate];
+        self.lastEditedTime = [NSNumber numberWithDouble:[today timeIntervalSince1970]];
+        [self.cacheManager saveWithObject:self.lastEditedTime forKey:RecipesLastEditedTimeCacheKey];
         [json registerClass:[NITRecipe class] forType:@"recipes"];
         self.recipes = [json parseToArrayOfObjects];
         [self.cacheManager saveWithObject:self.recipes forKey:RecipesCacheKey];

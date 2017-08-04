@@ -171,7 +171,7 @@ static NITManager *defaultManager;
     NITCooldownValidator *cooldownValidator = [[NITCooldownValidator alloc] initWithRecipeHistory:recipeHistory dateManager:dateManager];
     NITScheduleValidator *scheduleValidator = [[NITScheduleValidator alloc] initWithDateManager:dateManager];
     NITRecipeValidationFilter *recipeValidationFilter = [[NITRecipeValidationFilter alloc] initWithValidators:@[cooldownValidator, scheduleValidator]];
-    return [[NITRecipesManager alloc] initWithCacheManager:cacheManager networkManager:networkManager configuration:configuration trackManager:trackManager recipeHistory:recipeHistory recipeValidationFilter:recipeValidationFilter];
+    return [[NITRecipesManager alloc] initWithCacheManager:cacheManager networkManager:networkManager configuration:configuration trackManager:trackManager recipeHistory:recipeHistory recipeValidationFilter:recipeValidationFilter dateManager:dateManager];
 }
 
 + (NITGeopolisManager*)makeGeopolisManagerWithNetworkManager:(id<NITNetworkManaging>)networkManager cacheManager:(NITCacheManager*)cacheManager configuration:(NITConfiguration*)configuration trackManager:(NITTrackManager*)trackManager {
@@ -210,7 +210,7 @@ static NITManager *defaultManager;
     }];
     
     dispatch_group_enter(group);
-    [self.recipesManager refreshConfigWithCompletionHandler:^(NSError * _Nullable error) {
+    [self.recipesManager refreshConfigCheckTimeWithCompletionHandler:^(NSError * _Nullable error) {
         if (error) {
             [errors addObject:error];
         }
