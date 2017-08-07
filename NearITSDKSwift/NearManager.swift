@@ -22,7 +22,6 @@ public protocol NearManagerDelegate {
 
 public final class NearManager: NSObject, NITManagerDelegate {
     
-    private static var nearManager: NearManager!
     private var manager: NITManager!
     public var delegate: NearManagerDelegate?
     public var profileId: String? {
@@ -38,20 +37,12 @@ public final class NearManager: NSObject, NITManagerDelegate {
             manager.showBackgroundNotification = show
         }
     }
-    public class var shared: NearManager {
-        get {
-            let lock = NSLock()
-            if lock.try() {
-                if nearManager == nil {
-                    nearManager = NearManager()
-                    nearManager.manager = NITManager.default()
-                    nearManager.manager.delegate = nearManager
-                }
-                lock.unlock()
-            }
-            return nearManager
-        }
-    }
+    public static let shared: NearManager = {
+        let nearManager = NearManager()
+        nearManager.manager = NITManager.default()
+        nearManager.manager.delegate = nearManager
+        return nearManager
+    }()
     
     public class func setup(apiKey: String) {
         NITManager.setup(withApiKey: apiKey)

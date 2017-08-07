@@ -121,12 +121,16 @@ When `eventWithContent` gets called you will obtain the recipe and the content b
 
 Content is an object which contains the useful data, it could have several class types:
 
+- `NITSimpleNotification` instance representing the simple notification
 - `NITContent` instance representing the rich content if any
 - `NITCustomJSON` instance representing the custom object if any
 - `NITCoupon` instance representig the coupon if any
 - `NITFeedback` instance representing the feedback request if any
 
 ## Content classes
+
+- `NITSimpleNotification` for the simple notification, with the following attributes:
+    - `message` returns the notification message
 
 - `NITContent` for the notification with content, with the following attributes:
     - `content` returns the text content, without processing the html
