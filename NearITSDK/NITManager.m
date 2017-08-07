@@ -176,7 +176,8 @@ static NITManager *defaultManager;
 
 + (NITGeopolisManager*)makeGeopolisManagerWithNetworkManager:(id<NITNetworkManaging>)networkManager cacheManager:(NITCacheManager*)cacheManager configuration:(NITConfiguration*)configuration trackManager:(NITTrackManager*)trackManager {
     NITGeopolisNodesManager *nodesManager = [[NITGeopolisNodesManager alloc] init];
-    NITGeopolisManager *geopolisManager = [[NITGeopolisManager alloc] initWithNodesManager:nodesManager cachaManager:cacheManager networkManager:networkManager configuration:configuration trackManager:trackManager];
+    NITDateManager *dateManager = [[NITDateManager alloc] init];
+    NITGeopolisManager *geopolisManager = [[NITGeopolisManager alloc] initWithNodesManager:nodesManager cachaManager:cacheManager networkManager:networkManager configuration:configuration trackManager:trackManager dateManager:dateManager];
     return geopolisManager;
 }
 
@@ -198,7 +199,7 @@ static NITManager *defaultManager;
     dispatch_group_t group = dispatch_group_create();
     
     dispatch_group_enter(group);
-    [self.geopolisManager refreshConfigWithCompletionHandler:^(NSError * _Nullable error) {
+    [self.geopolisManager refreshConfigCheckTimeWithCompletionHandler:^(NSError * _Nullable error) {
         if (error) {
             [errors addObject:error];
         } else {

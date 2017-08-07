@@ -17,6 +17,8 @@
 #import "NITJSONAPIResource.h"
 #import "NITJSONAPI.h"
 #import "NITNode.h"
+#import "NITBeaconNode.h"
+#import "NITGeofenceNode.h"
 #import "Constants.h"
 #import "NITBeaconProximityManager.h"
 #import "NITCacheManager.h"
@@ -36,6 +38,7 @@
 @property (nonatomic, strong) XCTestExpectation *recipesManagingExpectation;
 @property (nonatomic, strong) NITConfiguration *configuration;
 @property (nonatomic, strong) NITTrackManager *trackManager;
+@property (nonatomic, strong) NITDateManager *dateManager;
 
 @end
 
@@ -55,6 +58,7 @@
     self.trackManager = mock([NITTrackManager class]);
     self.recipesManagingId = nil;
     self.recipesManagingExpectation = nil;
+    self.dateManager = mock([NITDateManager class]);
 }
 
 - (void)tearDown {
@@ -434,7 +438,7 @@
         return nil;
     };
     
-    NITGeopolisManager *manager = [[NITGeopolisManager alloc] initWithNodesManager:nodesManager cachaManager:cacheManager networkManager:networkManager configuration:self.configuration trackManager:self.trackManager];
+    NITGeopolisManager *manager = [[NITGeopolisManager alloc] initWithNodesManager:nodesManager cachaManager:cacheManager networkManager:networkManager configuration:self.configuration trackManager:self.trackManager dateManager:self.dateManager];
     [given([cacheManager loadObjectForKey:@"GeopolisNodesJSON"]) willReturn:jsonApi];
     
     XCTestExpectation *geopolisExp = [self expectationWithDescription:@"Geopolis"];
@@ -457,7 +461,7 @@
         return nil;
     };
     
-    NITGeopolisManager *manager = [[NITGeopolisManager alloc] initWithNodesManager:nodesManager cachaManager:cacheManager networkManager:networkManager configuration:self.configuration trackManager:self.trackManager];
+    NITGeopolisManager *manager = [[NITGeopolisManager alloc] initWithNodesManager:nodesManager cachaManager:cacheManager networkManager:networkManager configuration:self.configuration trackManager:self.trackManager dateManager:self.dateManager];
     
     XCTestExpectation *geopolisExp = [self expectationWithDescription:@"Geopolis"];
     [manager refreshConfigWithCompletionHandler:^(NSError * _Nullable error) {
@@ -476,7 +480,7 @@
         return [self jsonApiWithContentsOfFile:@"beacon_areas_in_bg"];
     };
     
-    NITGeopolisManager *manager = [[NITGeopolisManager alloc] initWithNodesManager:nodesManager cachaManager:cacheManager networkManager:networkManager configuration:self.configuration trackManager:self.trackManager];
+    NITGeopolisManager *manager = [[NITGeopolisManager alloc] initWithNodesManager:nodesManager cachaManager:cacheManager networkManager:networkManager configuration:self.configuration trackManager:self.trackManager dateManager:self.dateManager];
     
     XCTestExpectation *geopolisExp = [self expectationWithDescription:@"Geopolis"];
     [manager refreshConfigWithCompletionHandler:^(NSError * _Nullable error) {
@@ -501,7 +505,7 @@
     
     NITTrackManager *trackManager = mock([NITTrackManager class]);
     
-    NITGeopolisManager *manager = [[NITGeopolisManager alloc] initWithNodesManager:nodesManager cachaManager:cacheManager networkManager:networkManager configuration:self.configuration trackManager:trackManager];
+    NITGeopolisManager *manager = [[NITGeopolisManager alloc] initWithNodesManager:nodesManager cachaManager:cacheManager networkManager:networkManager configuration:self.configuration trackManager:trackManager dateManager:self.dateManager];
     
     XCTestExpectation *geopolisExp = [self expectationWithDescription:@"Geopolis"];
     [manager refreshConfigWithCompletionHandler:^(NSError * _Nullable error) {
@@ -641,6 +645,121 @@
     XCTAssertTrue([beaconProximity proximityWithBeaconIdentifier:@"beacon4" regionIdentifier:region1] == CLProximityFar);
 }
 
+// MARK: - Timestamp geopolis refresh
+
+- (void)testGeopolisCheckTimeEmptyCache {
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSString *path = [bundle pathForResource:@"beacon_areas_in_bg" ofType:@"json"];
+    NITJSONAPI *jsonApi = [[NITJSONAPI alloc ] initWithContentsOfFile:path error:nil];
+    NSTimeInterval time = 10000;
+    
+    NITGeopolisNodesManager *nodesManager = mock([NITGeopolisNodesManager class]);
+    NITCacheManager *cacheManager = mock([NITCacheManager class]);
+    NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
+    [networkManager setMock:^NITJSONAPI *(NSURLRequest *request) {
+        if ([request.URL.absoluteString containsString:@"/nodes"]) {
+            return jsonApi;
+        }
+        return nil;
+    } forKey:@"recipes"];
+    [networkManager setMock:^NITJSONAPI *(NSURLRequest *request) {
+        if ([request.URL.absoluteString containsString:@"/timestamps"]) {
+            return [self makeTimestampsResponseWithTimeInterval:time];
+        }
+        return nil;
+    } forKey:@"timestamps"];
+    
+    NITGeopolisManager *manager = [[NITGeopolisManager alloc] initWithNodesManager:nodesManager cachaManager:cacheManager networkManager:networkManager configuration:self.configuration trackManager:self.trackManager dateManager:self.dateManager];
+    [verifyCount(cacheManager, times(1)) loadObjectForKey:NodeJSONCacheKey];
+    [verifyCount(cacheManager, times(1)) loadNumberForKey:NodeLastEditedTimeCacheKey];
+    
+    [manager refreshConfigCheckTimeWithCompletionHandler:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [verifyCount(cacheManager, times(1)) saveWithObject:anything() forKey:NodeJSONCacheKey];
+        [verifyCount(cacheManager, times(1)) saveWithObject:anything() forKey:NodeLastEditedTimeCacheKey];
+    }];
+}
+
+- (void)testRecipesCheckTimeCacheIsUpdated {
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSString *path = [bundle pathForResource:@"beacon_areas_in_bg" ofType:@"json"];
+    NITJSONAPI *jsonApi = [[NITJSONAPI alloc ] initWithContentsOfFile:path error:nil];
+    [jsonApi registerClass:[NITGeofenceNode class] forType:@"geofence_nodes"];
+    [jsonApi registerClass:[NITBeaconNode class] forType:@"beacon_nodes"];
+    
+    NSArray<NITNode*> *nodes = [jsonApi parseToArrayOfObjects];
+    NITCacheManager *cacheManager = mock([NITCacheManager class]);
+    [given([cacheManager loadArrayForKey:NodeJSONCacheKey]) willReturn:nodes];
+    
+    NSTimeInterval time = 10000;
+    [given([cacheManager loadNumberForKey:NodeLastEditedTimeCacheKey]) willReturn:[NSNumber numberWithDouble:time + 10]];
+    
+    NITGeopolisNodesManager *nodesManager = mock([NITGeopolisNodesManager class]);
+    NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
+    [networkManager setMock:^NITJSONAPI *(NSURLRequest *request) {
+        if ([request.URL.absoluteString containsString:@"/nodes"]) {
+            return jsonApi;
+        }
+        return nil;
+    } forKey:@"recipes"];
+    [networkManager setMock:^NITJSONAPI *(NSURLRequest *request) {
+        if ([request.URL.absoluteString containsString:@"/timestamps"]) {
+            return [self makeTimestampsResponseWithTimeInterval:time];
+        }
+        return nil;
+    } forKey:@"timestamps"];
+    
+    NITGeopolisManager *manager = [[NITGeopolisManager alloc] initWithNodesManager:nodesManager cachaManager:cacheManager networkManager:networkManager configuration:self.configuration trackManager:self.trackManager dateManager:self.dateManager];
+    [verifyCount(cacheManager, times(1)) loadObjectForKey:NodeJSONCacheKey];
+    [verifyCount(cacheManager, times(1)) loadNumberForKey:NodeLastEditedTimeCacheKey];
+    
+    [manager refreshConfigCheckTimeWithCompletionHandler:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [verifyCount(cacheManager, never()) saveWithObject:anything() forKey:NodeJSONCacheKey];
+        [verifyCount(cacheManager, never()) saveWithObject:anything() forKey:NodeLastEditedTimeCacheKey];
+    }];
+}
+
+- (void)testRecipesCheckTimeCacheIsOld {
+    NSBundle *bundle = [NSBundle bundleForClass:[self class]];
+    NSString *path = [bundle pathForResource:@"beacon_areas_in_bg" ofType:@"json"];
+    NITJSONAPI *jsonApi = [[NITJSONAPI alloc ] initWithContentsOfFile:path error:nil];
+    [jsonApi registerClass:[NITGeofenceNode class] forType:@"geofence_nodes"];
+    [jsonApi registerClass:[NITBeaconNode class] forType:@"beacon_nodes"];
+    
+    NSArray<NITNode*> *nodes = [jsonApi parseToArrayOfObjects];
+    NITCacheManager *cacheManager = mock([NITCacheManager class]);
+    [given([cacheManager loadArrayForKey:NodeJSONCacheKey]) willReturn:nodes];
+    
+    NSTimeInterval time = 10000;
+    [given([cacheManager loadNumberForKey:NodeLastEditedTimeCacheKey]) willReturn:[NSNumber numberWithDouble:time - 10]];
+    
+    NITGeopolisNodesManager *nodesManager = mock([NITGeopolisNodesManager class]);
+    NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
+    [networkManager setMock:^NITJSONAPI *(NSURLRequest *request) {
+        if ([request.URL.absoluteString containsString:@"/nodes"]) {
+            return jsonApi;
+        }
+        return nil;
+    } forKey:@"recipes"];
+    [networkManager setMock:^NITJSONAPI *(NSURLRequest *request) {
+        if ([request.URL.absoluteString containsString:@"/timestamps"]) {
+            return [self makeTimestampsResponseWithTimeInterval:time];
+        }
+        return nil;
+    } forKey:@"timestamps"];
+    
+    NITGeopolisManager *manager = [[NITGeopolisManager alloc] initWithNodesManager:nodesManager cachaManager:cacheManager networkManager:networkManager configuration:self.configuration trackManager:self.trackManager dateManager:self.dateManager];
+    [verifyCount(cacheManager, times(1)) loadObjectForKey:NodeJSONCacheKey];
+    [verifyCount(cacheManager, times(1)) loadNumberForKey:NodeLastEditedTimeCacheKey];
+    
+    [manager refreshConfigCheckTimeWithCompletionHandler:^(NSError * _Nullable error) {
+        XCTAssertNil(error);
+        [verifyCount(cacheManager, times(1)) saveWithObject:anything() forKey:NodeJSONCacheKey];
+        [verifyCount(cacheManager, times(1)) saveWithObject:anything() forKey:NodeLastEditedTimeCacheKey];
+    }];
+}
+
 // MARK: - Test gotPulse
 
 - (void)testGotPulse {
@@ -655,7 +774,7 @@
     };
     NITRecipesManager *recipeManager = mock([NITRecipesManager class]);
     
-    NITGeopolisManager *geopolisManager = [[NITGeopolisManager alloc] initWithNodesManager:nodesManager cachaManager:cacheManager networkManager:networkManager configuration:self.configuration trackManager:self.trackManager];
+    NITGeopolisManager *geopolisManager = [[NITGeopolisManager alloc] initWithNodesManager:nodesManager cachaManager:cacheManager networkManager:networkManager configuration:self.configuration trackManager:self.trackManager dateManager:self.dateManager];
     geopolisManager.recipesManager = recipeManager;
     
     // Check pulseBundle

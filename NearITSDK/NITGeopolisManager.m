@@ -23,6 +23,8 @@
 #import "NITGeopolisNodesManager.h"
 #import "NITTrackManager.h"
 #import "NITGeopolisRadar.h"
+#import "NITTimestampsManager.h"
+#import "NITDateManager.h"
 #import <CoreLocation/CoreLocation.h>
 
 #define LOGTAG @"GeopolisManager"
@@ -31,43 +33,54 @@
 NSErrorDomain const NITGeopolisErrorDomain = @"com.nearit.geopolis";
 NSString* const NodeKey = @"node";
 NSString* const NodeJSONCacheKey = @"GeopolisNodesJSON";
+NSString* const NodeLastEditedTimeCacheKey = @"GeopolisNodesLastEditedTime";
 
 @interface NITGeopolisManager()<CLLocationManagerDelegate, NITGeopolisRadarDelegate>
 
 @property (nonatomic, strong) NITGeopolisNodesManager *nodesManager;
 @property (nonatomic, strong) NITCacheManager *cacheManager;
 @property (nonatomic, strong) NITConfiguration *configuration;
-@property (nonatomic, strong) id<NITNetworkManaging> networkManaeger;
+@property (nonatomic, strong) id<NITNetworkManaging> networkManager;
 @property (nonatomic, strong) NITTrackManager *trackManager;
 @property (nonatomic, strong) NITBeaconProximityManager *beaconProximity;
 @property (nonatomic, strong) NITNode *currentNode;
 @property (nonatomic, strong) NSString *pluginName;
 @property (nonatomic, strong) NITNetworkProvider *provider;
 @property (nonatomic, strong) NITGeopolisRadar *radar;
+@property (nonatomic, strong) NITDateManager *dateManager;
+@property (nonatomic, strong) NSNumber *lastEditedTime;
 
 @end
 
 @implementation NITGeopolisManager
 
-- (instancetype)initWithNodesManager:(NITGeopolisNodesManager*)nodesManager cachaManager:(NITCacheManager*)cacheManager networkManager:(id<NITNetworkManaging>)networkManager configuration:(NITConfiguration*)configuration trackManager:(NITTrackManager *)trackManager {
+- (instancetype)initWithNodesManager:(NITGeopolisNodesManager*)nodesManager cachaManager:(NITCacheManager*)cacheManager networkManager:(id<NITNetworkManaging>)networkManager configuration:(NITConfiguration*)configuration trackManager:(NITTrackManager *)trackManager dateManager:(NITDateManager * _Nonnull)dateManager {
     self = [super init];
     if (self) {
         self.nodesManager = nodesManager;
         self.cacheManager = cacheManager;
-        self.networkManaeger = networkManager;
+        self.networkManager = networkManager;
         self.trackManager = trackManager;
         self.configuration = configuration;
+        self.dateManager = dateManager;
         self.pluginName = @"geopolis";
         self.beaconProximity = [[NITBeaconProximityManager alloc] init];
         
         CLLocationManager *locationManager = [[CLLocationManager alloc] init];
         self.radar = [[NITGeopolisRadar alloc] initWithDelegate:self nodesManager:self.nodesManager locationManager:locationManager beaconProximityManager:self.beaconProximity];
+        
+        NITJSONAPI *jsonApi = [self.cacheManager loadObjectForKey:NodeJSONCacheKey];
+        if (jsonApi) {
+            [self.nodesManager setNodesWithJsonApi:jsonApi];
+        }
+        
+        self.lastEditedTime = [self.cacheManager loadNumberForKey:NodeLastEditedTimeCacheKey];
     }
     return self;
 }
 
 - (void)refreshConfigWithCompletionHandler:(void (^)(NSError * _Nullable error))completionHandler {
-    [self.networkManaeger makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] geopolisNodes] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
+    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] geopolisNodes] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
         if (error) {
             NITJSONAPI *jsonApi = [self.cacheManager loadObjectForKey:NodeJSONCacheKey];
             if (jsonApi) {
@@ -77,9 +90,32 @@ NSString* const NodeJSONCacheKey = @"GeopolisNodesJSON";
                 completionHandler(error);
             }
         } else {
+            NSDate *today = [self.dateManager currentDate];
+            self.lastEditedTime = [NSNumber numberWithDouble:[today timeIntervalSince1970]];
+            [self.cacheManager saveWithObject:self.lastEditedTime forKey:NodeLastEditedTimeCacheKey];
             [self.nodesManager setNodesWithJsonApi:json];
             [self.cacheManager saveWithObject:json forKey:NodeJSONCacheKey];
             completionHandler(nil);
+        }
+    }];
+}
+
+- (void)refreshConfigCheckTimeWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler {
+    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] timestamps] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
+        if (error) {
+            [self refreshConfigWithCompletionHandler:^(NSError * _Nullable error) {
+                completionHandler(error);
+            }];
+        } else {
+            NITTimestampsManager *timestampsManager = [[NITTimestampsManager alloc] initWithJsonApi:json];
+            NSTimeInterval geopolisTime = [timestampsManager timeForType:@"geopolis"];
+            if (self.lastEditedTime == nil || geopolisTime == TimestampInvalidTime || (geopolisTime != TimestampInvalidTime && geopolisTime > self.lastEditedTime.doubleValue)) {
+                [self refreshConfigWithCompletionHandler:^(NSError * _Nullable error) {
+                    completionHandler(error);
+                }];
+            } else {
+                completionHandler(nil);
+            }
         }
     }];
 }

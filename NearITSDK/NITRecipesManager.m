@@ -91,7 +91,6 @@ NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
 }
 
 - (void)refreshConfigCheckTimeWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler {
-    // TODO: Implementation
     [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] timestamps] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
         if (error) {
             [self refreshConfigWithCompletionHandler:^(NSError * _Nullable error) {
