@@ -18,6 +18,7 @@
 
 #define LOGTAG @"GeopolisRadar"
 #define MAX_LOCATION_TIMER_RETRY 3
+static NSString *const restartLock = @"restartLock";
 
 @interface NITGeopolisRadar()<CLLocationManagerDelegate>
 
@@ -85,12 +86,10 @@
 }
 
 - (BOOL)restart {
-    NSLock *lock = [[NSLock alloc] init];
     BOOL start = NO;
-    if ([lock tryLock]) {
+    @synchronized (restartLock) {
         [self stop];
         start = [self start];
-        [lock unlock];
     }
     return start;
 }
