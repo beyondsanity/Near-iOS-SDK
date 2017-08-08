@@ -11,7 +11,6 @@
 #import "NITJSONAPI.h"
 #import "NITRecipe.h"
 #import "NITJSONAPIResource.h"
-#import "NITConfiguration.h"
 #import "NITCoupon.h"
 #import "NITConstants.h"
 #import "NITImage.h"
@@ -30,7 +29,6 @@
 
 @property (nonatomic, strong) NITCacheManager *cacheManager;
 @property (nonatomic, strong) id<NITNetworkManaging> networkManager;
-@property (nonatomic, strong) NITConfiguration *configuration;
 @property (nonatomic, strong) NITRecipeHistory *recipeHistory;
 @property (nonatomic, strong) NITRecipeValidationFilter *recipeValidationFilter;
 @property (nonatomic, strong) NITRecipeRepository *repository;
@@ -41,12 +39,11 @@
 
 @implementation NITRecipesManager
 
-- (instancetype)initWithCacheManager:(NITCacheManager*)cacheManager networkManager:(id<NITNetworkManaging>)networkManager configuration:(NITConfiguration *)configuration recipeHistory:(NITRecipeHistory * _Nonnull)recipeHistory recipeValidationFilter:(NITRecipeValidationFilter * _Nonnull)recipeValidationFilter repository:(NITRecipeRepository * _Nonnull)repository trackSender:(NITRecipeTrackSender * _Nonnull)trackSender evaluationBodyBuilder:(NITEvaluationBodyBuilder *)evaluationBodyBuilder {
+- (instancetype)initWithCacheManager:(NITCacheManager*)cacheManager networkManager:(id<NITNetworkManaging>)networkManager recipeHistory:(NITRecipeHistory * _Nonnull)recipeHistory recipeValidationFilter:(NITRecipeValidationFilter * _Nonnull)recipeValidationFilter repository:(NITRecipeRepository * _Nonnull)repository trackSender:(NITRecipeTrackSender * _Nonnull)trackSender evaluationBodyBuilder:(NITEvaluationBodyBuilder *)evaluationBodyBuilder {
     self = [super init];
     if (self) {
         self.cacheManager = cacheManager;
         self.networkManager = networkManager;
-        self.configuration = configuration;
         self.recipeHistory = recipeHistory;
         self.recipeValidationFilter = recipeValidationFilter;
         self.repository = repository;
