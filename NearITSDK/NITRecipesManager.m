@@ -22,6 +22,7 @@
 #import "NITTimestampsManager.h"
 #import "NITRecipeRepository.h"
 #import "NITRecipeTrackSender.h"
+#import "NITEvaluationBodyBuilder.h"
 
 #define LOGTAG @"RecipesManager"
 
@@ -34,12 +35,13 @@
 @property (nonatomic, strong) NITRecipeValidationFilter *recipeValidationFilter;
 @property (nonatomic, strong) NITRecipeRepository *repository;
 @property (nonatomic, strong) NITRecipeTrackSender *trackSender;
+@property (nonatomic, strong) NITEvaluationBodyBuilder *evaluationBodyBuilder;
 
 @end
 
 @implementation NITRecipesManager
 
-- (instancetype)initWithCacheManager:(NITCacheManager*)cacheManager networkManager:(id<NITNetworkManaging>)networkManager configuration:(NITConfiguration *)configuration recipeHistory:(NITRecipeHistory * _Nonnull)recipeHistory recipeValidationFilter:(NITRecipeValidationFilter * _Nonnull)recipeValidationFilter repository:(NITRecipeRepository * _Nonnull)repository trackSender:(NITRecipeTrackSender * _Nonnull)trackSender {
+- (instancetype)initWithCacheManager:(NITCacheManager*)cacheManager networkManager:(id<NITNetworkManaging>)networkManager configuration:(NITConfiguration *)configuration recipeHistory:(NITRecipeHistory * _Nonnull)recipeHistory recipeValidationFilter:(NITRecipeValidationFilter * _Nonnull)recipeValidationFilter repository:(NITRecipeRepository * _Nonnull)repository trackSender:(NITRecipeTrackSender * _Nonnull)trackSender evaluationBodyBuilder:(NITEvaluationBodyBuilder *)evaluationBodyBuilder {
     self = [super init];
     if (self) {
         self.cacheManager = cacheManager;
@@ -49,6 +51,7 @@
         self.recipeValidationFilter = recipeValidationFilter;
         self.repository = repository;
         self.trackSender = trackSender;
+        self.evaluationBodyBuilder = evaluationBodyBuilder;
     }
     return self;
 }
@@ -182,7 +185,7 @@
 }
 
 - (void)onlinePulseEvaluationWithPlugin:(NSString*)plugin action:(NSString*)action bundle:(NSString*)bundle {
-    NITJSONAPI *jsonApi = [self buildEvaluationBodyWithPlugin:plugin action:action bundle:bundle];
+    NITJSONAPI *jsonApi = [self.evaluationBodyBuilder buildEvaluationBodyWithPlugin:plugin action:action bundle:bundle];
     [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] onlinePulseEvaluationWithJsonApi:jsonApi] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
         if (json) {
             [self registerClassesWithJsonApi:json];
@@ -196,7 +199,7 @@
 }
 
 - (void)evaluateRecipeWithId:(NSString*)recipeId {
-    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] evaluateRecipeWithId:recipeId jsonApi:[self buildEvaluationBody]] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
+    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] evaluateRecipeWithId:recipeId jsonApi:[self.evaluationBodyBuilder buildEvaluationBody]] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
         if (json) {
             [self registerClassesWithJsonApi:json];
             NSArray<NITRecipe*> *recipes = [json parseToArrayOfObjects];
@@ -228,62 +231,6 @@
 
 - (NSInteger)recipesCount {
     return [self.repository.recipes count];
-}
-
-- (NITJSONAPI*)buildEvaluationBody {
-    return [self buildEvaluationBodyWithPlugin:nil action:nil bundle:nil];
-}
-
-- (NITJSONAPI*)buildEvaluationBodyWithPlugin:(NSString*)plugin action:(NSString*)action bundle:(NSString*)bundle {
-    NITJSONAPI *jsonApi = [[NITJSONAPI alloc] init];
-    NITJSONAPIResource *resource = [[NITJSONAPIResource alloc] init];
-    resource.type = @"evaluation";
-    [resource addAttributeObject:[self buildCoreObject] forKey:@"core"];
-    if(plugin) {
-        [resource addAttributeObject:plugin forKey:@"pulse_plugin_id"];
-    }
-    if(action) {
-        [resource addAttributeObject:action forKey:@"pulse_action_id"];
-    }
-    if(bundle) {
-        [resource addAttributeObject:bundle forKey:@"pulse_bundle_id"];
-    }
-    [jsonApi setDataWithResourceObject:resource];
-    return jsonApi;
-}
-
-- (NSDictionary*)buildCoreObject {
-    NITConfiguration *config = self.configuration;
-    NSMutableDictionary<NSString*, id> *core = [[NSMutableDictionary alloc] init];
-    if (config.appId && config.profileId && config.installationId) {
-        [core setObject:config.profileId forKey:@"profile_id"];
-        [core setObject:config.installationId forKey:@"installation_id"];
-        [core setObject:config.appId forKey:@"app_id"];
-        NSDate *now = [NSDate date];
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateFormat:@"XXX"];
-        NSString *hours = [dateFormatter stringFromDate:now];
-        [core setObject:hours forKey:@"utc_offset"];
-    }
-    if (self.recipeHistory) {
-        [core setObject:[self buildCooldownBlockWithRecipeCooler:self.recipeHistory] forKey:@"cooldown"];
-    }
-    return [NSDictionary dictionaryWithDictionary:core];
-}
-
-- (NSDictionary*)buildCooldownBlockWithRecipeCooler:(NITRecipeHistory*)recipeHistory {
-    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-    
-    NSNumber *latestLog = [recipeHistory latestLog];
-    if (latestLog) {
-        [dict setObject:latestLog forKey:@"last_notified_at"];
-    }
-    NSDictionary<NSString*, NSNumber*> *log = [recipeHistory log];
-    if (log) {
-        [dict setObject:log forKey:@"recipes_notified_at"];
-    }
-    
-    return [NSDictionary dictionaryWithDictionary:dict];
 }
 
 @end

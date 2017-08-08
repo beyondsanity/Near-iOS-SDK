@@ -17,6 +17,7 @@
 @class NITRecipeValidationFilter;
 @class NITRecipeRepository;
 @class NITRecipeTrackSender;
+@class NITEvaluationBodyBuilder;
 
 @protocol NITRecipesManaging <NSObject>
 
@@ -30,7 +31,7 @@
 
 @property (nonatomic, strong) id<NITManaging> _Nullable manager;
 
-- (instancetype _Nonnull)initWithCacheManager:(NITCacheManager* _Nonnull)cacheManager networkManager:(id<NITNetworkManaging> _Nonnull)networkManager configuration:(NITConfiguration* _Nonnull)configuration recipeHistory:(NITRecipeHistory* _Nonnull)recipeHistory recipeValidationFilter:(NITRecipeValidationFilter* _Nonnull)recipeValidationFilter repository:(NITRecipeRepository* _Nonnull)repository trackSender:(NITRecipeTrackSender* _Nonnull)trackSender;
+- (instancetype _Nonnull)initWithCacheManager:(NITCacheManager* _Nonnull)cacheManager networkManager:(id<NITNetworkManaging> _Nonnull)networkManager configuration:(NITConfiguration* _Nonnull)configuration recipeHistory:(NITRecipeHistory* _Nonnull)recipeHistory recipeValidationFilter:(NITRecipeValidationFilter* _Nonnull)recipeValidationFilter repository:(NITRecipeRepository* _Nonnull)repository trackSender:(NITRecipeTrackSender* _Nonnull)trackSender evaluationBodyBuilder:(NITEvaluationBodyBuilder* _Nonnull)evaluationBodyBuilder;
 
 - (void)refreshConfigWithCompletionHandler:(void (^_Nullable)(NSError * _Nullable error))completionHandler;
 - (void)recipesWithCompletionHandler:(void (^_Nullable)(NSArray<NITRecipe*>* _Nullable recipes, NSError * _Nullable error))completionHandler;
