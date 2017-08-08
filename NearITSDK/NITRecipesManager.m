@@ -23,6 +23,7 @@
 #import "NITRecipeValidationFilter.h"
 #import "NITTimestampsManager.h"
 #import "NITRecipeRepository.h"
+#import "NITRecipeTrackSender.h"
 
 #define LOGTAG @"RecipesManager"
 
@@ -36,12 +37,13 @@
 @property (nonatomic, strong) NITRecipeValidationFilter *recipeValidationFilter;
 @property (nonatomic, strong) NITDateManager *dateManager;
 @property (nonatomic, strong) NITRecipeRepository *repository;
+@property (nonatomic, strong) NITRecipeTrackSender *trackSender;
 
 @end
 
 @implementation NITRecipesManager
 
-- (instancetype)initWithCacheManager:(NITCacheManager*)cacheManager networkManager:(id<NITNetworkManaging>)networkManager configuration:(NITConfiguration *)configuration trackManager:(NITTrackManager * _Nonnull)trackManager recipeHistory:(NITRecipeHistory * _Nonnull)recipeHistory recipeValidationFilter:(NITRecipeValidationFilter * _Nonnull)recipeValidationFilter dateManager:(NITDateManager * _Nonnull)dateManager repository:(NITRecipeRepository * _Nonnull)repository {
+- (instancetype)initWithCacheManager:(NITCacheManager*)cacheManager networkManager:(id<NITNetworkManaging>)networkManager configuration:(NITConfiguration *)configuration trackManager:(NITTrackManager * _Nonnull)trackManager recipeHistory:(NITRecipeHistory * _Nonnull)recipeHistory recipeValidationFilter:(NITRecipeValidationFilter * _Nonnull)recipeValidationFilter dateManager:(NITDateManager * _Nonnull)dateManager repository:(NITRecipeRepository * _Nonnull)repository trackSender:(NITRecipeTrackSender * _Nonnull)trackSender {
     self = [super init];
     if (self) {
         self.cacheManager = cacheManager;
@@ -52,6 +54,7 @@
         self.recipeValidationFilter = recipeValidationFilter;
         self.dateManager = dateManager;
         self.repository = repository;
+        self.trackSender = trackSender;
     }
     return self;
 }
@@ -212,33 +215,7 @@
 }
 
 - (void)sendTrackingWithRecipeId:(NSString *)recipeId event:(NSString*)event {
-    if ([event isEqualToString:NITRecipeNotified]) {
-        [self.recipeHistory markRecipeAsShownWithId:recipeId];
-    }
-    
-    NITConfiguration *config = self.configuration;
-    NITJSONAPI *jsonApi = [[NITJSONAPI alloc] init];
-    NITJSONAPIResource *resource = [[NITJSONAPIResource alloc] init];
-    resource.type = @"trackings";
-    if (self.configuration.profileId && self.configuration.installationId && self.configuration.appId) {
-        [resource addAttributeObject:config.profileId forKey:@"profile_id"];
-        [resource addAttributeObject:config.installationId forKey:@"installation_id"];
-        [resource addAttributeObject:config.appId forKey:@"app_id"];
-    } else {
-        NITLogW(LOGTAG, @"Can't send geopolis tracking: missing data");
-        return;
-    }
-    [resource addAttributeObject:recipeId forKey:@"recipe_id"];
-    [resource addAttributeObject:event forKey:@"event"];
-    
-    NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
-    dateFormatter.dateFormat = ISO8601DateFormatMilliseconds;
-    [dateFormatter setTimeZone:[NSTimeZone timeZoneWithName:@"UTC"]];
-    [resource addAttributeObject:[dateFormatter stringFromDate:[NSDate date]] forKey:@"tracked_at"];
-    
-    [jsonApi setDataWithResourceObject:resource];
-    
-    [self.trackManager addTrackWithRequest:[[NITNetworkProvider sharedInstance] sendTrackingsWithJsonApi:jsonApi]];
+    [self.trackSender sendTrackingWithRecipeId:recipeId event:event];
 }
 
 - (void)gotRecipe:(NITRecipe*)recipe {
