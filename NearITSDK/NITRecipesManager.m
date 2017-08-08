@@ -22,10 +22,9 @@
 #import "NITRecipeHistory.h"
 #import "NITRecipeValidationFilter.h"
 #import "NITTimestampsManager.h"
+#import "NITRecipeRepository.h"
 
 #define LOGTAG @"RecipesManager"
-NSString* const RecipesCacheKey = @"Recipes";
-NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
 
 @interface NITRecipesManager()
 

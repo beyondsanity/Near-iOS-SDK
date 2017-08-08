@@ -18,9 +18,6 @@
 @class NITRecipeValidationFilter;
 @class NITDateManager;
 
-extern NSString* _Nonnull const RecipesCacheKey;
-extern NSString* _Nonnull const RecipesLastEditedTimeCacheKey;
-
 @protocol NITRecipesManaging <NSObject>
 
 - (void)setRecipesWithJsonApi:(NITJSONAPI* _Nullable)json;
