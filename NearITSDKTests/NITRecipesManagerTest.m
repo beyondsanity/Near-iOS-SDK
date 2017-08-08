@@ -15,8 +15,6 @@
 #import "NITNetworkMockManger.h"
 #import "NITConfiguration.h"
 #import "NITReachability.h"
-#import "NITTrackManager.h"
-#import "NITDateManager.h"
 #import "NITRecipeHistory.h"
 #import "NITRecipeValidationFilter.h"
 #import "NITPulseBundle.h"
@@ -29,11 +27,9 @@
 
 @property (nonatomic, strong) XCTestExpectation *expectation;
 @property (nonatomic, strong) NITReachability *reachability;
-@property (nonatomic, strong) NITDateManager *dateManager;
 @property (nonatomic, strong) NITRecipeHistory *recipeHistory;
 @property (nonatomic, strong) NITRecipeValidationFilter *recipeValidationFilter;
 @property (nonatomic, strong) NITCacheManager *cacheManager;
-@property (nonatomic, strong) NITTrackManager *trackManager;
 @property (nonatomic, strong) NITRecipeRepository *repository;
 @property (nonatomic, strong) NITRecipeTrackSender *trackSender;
 
@@ -46,12 +42,10 @@
     // Put setup code here. This method is called before the invocation of each test method in the class.
     self.reachability = mock([NITReachability class]);
     [given([self.reachability currentReachabilityStatus]) willReturnInteger:NotReachable];
-    self.dateManager = [[NITDateManager alloc] init];
     NITCacheManager *cacheManager = mock([NITCacheManager class]);
-    self.recipeHistory = [[NITRecipeHistory alloc] initWithCacheManager:cacheManager dateManager:self.dateManager];
+    self.recipeHistory = mock([NITRecipeHistory class]);
     self.recipeValidationFilter = mock([NITRecipeValidationFilter class]);
     self.cacheManager = mock([NITCacheManager class]);
-    self.trackManager = mock([NITTrackManager class]);
     self.repository = mock([NITRecipeRepository class]);
     self.trackSender = mock([NITRecipeTrackSender class]);
 }
@@ -66,7 +60,7 @@
     [given([self.cacheManager loadArrayForKey:RecipesCacheKey]) willReturn:nil];
     
     NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
-    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithCacheManager:self.cacheManager networkManager:networkManager configuration:[[NITConfiguration alloc] init] trackManager:self.trackManager recipeHistory:self.recipeHistory recipeValidationFilter:self.recipeValidationFilter dateManager:self.dateManager repository:self.repository trackSender:self.trackSender];
+    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithCacheManager:self.cacheManager networkManager:networkManager configuration:[[NITConfiguration alloc] init] recipeHistory:self.recipeHistory recipeValidationFilter:self.recipeValidationFilter  repository:self.repository trackSender:self.trackSender];
     [given([self.repository recipes]) willReturn:[self recipesFromJsonWithName:@"online_recipe"]];
     recipesManager.manager = self;
     
@@ -84,7 +78,7 @@
     [given([self.cacheManager loadArrayForKey:RecipesCacheKey]) willReturn:nil];
     
     NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
-    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithCacheManager:self.cacheManager networkManager:networkManager configuration:[[NITConfiguration alloc] init] trackManager:self.trackManager recipeHistory:self.recipeHistory recipeValidationFilter:self.recipeValidationFilter dateManager:self.dateManager repository:self.repository trackSender:self.trackSender];
+    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithCacheManager:self.cacheManager networkManager:networkManager configuration:[[NITConfiguration alloc] init] recipeHistory:self.recipeHistory recipeValidationFilter:self.recipeValidationFilter repository:self.repository trackSender:self.trackSender];
     [given([self.repository recipes]) willReturn:[self recipesFromJsonWithName:@"online_recipe"]];
     recipesManager.manager = self;
     
@@ -99,7 +93,7 @@
 
 - (void)testGotPulseBundleNoMatching {
     NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
-    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithCacheManager:self.cacheManager networkManager:networkManager configuration:[[NITConfiguration alloc] init] trackManager:self.trackManager recipeHistory:self.recipeHistory recipeValidationFilter:self.recipeValidationFilter dateManager:self.dateManager repository:self.repository trackSender:self.trackSender];
+    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithCacheManager:self.cacheManager networkManager:networkManager configuration:[[NITConfiguration alloc] init] recipeHistory:self.recipeHistory recipeValidationFilter:self.recipeValidationFilter repository:self.repository trackSender:self.trackSender];
     [given([self.repository recipes]) willReturn:[self recipesFromJsonWithName:@"recipes"]];
     
     networkManager.mock = ^NITJSONAPI *(NSURLRequest *request) {
@@ -115,7 +109,7 @@
 
 - (void)testGotPulseBundleMatchingWithValidation {
     NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
-    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithCacheManager:self.cacheManager networkManager:networkManager configuration:[[NITConfiguration alloc] init] trackManager:self.trackManager recipeHistory:self.recipeHistory recipeValidationFilter:self.recipeValidationFilter dateManager:self.dateManager repository:self.repository trackSender:self.trackSender];
+    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithCacheManager:self.cacheManager networkManager:networkManager configuration:[[NITConfiguration alloc] init] recipeHistory:self.recipeHistory recipeValidationFilter:self.recipeValidationFilter repository:self.repository trackSender:self.trackSender];
     [given([self.repository recipes]) willReturn:[self recipesFromJsonWithName:@"recipes"]];
     
     networkManager.mock = ^NITJSONAPI *(NSURLRequest *request) {

@@ -21,7 +21,7 @@
 @class NITDateManager;
 
 extern NSString* _Nonnull const NodeLastEditedTimeCacheKey;
-extern NSString* const NodeJSONCacheKey;
+extern NSString* _Nonnull const NodeJSONCacheKey;
 
 @interface NITGeopolisManager : NSObject
 

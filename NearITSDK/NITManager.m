@@ -175,7 +175,7 @@ static NITManager *defaultManager;
     NITRecipeValidationFilter *recipeValidationFilter = [[NITRecipeValidationFilter alloc] initWithValidators:@[cooldownValidator, scheduleValidator]];
     NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:cacheManager networkManager:networkManager dateManager:dateManager configuration:configuration recipeHistory:recipeHistory];
     NITRecipeTrackSender *trackSender = [[NITRecipeTrackSender alloc] initWithConfiguration:configuration history:recipeHistory trackManager:trackManager dateManager:dateManager];
-    return [[NITRecipesManager alloc] initWithCacheManager:cacheManager networkManager:networkManager configuration:configuration trackManager:trackManager recipeHistory:recipeHistory recipeValidationFilter:recipeValidationFilter dateManager:dateManager repository:repository trackSender:trackSender];
+    return [[NITRecipesManager alloc] initWithCacheManager:cacheManager networkManager:networkManager configuration:configuration recipeHistory:recipeHistory recipeValidationFilter:recipeValidationFilter repository:repository trackSender:trackSender];
 }
 
 + (NITGeopolisManager*)makeGeopolisManagerWithNetworkManager:(id<NITNetworkManaging>)networkManager cacheManager:(NITCacheManager*)cacheManager configuration:(NITConfiguration*)configuration trackManager:(NITTrackManager*)trackManager {

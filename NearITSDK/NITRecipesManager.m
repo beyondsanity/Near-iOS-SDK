@@ -17,8 +17,6 @@
 #import "NITImage.h"
 #import "NITClaim.h"
 #import "NITCacheManager.h"
-#import "NITTrackManager.h"
-#import "NITDateManager.h"
 #import "NITRecipeHistory.h"
 #import "NITRecipeValidationFilter.h"
 #import "NITTimestampsManager.h"
@@ -32,10 +30,8 @@
 @property (nonatomic, strong) NITCacheManager *cacheManager;
 @property (nonatomic, strong) id<NITNetworkManaging> networkManager;
 @property (nonatomic, strong) NITConfiguration *configuration;
-@property (nonatomic, strong) NITTrackManager *trackManager;
 @property (nonatomic, strong) NITRecipeHistory *recipeHistory;
 @property (nonatomic, strong) NITRecipeValidationFilter *recipeValidationFilter;
-@property (nonatomic, strong) NITDateManager *dateManager;
 @property (nonatomic, strong) NITRecipeRepository *repository;
 @property (nonatomic, strong) NITRecipeTrackSender *trackSender;
 
@@ -43,16 +39,14 @@
 
 @implementation NITRecipesManager
 
-- (instancetype)initWithCacheManager:(NITCacheManager*)cacheManager networkManager:(id<NITNetworkManaging>)networkManager configuration:(NITConfiguration *)configuration trackManager:(NITTrackManager * _Nonnull)trackManager recipeHistory:(NITRecipeHistory * _Nonnull)recipeHistory recipeValidationFilter:(NITRecipeValidationFilter * _Nonnull)recipeValidationFilter dateManager:(NITDateManager * _Nonnull)dateManager repository:(NITRecipeRepository * _Nonnull)repository trackSender:(NITRecipeTrackSender * _Nonnull)trackSender {
+- (instancetype)initWithCacheManager:(NITCacheManager*)cacheManager networkManager:(id<NITNetworkManaging>)networkManager configuration:(NITConfiguration *)configuration recipeHistory:(NITRecipeHistory * _Nonnull)recipeHistory recipeValidationFilter:(NITRecipeValidationFilter * _Nonnull)recipeValidationFilter repository:(NITRecipeRepository * _Nonnull)repository trackSender:(NITRecipeTrackSender * _Nonnull)trackSender {
     self = [super init];
     if (self) {
         self.cacheManager = cacheManager;
         self.networkManager = networkManager;
         self.configuration = configuration;
-        self.trackManager = trackManager;
         self.recipeHistory = recipeHistory;
         self.recipeValidationFilter = recipeValidationFilter;
-        self.dateManager = dateManager;
         self.repository = repository;
         self.trackSender = trackSender;
     }
