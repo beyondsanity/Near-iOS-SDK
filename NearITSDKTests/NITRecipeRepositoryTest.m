@@ -14,6 +14,7 @@
 #import "NITNetworkMockManger.h"
 #import "NITDateManager.h"
 #import "NITRecipeHistory.h"
+#import "NITEvaluationBodyBuilder.h"
 #import <OCMockitoIOS/OCMockitoIOS.h>
 #import <OCHamcrestIOS/OCHamcrestIOS.h>
 
@@ -24,6 +25,7 @@
 @property (nonatomic, strong) NITDateManager *dateManager;
 @property (nonatomic, strong) NITConfiguration *configuration;
 @property (nonatomic, strong) NITRecipeHistory *recipeHistory;
+@property (nonatomic, strong) NITEvaluationBodyBuilder *evaluationBodyBuilder;
 
 @end
 
@@ -38,6 +40,8 @@
     self.dateManager = mock([NITDateManager class]);
     self.configuration = mock([NITConfiguration class]);
     self.recipeHistory = mock([NITRecipeHistory class]);
+    self.evaluationBodyBuilder = mock([NITEvaluationBodyBuilder class]);
+    [given([self.evaluationBodyBuilder buildEvaluationBody]) willReturn:[self simpleJsonApi]];
 }
 
 - (void)tearDown {
@@ -57,7 +61,7 @@
     self.networkManager.mock = ^NITJSONAPI *(NSURLRequest *request) {
         return nil;
     };
-    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:self.networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory];
+    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:self.networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory evaluationBodyBuilder:self.evaluationBodyBuilder];
     [verifyCount(self.cacheManager, times(1)) loadArrayForKey:RecipesCacheKey];
     
     XCTestExpectation *recipesExp = [self expectationWithDescription:@"Recipes"];
@@ -79,7 +83,7 @@
         return recipesJson;
     };
     
-    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:self.networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory];
+    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:self.networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory evaluationBodyBuilder:self.evaluationBodyBuilder];
     [verifyCount(self.cacheManager, times(1)) loadArrayForKey:RecipesCacheKey];
     
     XCTestExpectation *exp = [self expectationWithDescription:@"Recipes"];
@@ -102,7 +106,7 @@
         return recipesJson;
     };
     
-    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:self.networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory];
+    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:self.networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory evaluationBodyBuilder:self.evaluationBodyBuilder];
     [verifyCount(self.cacheManager, times(1)) loadArrayForKey:RecipesCacheKey];
     
     XCTestExpectation *exp = [self expectationWithDescription:@"Recipes"];
@@ -125,7 +129,7 @@
     [self setNetworkMockForRecipesProcessWithJsonApi:recipesJson networkManager:networkManager];
     [self setNetworkMockForTimestampsWithTime:time networkManager:networkManager];
     
-    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory];
+    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory evaluationBodyBuilder:self.evaluationBodyBuilder];
     [verifyCount(self.cacheManager, times(1)) loadArrayForKey:RecipesCacheKey];
     [verifyCount(self.cacheManager, times(1)) loadNumberForKey:RecipesLastEditedTimeCacheKey];
     
@@ -149,7 +153,7 @@
     [self setNetworkMockForRecipesProcessWithJsonApi:recipesJson networkManager:networkManager];
     [self setNetworkMockForTimestampsWithTime:time networkManager:networkManager];
     
-    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory];
+    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory evaluationBodyBuilder:self.evaluationBodyBuilder];
     
     [repository refreshConfigCheckTimeWithCompletionHandler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
@@ -171,7 +175,7 @@
     [self setNetworkMockForRecipesProcessWithJsonApi:recipesJson networkManager:networkManager];
     [self setNetworkMockForTimestampsWithTime:time networkManager:networkManager];
     
-    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory];
+    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory evaluationBodyBuilder:self.evaluationBodyBuilder];
     
     [repository refreshConfigCheckTimeWithCompletionHandler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
@@ -199,6 +203,5 @@
         return nil;
     } forKey:@"timestamps"];
 }
-
 
 @end

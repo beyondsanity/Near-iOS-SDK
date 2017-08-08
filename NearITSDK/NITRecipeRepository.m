@@ -16,6 +16,7 @@
 #import "NITTimestampsManager.h"
 #import "NITConfiguration.h"
 #import "NITRecipeHistory.h"
+#import "NITEvaluationBodyBuilder.h"
 
 NSString* const RecipesCacheKey = @"Recipes";
 NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
@@ -28,13 +29,14 @@ NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
 @property (nonatomic, strong) NITDateManager *dateManager;
 @property (nonatomic, strong) NITConfiguration *configuration;
 @property (nonatomic, strong) NITRecipeHistory *recipeHistory;
+@property (nonatomic, strong) NITEvaluationBodyBuilder *evaluationBodyBuilder;
 @property (nonatomic) NSTimeInterval lastEditedTime;
 
 @end
 
 @implementation NITRecipeRepository
 
-- (instancetype)initWithCacheManager:(NITCacheManager *)cacheManager networkManager:(id<NITNetworkManaging>)networkManager dateManager:(NITDateManager *)dateManager configuration:(NITConfiguration *)configuration recipeHistory:(NITRecipeHistory * _Nonnull)recipeHistory {
+- (instancetype)initWithCacheManager:(NITCacheManager *)cacheManager networkManager:(id<NITNetworkManaging>)networkManager dateManager:(NITDateManager *)dateManager configuration:(NITConfiguration *)configuration recipeHistory:(NITRecipeHistory * _Nonnull)recipeHistory evaluationBodyBuilder:(NITEvaluationBodyBuilder * _Nonnull)evaluationBodyBuilder {
     self = [super init];
     if (self) {
         self.cacheManager = cacheManager;
@@ -42,6 +44,7 @@ NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
         self.dateManager = dateManager;
         self.configuration = configuration;
         self.recipeHistory = recipeHistory;
+        self.evaluationBodyBuilder = evaluationBodyBuilder;
         self.recipes = [self.cacheManager loadArrayForKey:RecipesCacheKey];
         NSNumber *time = [self.cacheManager loadNumberForKey:RecipesLastEditedTimeCacheKey];
         if (time) {
@@ -63,7 +66,7 @@ NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
 }
 
 - (void)refreshConfigWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler {
-    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] recipesProcessListWithJsonApi:[self buildEvaluationBody]] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
+    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] recipesProcessListWithJsonApi:[self.evaluationBodyBuilder buildEvaluationBody]] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
         if (error) {
             NSArray<NITRecipe*> *cachedRecipes = [self.cacheManager loadArrayForKey:RecipesCacheKey];
             if (cachedRecipes) {
@@ -91,7 +94,7 @@ NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
 }
 
 - (void)recipesWithCompletionHandler:(void (^)(NSArray<NITRecipe *> * _Nullable, NSError * _Nullable))completionHandler {
-    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] recipesProcessListWithJsonApi:[self buildEvaluationBody]] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
+    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] recipesProcessListWithJsonApi:[self.evaluationBodyBuilder buildEvaluationBody]] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
         if (error) {
             if (completionHandler) {
                 completionHandler(nil, error);
@@ -123,64 +126,6 @@ NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
             }
         }
     }];
-}
-
-// MARK: - Evaluation body
-
-- (NITJSONAPI*)buildEvaluationBody {
-    return [self buildEvaluationBodyWithPlugin:nil action:nil bundle:nil];
-}
-
-- (NITJSONAPI*)buildEvaluationBodyWithPlugin:(NSString*)plugin action:(NSString*)action bundle:(NSString*)bundle {
-    NITJSONAPI *jsonApi = [[NITJSONAPI alloc] init];
-    NITJSONAPIResource *resource = [[NITJSONAPIResource alloc] init];
-    resource.type = @"evaluation";
-    [resource addAttributeObject:[self buildCoreObject] forKey:@"core"];
-    if(plugin) {
-        [resource addAttributeObject:plugin forKey:@"pulse_plugin_id"];
-    }
-    if(action) {
-        [resource addAttributeObject:action forKey:@"pulse_action_id"];
-    }
-    if(bundle) {
-        [resource addAttributeObject:bundle forKey:@"pulse_bundle_id"];
-    }
-    [jsonApi setDataWithResourceObject:resource];
-    return jsonApi;
-}
-
-- (NSDictionary*)buildCoreObject {
-    NITConfiguration *config = self.configuration;
-    NSMutableDictionary<NSString*, id> *core = [[NSMutableDictionary alloc] init];
-    if (config.appId && config.profileId && config.installationId) {
-        [core setObject:config.profileId forKey:@"profile_id"];
-        [core setObject:config.installationId forKey:@"installation_id"];
-        [core setObject:config.appId forKey:@"app_id"];
-        NSDate *now = [NSDate date];
-        NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
-        [dateFormatter setDateFormat:@"XXX"];
-        NSString *hours = [dateFormatter stringFromDate:now];
-        [core setObject:hours forKey:@"utc_offset"];
-    }
-    if (self.recipeHistory) {
-        [core setObject:[self buildCooldownBlockWithRecipeCooler:self.recipeHistory] forKey:@"cooldown"];
-    }
-    return [NSDictionary dictionaryWithDictionary:core];
-}
-
-- (NSDictionary*)buildCooldownBlockWithRecipeCooler:(NITRecipeHistory*)recipeHistory {
-    NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
-    
-    NSNumber *latestLog = [recipeHistory latestLog];
-    if (latestLog) {
-        [dict setObject:latestLog forKey:@"last_notified_at"];
-    }
-    NSDictionary<NSString*, NSNumber*> *log = [recipeHistory log];
-    if (log) {
-        [dict setObject:log forKey:@"recipes_notified_at"];
-    }
-    
-    return [NSDictionary dictionaryWithDictionary:dict];
 }
 
 @end

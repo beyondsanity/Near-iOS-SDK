@@ -123,4 +123,13 @@
     return json;
 }
 
+- (NITJSONAPI*)simpleJsonApi {
+    NITJSONAPI *jsonApi = [[NITJSONAPI alloc] init];
+    NITJSONAPIResource *res = [[NITJSONAPIResource alloc] init];
+    res.type = @"simple";
+    [res addAttributeObject:@"hello world" forKey:@"message"];
+    [jsonApi setDataWithResourceObject:res];
+    return jsonApi;
+}
+
 @end

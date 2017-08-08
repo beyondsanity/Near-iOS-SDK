@@ -26,5 +26,6 @@
 - (NSDictionary*)jsonWithContentsOfFile:(NSString*)filename;
 - (void)executeOnClientRunLoopAfterDelay:(NSTimeInterval)delayInSeconds block:(dispatch_block_t)block;
 - (NITJSONAPI*)makeTimestampsResponseWithTimeInterval:(NSTimeInterval)timeInterval;
+- (NITJSONAPI*)simpleJsonApi;
 
 @end

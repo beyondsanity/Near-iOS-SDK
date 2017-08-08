@@ -50,6 +50,8 @@
     self.repository = mock([NITRecipeRepository class]);
     self.trackSender = mock([NITRecipeTrackSender class]);
     self.evaluationBodyBuilder = mock([NITEvaluationBodyBuilder class]);
+    [given([self.evaluationBodyBuilder buildEvaluationBody]) willReturn:[self simpleJsonApi]];
+    [given([self.evaluationBodyBuilder buildEvaluationBodyWithPlugin:anything() action:anything() bundle:anything()]) willReturn:[self simpleJsonApi]];
 }
 
 - (void)tearDown {

@@ -174,9 +174,9 @@ static NITManager *defaultManager;
     NITCooldownValidator *cooldownValidator = [[NITCooldownValidator alloc] initWithRecipeHistory:recipeHistory dateManager:dateManager];
     NITScheduleValidator *scheduleValidator = [[NITScheduleValidator alloc] initWithDateManager:dateManager];
     NITRecipeValidationFilter *recipeValidationFilter = [[NITRecipeValidationFilter alloc] initWithValidators:@[cooldownValidator, scheduleValidator]];
-    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:cacheManager networkManager:networkManager dateManager:dateManager configuration:configuration recipeHistory:recipeHistory];
-    NITRecipeTrackSender *trackSender = [[NITRecipeTrackSender alloc] initWithConfiguration:configuration history:recipeHistory trackManager:trackManager dateManager:dateManager];
     NITEvaluationBodyBuilder *evaluationBodyBuilder = [[NITEvaluationBodyBuilder alloc] initWithConfiguration:configuration recipeHistory:recipeHistory dateManager:dateManager];
+    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:cacheManager networkManager:networkManager dateManager:dateManager configuration:configuration recipeHistory:recipeHistory evaluationBodyBuilder:evaluationBodyBuilder];
+    NITRecipeTrackSender *trackSender = [[NITRecipeTrackSender alloc] initWithConfiguration:configuration history:recipeHistory trackManager:trackManager dateManager:dateManager];
     return [[NITRecipesManager alloc] initWithCacheManager:cacheManager networkManager:networkManager configuration:configuration recipeHistory:recipeHistory recipeValidationFilter:recipeValidationFilter repository:repository trackSender:trackSender evaluationBodyBuilder:evaluationBodyBuilder];
 }
 
