@@ -492,12 +492,8 @@
 }
 
 - (void)testGeopolisCacheSaveOverwrite {
-    NITJSONAPI *jsonApi = [self jsonApiWithContentsOfFile:@"gf_array"];
     NITGeopolisNodesManager *nodesManager = [[NITGeopolisNodesManager alloc] init];
-    NITCacheManager *cacheManager = [[NITCacheManager alloc] initWithAppId:@"testGeopolisCacheSaveOverwrite"];
-    [cacheManager saveWithObject:jsonApi forKey:@"GeopolisNodesJSON"];
-    [NSThread sleepForTimeInterval:0.5];
-    XCTAssertTrue([cacheManager numberOfStoredKeys] == 1);
+    NITCacheManager *cacheManager = mock([NITCacheManager class]);
     NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
     networkManager.mock = ^NITJSONAPI *(NSURLRequest *request) {
         return [self jsonApiWithContentsOfFile:@"beacon_areas_in_bg"];
@@ -509,23 +505,14 @@
     
     XCTestExpectation *geopolisExp = [self expectationWithDescription:@"Geopolis"];
     [manager refreshConfigWithCompletionHandler:^(NSError * _Nullable error) {
-        [NSThread sleepForTimeInterval:0.5];
-        XCTAssertTrue([cacheManager numberOfStoredKeys] == 1);
-        
         XCTAssertNil(error);
         NSArray<NITNode*> *roots = [nodesManager roots];
         XCTAssertTrue([roots count] == 10);
-        NITJSONAPI *savedJson = [cacheManager loadObjectForKey:@"GeopolisNodesJSON"];
-        XCTAssertTrue([[savedJson rootResources] count] == [roots count]);
+        [verifyCount(cacheManager, times(1)) saveWithObject:anything() forKey:@"GeopolisNodesJSON"];
         [geopolisExp fulfill];
     }];
     
-    XCTestExpectation *cacheExp = [self expectationWithDescription:@"Cache"];
-    [cacheManager removeAllItemsWithCompletionHandler:^{
-        [cacheExp fulfill];
-    }];
-    
-    [self waitForExpectationsWithTimeout:4.0 handler:nil];
+    [self waitForExpectationsWithTimeout:3.0 handler:nil];
 }
 
 - (void)testGeopolisCurrentNodesConfig22FromRoot {
