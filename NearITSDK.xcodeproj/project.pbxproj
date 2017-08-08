@@ -206,6 +206,9 @@
 		2638E3F81F399E4600D3B194 /* NITRecipeRepository.h in Headers */ = {isa = PBXBuildFile; fileRef = 2638E3F61F399E4600D3B194 /* NITRecipeRepository.h */; };
 		2638E3F91F399E4600D3B194 /* NITRecipeRepository.m in Sources */ = {isa = PBXBuildFile; fileRef = 2638E3F71F399E4600D3B194 /* NITRecipeRepository.m */; };
 		2638E3FB1F39A56E00D3B194 /* NITRecipeRepositoryTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 2638E3FA1F39A56E00D3B194 /* NITRecipeRepositoryTest.m */; };
+		2638E3FE1F39B6EB00D3B194 /* NITRecipeTrackSender.h in Headers */ = {isa = PBXBuildFile; fileRef = 2638E3FC1F39B6EB00D3B194 /* NITRecipeTrackSender.h */; };
+		2638E3FF1F39B6EB00D3B194 /* NITRecipeTrackSender.m in Sources */ = {isa = PBXBuildFile; fileRef = 2638E3FD1F39B6EB00D3B194 /* NITRecipeTrackSender.m */; };
+		2638E4011F39BB0800D3B194 /* NITRecipeTrackSenderTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 2638E4001F39BB0800D3B194 /* NITRecipeTrackSenderTest.m */; };
 		264F851D1F346EB500241376 /* NITTimestampsManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 264F851B1F346EB500241376 /* NITTimestampsManager.h */; };
 		264F851E1F346EB500241376 /* NITTimestampsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 264F851C1F346EB500241376 /* NITTimestampsManager.m */; };
 		264F85221F346FCC00241376 /* NITTimestamp.h in Headers */ = {isa = PBXBuildFile; fileRef = 264F85201F346FCC00241376 /* NITTimestamp.h */; };
@@ -481,6 +484,9 @@
 		2638E3F61F399E4600D3B194 /* NITRecipeRepository.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NITRecipeRepository.h; sourceTree = "<group>"; };
 		2638E3F71F399E4600D3B194 /* NITRecipeRepository.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITRecipeRepository.m; sourceTree = "<group>"; };
 		2638E3FA1F39A56E00D3B194 /* NITRecipeRepositoryTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITRecipeRepositoryTest.m; sourceTree = "<group>"; };
+		2638E3FC1F39B6EB00D3B194 /* NITRecipeTrackSender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NITRecipeTrackSender.h; sourceTree = "<group>"; };
+		2638E3FD1F39B6EB00D3B194 /* NITRecipeTrackSender.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITRecipeTrackSender.m; sourceTree = "<group>"; };
+		2638E4001F39BB0800D3B194 /* NITRecipeTrackSenderTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITRecipeTrackSenderTest.m; sourceTree = "<group>"; };
 		264F851B1F346EB500241376 /* NITTimestampsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NITTimestampsManager.h; sourceTree = "<group>"; };
 		264F851C1F346EB500241376 /* NITTimestampsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITTimestampsManager.m; sourceTree = "<group>"; };
 		264F85201F346FCC00241376 /* NITTimestamp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NITTimestamp.h; sourceTree = "<group>"; };
@@ -560,6 +566,7 @@
 				135359051EEFD8CE0056AF7C /* NITRecipeValidationFilterTest.m */,
 				134E2ED21EF2BAE600A2B1F0 /* NITTimeBandEvaluatorTest.m */,
 				2638E3FA1F39A56E00D3B194 /* NITRecipeRepositoryTest.m */,
+				2638E4001F39BB0800D3B194 /* NITRecipeTrackSenderTest.m */,
 			);
 			name = "Test Recipes";
 			sourceTree = "<group>";
@@ -1066,6 +1073,8 @@
 				130FB37D1EEE8E78008B24C1 /* NITRecipeHistory.m */,
 				2638E3F61F399E4600D3B194 /* NITRecipeRepository.h */,
 				2638E3F71F399E4600D3B194 /* NITRecipeRepository.m */,
+				2638E3FC1F39B6EB00D3B194 /* NITRecipeTrackSender.h */,
+				2638E3FD1F39B6EB00D3B194 /* NITRecipeTrackSender.m */,
 			);
 			name = Recipes;
 			sourceTree = "<group>";
@@ -1151,6 +1160,7 @@
 				1327D89F1E82A99600C6689E /* NITPulseBundle.h in Headers */,
 				1374E0ED1EA9FBFF00D613A5 /* NITTrackManager.h in Headers */,
 				132296F41E8D09D400AE6EFC /* NITCoupon.h in Headers */,
+				2638E3FE1F39B6EB00D3B194 /* NITRecipeTrackSender.h in Headers */,
 				1349EEC41E7A95E3000B0666 /* NITNodesManager.h in Headers */,
 				135359031EEFD2DD0056AF7C /* NITRecipeValidationFilter.h in Headers */,
 				13423EE31E7BCB07008CAAC8 /* NITGeofenceNode.h in Headers */,
@@ -1456,6 +1466,7 @@
 				134E2ECE1EF2B9F800A2B1F0 /* NITTimeBandEvaluator.m in Sources */,
 				132296F51E8D09D400AE6EFC /* NITCoupon.m in Sources */,
 				1349EEA71E793413000B0666 /* NITJSONAPIResource.m in Sources */,
+				2638E3FF1F39B6EB00D3B194 /* NITRecipeTrackSender.m in Sources */,
 				130FB3881EEE9FD6008B24C1 /* NITCooldownValidator.m in Sources */,
 				132297041E8D306A00AE6EFC /* NITFeedback.m in Sources */,
 				132297001E8D2F6400AE6EFC /* NITFeedbackReaction.m in Sources */,
@@ -1505,6 +1516,7 @@
 				1374E0D51EA89DDF00D613A5 /* NITManagerTest.m in Sources */,
 				1374E0DA1EA8C03B00D613A5 /* NITTestLogger.m in Sources */,
 				130CCF9C1F02690D00876327 /* NITNotificationProcessorTest.m in Sources */,
+				2638E4011F39BB0800D3B194 /* NITRecipeTrackSenderTest.m in Sources */,
 				135CD79B1E9D089A005C75A4 /* NITUserProfileTest.m in Sources */,
 				137E38B11E8A9569008E83E6 /* NITRecipesManagerTest.m in Sources */,
 				135BB64F1EFA5DF0005DB5C9 /* NITReactionModelTest.m in Sources */,
