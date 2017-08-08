@@ -17,10 +17,10 @@
 @class NITRecipeHistory;
 @class NITRecipeValidationFilter;
 @class NITDateManager;
+@class NITRecipeRepository;
 
 @protocol NITRecipesManaging <NSObject>
 
-- (void)setRecipesWithJsonApi:(NITJSONAPI* _Nullable)json;
 - (BOOL)gotPulseWithPulsePlugin:(NSString* _Nonnull)pulsePlugin pulseAction:(NSString* _Nonnull)pulseAction pulseBundle:(NSString* _Nullable)pulseBundle;
 - (BOOL)gotPulseWithPulsePlugin:(NSString* _Nonnull)pulsePlugin pulseAction:(NSString* _Nonnull)pulseAction tags:(NSArray<NSString*>* _Nullable)tags;
 - (void)gotPulseOnlineWithPulsePlugin:(NSString* _Nonnull)pulsePlugin pulseAction:(NSString* _Nonnull)pulseAction pulseBundle:(NSString* _Nullable)pulseBundle;
@@ -31,7 +31,7 @@
 
 @property (nonatomic, strong) id<NITManaging> _Nullable manager;
 
-- (instancetype _Nonnull)initWithCacheManager:(NITCacheManager* _Nonnull)cacheManager networkManager:(id<NITNetworkManaging> _Nonnull)networkManager configuration:(NITConfiguration* _Nonnull)configuration trackManager:(NITTrackManager* _Nonnull)trackManager recipeHistory:(NITRecipeHistory* _Nonnull)recipeHistory recipeValidationFilter:(NITRecipeValidationFilter* _Nonnull)recipeValidationFilter dateManager:(NITDateManager* _Nonnull)dateManager;
+- (instancetype _Nonnull)initWithCacheManager:(NITCacheManager* _Nonnull)cacheManager networkManager:(id<NITNetworkManaging> _Nonnull)networkManager configuration:(NITConfiguration* _Nonnull)configuration trackManager:(NITTrackManager* _Nonnull)trackManager recipeHistory:(NITRecipeHistory* _Nonnull)recipeHistory recipeValidationFilter:(NITRecipeValidationFilter* _Nonnull)recipeValidationFilter dateManager:(NITDateManager* _Nonnull)dateManager repository:(NITRecipeRepository* _Nonnull)repository;
 
 - (void)refreshConfigWithCompletionHandler:(void (^_Nullable)(NSError * _Nullable error))completionHandler;
 - (void)recipesWithCompletionHandler:(void (^_Nullable)(NSArray<NITRecipe*>* _Nullable recipes, NSError * _Nullable error))completionHandler;

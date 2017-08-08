@@ -28,7 +28,6 @@
 
 @interface NITRecipesManager()
 
-@property (nonatomic, strong) NSArray<NITRecipe*> *recipes;
 @property (nonatomic, strong) NITCacheManager *cacheManager;
 @property (nonatomic, strong) id<NITNetworkManaging> networkManager;
 @property (nonatomic, strong) NITConfiguration *configuration;
@@ -36,13 +35,13 @@
 @property (nonatomic, strong) NITRecipeHistory *recipeHistory;
 @property (nonatomic, strong) NITRecipeValidationFilter *recipeValidationFilter;
 @property (nonatomic, strong) NITDateManager *dateManager;
-@property (nonatomic) NSTimeInterval lastEditedTime;
+@property (nonatomic, strong) NITRecipeRepository *repository;
 
 @end
 
 @implementation NITRecipesManager
 
-- (instancetype)initWithCacheManager:(NITCacheManager*)cacheManager networkManager:(id<NITNetworkManaging>)networkManager configuration:(NITConfiguration *)configuration trackManager:(NITTrackManager * _Nonnull)trackManager recipeHistory:(NITRecipeHistory * _Nonnull)recipeHistory recipeValidationFilter:(NITRecipeValidationFilter * _Nonnull)recipeValidationFilter dateManager:(NITDateManager * _Nonnull)dateManager {
+- (instancetype)initWithCacheManager:(NITCacheManager*)cacheManager networkManager:(id<NITNetworkManaging>)networkManager configuration:(NITConfiguration *)configuration trackManager:(NITTrackManager * _Nonnull)trackManager recipeHistory:(NITRecipeHistory * _Nonnull)recipeHistory recipeValidationFilter:(NITRecipeValidationFilter * _Nonnull)recipeValidationFilter dateManager:(NITDateManager * _Nonnull)dateManager repository:(NITRecipeRepository * _Nonnull)repository {
     self = [super init];
     if (self) {
         self.cacheManager = cacheManager;
@@ -52,91 +51,33 @@
         self.recipeHistory = recipeHistory;
         self.recipeValidationFilter = recipeValidationFilter;
         self.dateManager = dateManager;
-        self.recipes = [self.cacheManager loadArrayForKey:RecipesCacheKey];
-        NSNumber *time = [self.cacheManager loadNumberForKey:RecipesLastEditedTimeCacheKey];
-        if (time) {
-            self.lastEditedTime = (NSTimeInterval)time.doubleValue;
-        } else {
-            self.lastEditedTime = TimestampInvalidTime;
-        }
+        self.repository = repository;
     }
     return self;
 }
 
-- (void)setRecipesWithJsonApi:(NITJSONAPI*)json {
-    [json registerClass:[NITRecipe class] forType:@"recipes"];
-    self.recipes = [json parseToArrayOfObjects];
-}
-
 - (void)refreshConfigWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler {
-    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] recipesProcessListWithJsonApi:[self buildEvaluationBody]] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
-        [self refreshRecipesWithJson:json error:error completion:^(NSError * _Nullable cError) {
-            if (completionHandler) {
-                completionHandler(cError);
-            }
-        }];
+    [self.repository refreshConfigWithCompletionHandler:^(NSError * _Nullable error) {
+        if (completionHandler) {
+            completionHandler(error);
+        }
     }];
 }
 
 - (void)recipesWithCompletionHandler:(void (^)(NSArray<NITRecipe *> * _Nullable, NSError * _Nullable))completionHandler {
-    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] recipesProcessListWithJsonApi:[self buildEvaluationBody]] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
-        if (error) {
-            if (completionHandler) {
-                completionHandler(nil, error);
-            }
-        } else {
-            if (completionHandler) {
-                [json registerClass:[NITRecipe class] forType:@"recipes"];
-                NSArray<NITRecipe*>* recipes = [json parseToArrayOfObjects];
-                completionHandler(recipes, nil);
-            }
+    [self.repository recipesWithCompletionHandler:^(NSArray<NITRecipe *> * _Nullable recipes, NSError * _Nullable error) {
+        if (completionHandler) {
+            completionHandler(recipes, error);
         }
     }];
 }
 
 - (void)refreshConfigCheckTimeWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler {
-    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] timestamps] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
-        if (error) {
-            [self refreshConfigWithCompletionHandler:^(NSError * _Nullable error) {
-                completionHandler(error);
-            }];
-        } else {
-            NITTimestampsManager *timestampsManager = [[NITTimestampsManager alloc] initWithJsonApi:json];
-            if ([timestampsManager needsToUpdateForType:@"recipes" referenceTime:self.lastEditedTime]) {
-                [self refreshConfigWithCompletionHandler:^(NSError * _Nullable error) {
-                    completionHandler(error);
-                }];
-            } else {
-                completionHandler(nil);
-            }
+    [self.repository refreshConfigCheckTimeWithCompletionHandler:^(NSError * _Nullable error) {
+        if (completionHandler) {
+            completionHandler(error);
         }
     }];
-}
-
-- (void)refreshRecipesWithJson:(NITJSONAPI*)json error:(NSError*)error completion:(void (^_Nullable)(NSError * _Nullable error))completionHandler {
-    if (error) {
-        NSArray<NITRecipe*> *cachedRecipes = [self.cacheManager loadArrayForKey:RecipesCacheKey];
-        if (cachedRecipes) {
-            self.recipes = cachedRecipes;
-            if (completionHandler) {
-                completionHandler(nil);
-            }
-        } else {
-            if (completionHandler) {
-                completionHandler(error);
-            }
-        }
-    } else {
-        NSDate *today = [self.dateManager currentDate];
-        self.lastEditedTime = [today timeIntervalSince1970];
-        [self.cacheManager saveWithObject:[NSNumber numberWithDouble:self.lastEditedTime] forKey:RecipesLastEditedTimeCacheKey];
-        [json registerClass:[NITRecipe class] forType:@"recipes"];
-        self.recipes = [json parseToArrayOfObjects];
-        [self.cacheManager saveWithObject:self.recipes forKey:RecipesCacheKey];
-        if (completionHandler) {
-            completionHandler(nil);
-        }
-    }
 }
 
 // MARK: - NITRecipesManaging
@@ -145,7 +86,7 @@
     BOOL handled = NO;
     NSMutableArray<NITRecipe*> *matchingRecipes = [[NSMutableArray alloc] init];
     
-    for (NITRecipe *recipe in self.recipes) {
+    for (NITRecipe *recipe in self.repository.recipes) {
         if ([recipe.pulsePluginId isEqualToString:pulsePlugin] && [recipe.pulseAction.ID isEqualToString:pulseAction] && [recipe.pulseBundle.ID isEqualToString:pulseBundle]) {
             [matchingRecipes addObject:recipe];
         }
@@ -164,7 +105,7 @@
     BOOL handled = NO;
     NSMutableArray<NITRecipe*> *matchingRecipes = [[NSMutableArray alloc] init];
     
-    for (NITRecipe *recipe in self.recipes) {
+    for (NITRecipe *recipe in self.repository.recipes) {
         if ([recipe.pulsePluginId isEqualToString:pulsePlugin] && [recipe.pulseAction.ID isEqualToString:pulseAction] && [self verifyTags:tags recipeTags:recipe.tags]) {
             [matchingRecipes addObject:recipe];
         }
@@ -315,7 +256,7 @@
 }
 
 - (NSInteger)recipesCount {
-    return [self.recipes count];
+    return [self.repository.recipes count];
 }
 
 - (NITJSONAPI*)buildEvaluationBody {

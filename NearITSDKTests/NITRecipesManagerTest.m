@@ -33,6 +33,7 @@
 @property (nonatomic, strong) NITRecipeValidationFilter *recipeValidationFilter;
 @property (nonatomic, strong) NITCacheManager *cacheManager;
 @property (nonatomic, strong) NITTrackManager *trackManager;
+@property (nonatomic, strong) NITRecipeRepository *repository;
 
 @end
 
@@ -49,6 +50,7 @@
     self.recipeValidationFilter = mock([NITRecipeValidationFilter class]);
     self.cacheManager = mock([NITCacheManager class]);
     self.trackManager = mock([NITTrackManager class]);
+    self.repository = mock([NITRecipeRepository class]);
 }
 
 - (void)tearDown {
@@ -60,11 +62,9 @@
     self.expectation = [self expectationWithDescription:@"expectation"];
     [given([self.cacheManager loadArrayForKey:RecipesCacheKey]) willReturn:nil];
     
-    NITJSONAPI *recipesJson = [self jsonApiWithContentsOfFile:@"online_recipe"];
-    
     NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
-    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithCacheManager:self.cacheManager networkManager:networkManager configuration:[[NITConfiguration alloc] init] trackManager:self.trackManager recipeHistory:self.recipeHistory recipeValidationFilter:self.recipeValidationFilter dateManager:self.dateManager];
-    [recipesManager setRecipesWithJsonApi:recipesJson];
+    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithCacheManager:self.cacheManager networkManager:networkManager configuration:[[NITConfiguration alloc] init] trackManager:self.trackManager recipeHistory:self.recipeHistory recipeValidationFilter:self.recipeValidationFilter dateManager:self.dateManager repository:self.repository];
+    [given([self.repository recipes]) willReturn:[self recipesFromJsonWithName:@"online_recipe"]];
     recipesManager.manager = self;
     
     networkManager.mock = ^NITJSONAPI *(NSURLRequest *request) {
@@ -80,11 +80,9 @@
     self.expectation = [self expectationWithDescription:@"expectation"];
     [given([self.cacheManager loadArrayForKey:RecipesCacheKey]) willReturn:nil];
     
-    NITJSONAPI *recipesJson = [self jsonApiWithContentsOfFile:@"online_recipe"];
-    
     NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
-    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithCacheManager:self.cacheManager networkManager:networkManager configuration:[[NITConfiguration alloc] init] trackManager:self.trackManager recipeHistory:self.recipeHistory recipeValidationFilter:self.recipeValidationFilter dateManager:self.dateManager];
-    [recipesManager setRecipesWithJsonApi:recipesJson];
+    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithCacheManager:self.cacheManager networkManager:networkManager configuration:[[NITConfiguration alloc] init] trackManager:self.trackManager recipeHistory:self.recipeHistory recipeValidationFilter:self.recipeValidationFilter dateManager:self.dateManager repository:self.repository];
+    [given([self.repository recipes]) willReturn:[self recipesFromJsonWithName:@"online_recipe"]];
     recipesManager.manager = self;
     
     networkManager.mock = ^NITJSONAPI *(NSURLRequest *request) {
@@ -97,11 +95,9 @@
 }
 
 - (void)testGotPulseBundleNoMatching {
-    NITJSONAPI *recipesJson = [self jsonApiWithContentsOfFile:@"recipes"];
-    
     NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
-    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithCacheManager:self.cacheManager networkManager:networkManager configuration:[[NITConfiguration alloc] init] trackManager:self.trackManager recipeHistory:self.recipeHistory recipeValidationFilter:self.recipeValidationFilter dateManager:self.dateManager];
-    [recipesManager setRecipesWithJsonApi:recipesJson];
+    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithCacheManager:self.cacheManager networkManager:networkManager configuration:[[NITConfiguration alloc] init] trackManager:self.trackManager recipeHistory:self.recipeHistory recipeValidationFilter:self.recipeValidationFilter dateManager:self.dateManager repository:self.repository];
+    [given([self.repository recipes]) willReturn:[self recipesFromJsonWithName:@"recipes"]];
     
     networkManager.mock = ^NITJSONAPI *(NSURLRequest *request) {
         return nil;
@@ -115,11 +111,9 @@
 }
 
 - (void)testGotPulseBundleMatchingWithValidation {
-    NITJSONAPI *recipesJson = [self jsonApiWithContentsOfFile:@"recipes"];
-    
     NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
-    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithCacheManager:self.cacheManager networkManager:networkManager configuration:[[NITConfiguration alloc] init] trackManager:self.trackManager recipeHistory:self.recipeHistory recipeValidationFilter:self.recipeValidationFilter dateManager:self.dateManager];
-    [recipesManager setRecipesWithJsonApi:recipesJson];
+    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithCacheManager:self.cacheManager networkManager:networkManager configuration:[[NITConfiguration alloc] init] trackManager:self.trackManager recipeHistory:self.recipeHistory recipeValidationFilter:self.recipeValidationFilter dateManager:self.dateManager repository:self.repository];
+    [given([self.repository recipes]) willReturn:[self recipesFromJsonWithName:@"recipes"]];
     
     networkManager.mock = ^NITJSONAPI *(NSURLRequest *request) {
         return nil;
@@ -180,6 +174,15 @@
         XCTAssertTrue([recipe.pulseBundle.ID isEqualToString:@"e11f58db-054e-4df1-b09b-d0cbe2676031"]);
         [self.expectation fulfill];
     }
+}
+
+// MARK: - Utils
+
+- (NSArray<NITRecipe*> *)recipesFromJsonWithName:(NSString*)name {
+    NITJSONAPI *recipesJson = [self jsonApiWithContentsOfFile:@"online_recipe"];
+    [recipesJson registerClass:[NITRecipe class] forType:@"recipes"];
+    NSArray<NITRecipe*> *recipes = [recipesJson parseToArrayOfObjects];
+    return recipes;
 }
 
 @end

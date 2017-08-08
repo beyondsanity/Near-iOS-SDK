@@ -23,6 +23,7 @@ extern NSString* _Nonnull const RecipesLastEditedTimeCacheKey;
 
 - (instancetype _Nonnull)initWithCacheManager:(NITCacheManager* _Nonnull)cacheManager networkManager:(id<NITNetworkManaging> _Nonnull)networkManager dateManager:(NITDateManager* _Nonnull)dateManager configuration:(NITConfiguration* _Nonnull)configuration recipeHistory:(NITRecipeHistory* _Nonnull)recipeHistory;
 
+- (NSArray<NITRecipe *> * _Nullable)recipes;
 - (void)refreshConfigWithCompletionHandler:(void (^_Nullable)(NSError * _Nullable))completionHandler;
 - (void)refreshConfigCheckTimeWithCompletionHandler:(void (^_Nullable)(NSError * _Nullable))completionHandler;
 - (void)recipesWithCompletionHandler:(void (^_Nullable)(NSArray<NITRecipe *> * _Nullable, NSError * _Nullable))completionHandler;

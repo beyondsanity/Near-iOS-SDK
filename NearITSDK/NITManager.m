@@ -36,6 +36,7 @@
 #import "NITReaction.h"
 #import "NITNotificationProcessor.h"
 #import "NITUserDataBackoff.h"
+#import "NITRecipeRepository.h"
 #import <CoreBluetooth/CoreBluetooth.h>
 #import <UserNotifications/UserNotifications.h>
 
@@ -171,7 +172,8 @@ static NITManager *defaultManager;
     NITCooldownValidator *cooldownValidator = [[NITCooldownValidator alloc] initWithRecipeHistory:recipeHistory dateManager:dateManager];
     NITScheduleValidator *scheduleValidator = [[NITScheduleValidator alloc] initWithDateManager:dateManager];
     NITRecipeValidationFilter *recipeValidationFilter = [[NITRecipeValidationFilter alloc] initWithValidators:@[cooldownValidator, scheduleValidator]];
-    return [[NITRecipesManager alloc] initWithCacheManager:cacheManager networkManager:networkManager configuration:configuration trackManager:trackManager recipeHistory:recipeHistory recipeValidationFilter:recipeValidationFilter dateManager:dateManager];
+    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:cacheManager networkManager:networkManager dateManager:dateManager configuration:configuration recipeHistory:recipeHistory];
+    return [[NITRecipesManager alloc] initWithCacheManager:cacheManager networkManager:networkManager configuration:configuration trackManager:trackManager recipeHistory:recipeHistory recipeValidationFilter:recipeValidationFilter dateManager:dateManager repository:repository];
 }
 
 + (NITGeopolisManager*)makeGeopolisManagerWithNetworkManager:(id<NITNetworkManaging>)networkManager cacheManager:(NITCacheManager*)cacheManager configuration:(NITConfiguration*)configuration trackManager:(NITTrackManager*)trackManager {
