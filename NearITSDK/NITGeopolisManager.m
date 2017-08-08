@@ -48,7 +48,7 @@ NSString* const NodeLastEditedTimeCacheKey = @"GeopolisNodesLastEditedTime";
 @property (nonatomic, strong) NITNetworkProvider *provider;
 @property (nonatomic, strong) NITGeopolisRadar *radar;
 @property (nonatomic, strong) NITDateManager *dateManager;
-@property (nonatomic, strong) NSNumber *lastEditedTime;
+@property (nonatomic) NSTimeInterval lastEditedTime;
 
 @end
 
@@ -74,7 +74,12 @@ NSString* const NodeLastEditedTimeCacheKey = @"GeopolisNodesLastEditedTime";
             [self.nodesManager setNodesWithJsonApi:jsonApi];
         }
         
-        self.lastEditedTime = [self.cacheManager loadNumberForKey:NodeLastEditedTimeCacheKey];
+        NSNumber *time = [self.cacheManager loadNumberForKey:NodeLastEditedTimeCacheKey];
+        if (time) {
+            self.lastEditedTime = (NSTimeInterval)time.doubleValue;
+        } else {
+            self.lastEditedTime = TimestampInvalidTime;
+        }
     }
     return self;
 }
@@ -91,8 +96,8 @@ NSString* const NodeLastEditedTimeCacheKey = @"GeopolisNodesLastEditedTime";
             }
         } else {
             NSDate *today = [self.dateManager currentDate];
-            self.lastEditedTime = [NSNumber numberWithDouble:[today timeIntervalSince1970]];
-            [self.cacheManager saveWithObject:self.lastEditedTime forKey:NodeLastEditedTimeCacheKey];
+            self.lastEditedTime = [today timeIntervalSince1970];
+            [self.cacheManager saveWithObject:[NSNumber numberWithDouble:self.lastEditedTime] forKey:NodeLastEditedTimeCacheKey];
             [self.nodesManager setNodesWithJsonApi:json];
             [self.cacheManager saveWithObject:json forKey:NodeJSONCacheKey];
             completionHandler(nil);
@@ -108,8 +113,7 @@ NSString* const NodeLastEditedTimeCacheKey = @"GeopolisNodesLastEditedTime";
             }];
         } else {
             NITTimestampsManager *timestampsManager = [[NITTimestampsManager alloc] initWithJsonApi:json];
-            NSTimeInterval geopolisTime = [timestampsManager timeForType:@"geopolis"];
-            if (self.lastEditedTime == nil || geopolisTime == TimestampInvalidTime || (geopolisTime != TimestampInvalidTime && geopolisTime > self.lastEditedTime.doubleValue)) {
+            if ([timestampsManager needsToUpdateForType:@"geopolis" referenceTime:self.lastEditedTime]) {
                 [self refreshConfigWithCompletionHandler:^(NSError * _Nullable error) {
                     completionHandler(error);
                 }];

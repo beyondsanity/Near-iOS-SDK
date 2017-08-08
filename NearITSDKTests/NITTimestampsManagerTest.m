@@ -34,8 +34,40 @@
     NSTimeInterval returnedTime = [manager timeForType:@"recipes"];
     XCTAssertTrue(returnedTime == time);
     
-    returnedTime = [manager timeForType:@"my-type"];
+    returnedTime = [manager timeForType:@"unknown-time"];
     XCTAssertTrue(returnedTime == TimestampInvalidTime);
+}
+
+- (void)testInvalidTime {
+    NSTimeInterval time = 15000;
+    NITJSONAPI *jsonApi = [self makeTimestampsResponseWithTimeInterval:time];
+    NITTimestampsManager *manager = [[NITTimestampsManager alloc] initWithJsonApi:jsonApi];
+    
+    XCTAssertTrue([manager needsToUpdateForType:@"unknown-time" referenceTime:20000]);
+}
+
+- (void)testIsOlder {
+    NSTimeInterval time = 15000;
+    NITJSONAPI *jsonApi = [self makeTimestampsResponseWithTimeInterval:time];
+    NITTimestampsManager *manager = [[NITTimestampsManager alloc] initWithJsonApi:jsonApi];
+    
+    XCTAssertFalse([manager needsToUpdateForType:@"geopolis" referenceTime:20000]);
+}
+
+- (void)testIsNewer {
+    NSTimeInterval time = 15000;
+    NITJSONAPI *jsonApi = [self makeTimestampsResponseWithTimeInterval:time];
+    NITTimestampsManager *manager = [[NITTimestampsManager alloc] initWithJsonApi:jsonApi];
+    
+    XCTAssertTrue([manager needsToUpdateForType:@"geopolis" referenceTime:14000]);
+}
+
+- (void)testIsEqual {
+    NSTimeInterval time = 15000;
+    NITJSONAPI *jsonApi = [self makeTimestampsResponseWithTimeInterval:time];
+    NITTimestampsManager *manager = [[NITTimestampsManager alloc] initWithJsonApi:jsonApi];
+    
+    XCTAssertFalse([manager needsToUpdateForType:@"geopolis" referenceTime:15000]);
 }
 
 @end

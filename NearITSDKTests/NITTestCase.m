@@ -110,17 +110,15 @@
     [recipes addAttributeObject:@"recipes" forKey:@"what"];
     [recipes addAttributeObject:[NSNumber numberWithDouble:timeInterval] forKey:@"time"];
     
-    [json setDataWithResourceObject:recipes];
-    
     NITJSONAPIResource *geopolis = [[NITJSONAPIResource alloc] init];
-    geopolis.type = @"geopolis";
+    geopolis.type = @"timestamps";
     geopolis.ID = @"geopolis-e3ef7882-c76e-4a9b-a91a-b65a40ab81a1";
     
-    [recipes addAttributeObject:@"my-app-id" forKey:@"app_id"];
-    [recipes addAttributeObject:@"geopolis" forKey:@"what"];
-    [recipes addAttributeObject:[NSNumber numberWithDouble:timeInterval] forKey:@"time"];
+    [geopolis addAttributeObject:@"my-app-id" forKey:@"app_id"];
+    [geopolis addAttributeObject:@"geopolis" forKey:@"what"];
+    [geopolis addAttributeObject:[NSNumber numberWithDouble:timeInterval] forKey:@"time"];
     
-    [json setDataWithResourceObject:recipes];
+    [json setDataWithResourcesObject:@[recipes, geopolis]];
     
     return json;
 }

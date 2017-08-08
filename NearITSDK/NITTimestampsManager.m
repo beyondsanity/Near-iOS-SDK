@@ -38,4 +38,18 @@ NSTimeInterval const TimestampInvalidTime = -1;
     return TimestampInvalidTime;
 }
 
+- (BOOL)needsToUpdateForType:(NSString *)type referenceTime:(NSTimeInterval)referenceTime {
+    NSTimeInterval time = [self timeForType:type];
+    
+    if (time == TimestampInvalidTime) {
+        return YES;
+    }
+    
+    if (referenceTime == TimestampInvalidTime || time > referenceTime) {
+        return YES;
+    } else {
+        return NO;
+    }
+}
+
 @end

@@ -37,7 +37,7 @@ NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
 @property (nonatomic, strong) NITRecipeHistory *recipeHistory;
 @property (nonatomic, strong) NITRecipeValidationFilter *recipeValidationFilter;
 @property (nonatomic, strong) NITDateManager *dateManager;
-@property (nonatomic, strong) NSNumber *lastEditedTime;
+@property (nonatomic) NSTimeInterval lastEditedTime;
 
 @end
 
@@ -54,7 +54,12 @@ NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
         self.recipeValidationFilter = recipeValidationFilter;
         self.dateManager = dateManager;
         self.recipes = [self.cacheManager loadArrayForKey:RecipesCacheKey];
-        self.lastEditedTime = [self.cacheManager loadNumberForKey:RecipesLastEditedTimeCacheKey];
+        NSNumber *time = [self.cacheManager loadNumberForKey:RecipesLastEditedTimeCacheKey];
+        if (time) {
+            self.lastEditedTime = (NSTimeInterval)time.doubleValue;
+        } else {
+            self.lastEditedTime = TimestampInvalidTime;
+        }
     }
     return self;
 }
@@ -98,8 +103,7 @@ NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
             }];
         } else {
             NITTimestampsManager *timestampsManager = [[NITTimestampsManager alloc] initWithJsonApi:json];
-            NSTimeInterval recipesTime = [timestampsManager timeForType:@"recipes"];
-            if (self.lastEditedTime == nil || recipesTime == TimestampInvalidTime || (recipesTime != TimestampInvalidTime && recipesTime > self.lastEditedTime.doubleValue)) {
+            if ([timestampsManager needsToUpdateForType:@"recipes" referenceTime:self.lastEditedTime]) {
                 [self refreshConfigWithCompletionHandler:^(NSError * _Nullable error) {
                     completionHandler(error);
                 }];
@@ -125,8 +129,8 @@ NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
         }
     } else {
         NSDate *today = [self.dateManager currentDate];
-        self.lastEditedTime = [NSNumber numberWithDouble:[today timeIntervalSince1970]];
-        [self.cacheManager saveWithObject:self.lastEditedTime forKey:RecipesLastEditedTimeCacheKey];
+        self.lastEditedTime = [today timeIntervalSince1970];
+        [self.cacheManager saveWithObject:[NSNumber numberWithDouble:self.lastEditedTime] forKey:RecipesLastEditedTimeCacheKey];
         [json registerClass:[NITRecipe class] forType:@"recipes"];
         self.recipes = [json parseToArrayOfObjects];
         [self.cacheManager saveWithObject:self.recipes forKey:RecipesCacheKey];

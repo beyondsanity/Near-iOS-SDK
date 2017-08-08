@@ -16,5 +16,6 @@ extern NSTimeInterval const TimestampInvalidTime;
 
 - (instancetype _Nonnull)initWithJsonApi:(NITJSONAPI* _Nonnull)jsonApi;
 - (NSTimeInterval)timeForType:(NSString* _Nonnull)type;
+- (BOOL)needsToUpdateForType:(NSString* _Nonnull)type referenceTime:(NSTimeInterval)referenceTime;
 
 @end
