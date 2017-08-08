@@ -122,18 +122,8 @@
     NSTimeInterval time = 10000;
     
     NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
-    [networkManager setMock:^NITJSONAPI *(NSURLRequest *request) {
-        if ([request.URL.absoluteString containsString:@"/recipes/process"]) {
-            return recipesJson;
-        }
-        return nil;
-    } forKey:@"recipes"];
-    [networkManager setMock:^NITJSONAPI *(NSURLRequest *request) {
-        if ([request.URL.absoluteString containsString:@"/timestamps"]) {
-            return [self makeTimestampsResponseWithTimeInterval:time];
-        }
-        return nil;
-    } forKey:@"timestamps"];
+    [self setNetworkMockForRecipesProcessWithJsonApi:recipesJson networkManager:networkManager];
+    [self setNetworkMockForTimestampsWithTime:time networkManager:networkManager];
     
     NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory];
     [verifyCount(self.cacheManager, times(1)) loadArrayForKey:RecipesCacheKey];
@@ -156,18 +146,8 @@
     [given([self.cacheManager loadNumberForKey:RecipesLastEditedTimeCacheKey]) willReturn:[NSNumber numberWithDouble:time + 10]];
     
     NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
-    [networkManager setMock:^NITJSONAPI *(NSURLRequest *request) {
-        if ([request.URL.absoluteString containsString:@"/recipes/process"]) {
-            return recipesJson;
-        }
-        return nil;
-    } forKey:@"recipes"];
-    [networkManager setMock:^NITJSONAPI *(NSURLRequest *request) {
-        if ([request.URL.absoluteString containsString:@"/timestamps"]) {
-            return [self makeTimestampsResponseWithTimeInterval:time];
-        }
-        return nil;
-    } forKey:@"timestamps"];
+    [self setNetworkMockForRecipesProcessWithJsonApi:recipesJson networkManager:networkManager];
+    [self setNetworkMockForTimestampsWithTime:time networkManager:networkManager];
     
     NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory];
     
@@ -188,18 +168,8 @@
     [given([self.cacheManager loadNumberForKey:RecipesLastEditedTimeCacheKey]) willReturn:[NSNumber numberWithDouble:time - 10]];
     
     NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
-    [networkManager setMock:^NITJSONAPI *(NSURLRequest *request) {
-        if ([request.URL.absoluteString containsString:@"/recipes/process"]) {
-            return recipesJson;
-        }
-        return nil;
-    } forKey:@"recipes"];
-    [networkManager setMock:^NITJSONAPI *(NSURLRequest *request) {
-        if ([request.URL.absoluteString containsString:@"/timestamps"]) {
-            return [self makeTimestampsResponseWithTimeInterval:time];
-        }
-        return nil;
-    } forKey:@"timestamps"];
+    [self setNetworkMockForRecipesProcessWithJsonApi:recipesJson networkManager:networkManager];
+    [self setNetworkMockForTimestampsWithTime:time networkManager:networkManager];
     
     NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory];
     
@@ -208,6 +178,26 @@
         [verifyCount(self.cacheManager, times(1)) saveWithObject:anything() forKey:RecipesCacheKey];
         [verifyCount(self.cacheManager, times(1)) saveWithObject:anything() forKey:RecipesLastEditedTimeCacheKey];
     }];
+}
+
+// MARK: - Utils
+
+- (void)setNetworkMockForRecipesProcessWithJsonApi:(NITJSONAPI*)jsonApi networkManager:(NITNetworkMockManger*)networkManager {
+    [networkManager setMock:^NITJSONAPI *(NSURLRequest *request) {
+        if ([request.URL.absoluteString containsString:@"/recipes/process"]) {
+            return jsonApi;
+        }
+        return nil;
+    } forKey:@"recipes"];
+}
+
+- (void)setNetworkMockForTimestampsWithTime:(NSTimeInterval)time networkManager:(NITNetworkMockManger*)networkManager {
+    [networkManager setMock:^NITJSONAPI *(NSURLRequest *request) {
+        if ([request.URL.absoluteString containsString:@"/timestamps"]) {
+            return [self makeTimestampsResponseWithTimeInterval:time];
+        }
+        return nil;
+    } forKey:@"timestamps"];
 }
 
 
