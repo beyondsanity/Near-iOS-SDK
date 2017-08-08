@@ -20,6 +20,7 @@
 
 NSString* const RecipesCacheKey = @"Recipes";
 NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
+NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
 
 @interface NITRecipeRepository()
 
@@ -31,6 +32,7 @@ NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
 @property (nonatomic, strong) NITRecipeHistory *recipeHistory;
 @property (nonatomic, strong) NITEvaluationBodyBuilder *evaluationBodyBuilder;
 @property (nonatomic) NSTimeInterval lastEditedTime;
+@property (nonatomic) BOOL pulseEvaluationOnline;
 
 @end
 
@@ -51,6 +53,12 @@ NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
             self.lastEditedTime = (NSTimeInterval)time.doubleValue;
         } else {
             self.lastEditedTime = TimestampInvalidTime;
+        }
+        NSNumber *online = [self.cacheManager loadNumberForKey:RecipePulseOnlineAvailable];
+        if (online) {
+            self.pulseEvaluationOnline = [online boolValue];
+        } else {
+            self.pulseEvaluationOnline = YES;
         }
     }
     return self;
@@ -84,6 +92,11 @@ NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
             self.lastEditedTime = [today timeIntervalSince1970];
             [self.cacheManager saveWithObject:[NSNumber numberWithDouble:self.lastEditedTime] forKey:RecipesLastEditedTimeCacheKey];
             [json registerClass:[NITRecipe class] forType:@"recipes"];
+            id onlineEvaluation = [json metaForKey:@"online_evaluation"];
+            if (onlineEvaluation && [onlineEvaluation isKindOfClass:[NSNumber class]]) {
+                self.pulseEvaluationOnline = [onlineEvaluation boolValue];
+                [self.cacheManager saveWithObject:onlineEvaluation forKey:RecipePulseOnlineAvailable];
+            }
             self.recipes = [json parseToArrayOfObjects];
             [self.cacheManager saveWithObject:self.recipes forKey:RecipesCacheKey];
             if (completionHandler) {
@@ -126,6 +139,10 @@ NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
             }
         }
     }];
+}
+
+- (BOOL)isPulseOnlineEvaluationAvaialble {
+    return self.pulseEvaluationOnline;
 }
 
 @end

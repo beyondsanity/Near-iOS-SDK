@@ -13,6 +13,7 @@
 @interface NITJSONAPI()
 
 @property (nonatomic) NSDictionary* sourceJson;
+@property (nonatomic, strong) NSDictionary *meta;
 @property (nonatomic, strong) NSMutableArray<NITJSONAPIResource*> *resources;
 @property (nonatomic, strong) NSMutableArray<NITJSONAPIResource*> *included;
 @property (nonatomic, strong) NSMutableDictionary<NSString*, Class> *registerdClass;
@@ -67,6 +68,11 @@
 - (instancetype)initWithDictionary:(NSDictionary*)json {
     self = [self init];
     self.sourceJson = json;
+    
+    id meta = [json objectForKey:@"meta"];
+    if ([meta isKindOfClass:[NSDictionary class]]) {
+        self.meta = meta;
+    }
     
     id data = [json objectForKey:@"data"];
     if ([data isKindOfClass:[NSArray class]]) {
@@ -327,6 +333,10 @@
     }
     [json setDataWithResourcesObject:jsonResources];
     return json;
+}
+
+- (id)metaForKey:(NSString *)key {
+    return [self.meta objectForKey:key];
 }
 
 // MARK: - NSCoding

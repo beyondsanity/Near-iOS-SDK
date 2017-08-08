@@ -26,5 +26,6 @@
 - (NSData* _Nullable)dataValue;
 + (NITJSONAPI* _Nonnull)jsonApiWithAttributes:(NSDictionary<NSString*, id>* _Nonnull)attributes type:(NSString* _Nonnull)type;
 + (NITJSONAPI* _Nonnull)jsonApiWithArray:(NSArray<NSDictionary<NSString*, id>*>* _Nonnull)resources type:(NSString* _Nonnull)type;
+- (id _Nullable)metaForKey:(NSString* _Nonnull)key;
 
 @end

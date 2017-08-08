@@ -29,5 +29,6 @@ extern NSString* _Nonnull const RecipesLastEditedTimeCacheKey;
 - (void)refreshConfigCheckTimeWithCompletionHandler:(void (^_Nullable)(NSError * _Nullable))completionHandler;
 - (void)recipesWithCompletionHandler:(void (^_Nullable)(NSArray<NITRecipe *> * _Nullable, NSError * _Nullable))completionHandler;
 - (NSInteger)recipesCount;
+- (BOOL)isPulseOnlineEvaluationAvaialble;
 
 @end
