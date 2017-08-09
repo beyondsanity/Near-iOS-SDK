@@ -24,15 +24,6 @@ NSTimeInterval const TimestampInvalidTime = -1;
 
 @implementation NITTimestampsManager
 
-- (instancetype)initWithJsonApi:(NITJSONAPI *)jsonApi {
-    self = [super init];
-    if (self) {
-        [jsonApi registerClass:[NITTimestamp class] forType:@"timestamps"];
-        self.timestamps = [jsonApi parseToArrayOfObjects];
-    }
-    return self;
-}
-
 - (instancetype)initWithNetworkManager:(id<NITNetworkManaging>)networkManager configuration:(NITConfiguration *)configuration {
     self = [super init];
     if (self) {
@@ -50,16 +41,16 @@ NSTimeInterval const TimestampInvalidTime = -1;
             }
         } else {
             [json registerClass:[NITTimestamp class] forType:@"timestamps"];
-            self.timestamps = [json parseToArrayOfObjects];
+            NSArray<NITTimestamp*>* timestamps = [json parseToArrayOfObjects];
             if (completionHandler) {
-                completionHandler([self needsToUpdateForType:type referenceTime:referenceTime]);
+                completionHandler([self needsToUpdateForType:type referenceTime:referenceTime timestamps:timestamps]);
             }
         }
     }];
 }
 
-- (NSTimeInterval)timeForType:(NSString *)type {
-    for (NITTimestamp *timestamp in self.timestamps) {
+- (NSTimeInterval)timeForType:(NSString *)type timestamps:(NSArray<NITTimestamp*>*)timestamps {
+    for (NITTimestamp *timestamp in timestamps) {
         if ([timestamp.what.lowercaseString isEqualToString:type.lowercaseString]) {
             return (NSTimeInterval)timestamp.time.doubleValue;
         }
@@ -67,8 +58,8 @@ NSTimeInterval const TimestampInvalidTime = -1;
     return TimestampInvalidTime;
 }
 
-- (BOOL)needsToUpdateForType:(NSString *)type referenceTime:(NSTimeInterval)referenceTime {
-    NSTimeInterval time = [self timeForType:type];
+- (BOOL)needsToUpdateForType:(NSString *)type referenceTime:(NSTimeInterval)referenceTime timestamps:(NSArray<NITTimestamp*>*)timestamps {
+    NSTimeInterval time = [self timeForType:type timestamps:timestamps];
     
     if (time == TimestampInvalidTime) {
         return YES;

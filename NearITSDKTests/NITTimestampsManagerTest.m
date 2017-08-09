@@ -34,62 +34,33 @@
     [super tearDown];
 }
 
-- (void)testTimestampsManager {
-    NSTimeInterval time = 15000;
-    NITJSONAPI *jsonApi = [self makeTimestampsResponseWithTimeInterval:time];
-    NITTimestampsManager *manager = [[NITTimestampsManager alloc] initWithJsonApi:jsonApi];
-    NSTimeInterval returnedTime = [manager timeForType:@"recipes"];
-    XCTAssertTrue(returnedTime == time);
-    
-    returnedTime = [manager timeForType:@"unknown-time"];
-    XCTAssertTrue(returnedTime == TimestampInvalidTime);
-}
-
-- (void)testInvalidTime {
-    NSTimeInterval time = 15000;
-    NITJSONAPI *jsonApi = [self makeTimestampsResponseWithTimeInterval:time];
-    NITTimestampsManager *manager = [[NITTimestampsManager alloc] initWithJsonApi:jsonApi];
-    
-    XCTAssertTrue([manager needsToUpdateForType:@"unknown-time" referenceTime:20000]);
-}
-
-- (void)testIsOlder {
-    NSTimeInterval time = 15000;
-    NITJSONAPI *jsonApi = [self makeTimestampsResponseWithTimeInterval:time];
-    NITTimestampsManager *manager = [[NITTimestampsManager alloc] initWithJsonApi:jsonApi];
-    
-    XCTAssertFalse([manager needsToUpdateForType:@"geopolis" referenceTime:20000]);
-}
-
-- (void)testIsNewer {
-    NSTimeInterval time = 15000;
-    NITJSONAPI *jsonApi = [self makeTimestampsResponseWithTimeInterval:time];
-    NITTimestampsManager *manager = [[NITTimestampsManager alloc] initWithJsonApi:jsonApi];
-    
-    XCTAssertTrue([manager needsToUpdateForType:@"geopolis" referenceTime:14000]);
-}
-
-- (void)testIsEqual {
-    NSTimeInterval time = 15000;
-    NITJSONAPI *jsonApi = [self makeTimestampsResponseWithTimeInterval:time];
-    NITTimestampsManager *manager = [[NITTimestampsManager alloc] initWithJsonApi:jsonApi];
-    
-    XCTAssertFalse([manager needsToUpdateForType:@"geopolis" referenceTime:15000]);
-}
-
 - (void)testCheckTimestampWithType {
+    
     NSTimeInterval time = 15000;
     NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
     [self setNetworkMockForTimestampsWithTime:time networkManager:networkManager];
     
     NITTimestampsManager *timestampsManager = [[NITTimestampsManager alloc] initWithNetworkManager:networkManager configuration:self.configuration];
+    
+    XCTestExpectation *exp1 = [self expectationWithDescription:@"exp1"];
     [timestampsManager checkTimestampWithType:@"recipes" referenceTime:time - 10 completionHandler:^(BOOL needToSync) {
         XCTAssertTrue(needToSync);
+        [exp1 fulfill];
     }];
     
+    XCTestExpectation *exp2 = [self expectationWithDescription:@"exp2"];
     [timestampsManager checkTimestampWithType:@"recipes" referenceTime:time + 10 completionHandler:^(BOOL needToSync) {
         XCTAssertFalse(needToSync);
+        [exp2 fulfill];
     }];
+    
+    XCTestExpectation *exp3 = [self expectationWithDescription:@"exp3"];
+    [timestampsManager checkTimestampWithType:@"recipes" referenceTime:time completionHandler:^(BOOL needToSync) {
+        XCTAssertFalse(needToSync);
+        [exp3 fulfill];
+    }];
+    
+    [self waitForExpectationsWithTimeout:3.0 handler:nil];
 }
 
 // MARK: - Utils
