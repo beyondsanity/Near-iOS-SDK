@@ -9,12 +9,16 @@
 #import "NITTimestampsManager.h"
 #import "NITTimestamp.h"
 #import "NITJSONAPI.h"
+#import "NITConfiguration.h"
+#import "NITNetworkProvider.h"
 
 NSTimeInterval const TimestampInvalidTime = -1;
 
 @interface NITTimestampsManager()
 
 @property (nonatomic, strong) NSArray<NITTimestamp*> *timestamps;
+@property (nonatomic, strong) id<NITNetworkManaging> networkManager;
+@property (nonatomic, strong) NITConfiguration *configuration;
 
 @end
 
@@ -27,6 +31,31 @@ NSTimeInterval const TimestampInvalidTime = -1;
         self.timestamps = [jsonApi parseToArrayOfObjects];
     }
     return self;
+}
+
+- (instancetype)initWithNetworkManager:(id<NITNetworkManaging>)networkManager configuration:(NITConfiguration *)configuration {
+    self = [super init];
+    if (self) {
+        self.networkManager = networkManager;
+        self.configuration = configuration;
+    }
+    return self;
+}
+
+- (void)checkTimestampWithType:(NSString *)type referenceTime:(NSTimeInterval)referenceTime completionHandler:(void (^)(BOOL))completionHandler {
+    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] timestamps] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
+        if (error) {
+            if (completionHandler) {
+                completionHandler(YES);
+            }
+        } else {
+            [json registerClass:[NITTimestamp class] forType:@"timestamps"];
+            self.timestamps = [json parseToArrayOfObjects];
+            if (completionHandler) {
+                completionHandler([self needsToUpdateForType:type referenceTime:referenceTime]);
+            }
+        }
+    }];
 }
 
 - (NSTimeInterval)timeForType:(NSString *)type {

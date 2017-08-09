@@ -15,8 +15,11 @@
 #import "NITDateManager.h"
 #import "NITRecipeHistory.h"
 #import "NITEvaluationBodyBuilder.h"
+#import "NITTimestampsManager.h"
 #import <OCMockitoIOS/OCMockitoIOS.h>
 #import <OCHamcrestIOS/OCHamcrestIOS.h>
+
+typedef void (^TimestampsCheckBlock)(BOOL needToSync);
 
 @interface NITRecipeRepositoryTest : NITTestCase
 
@@ -26,6 +29,7 @@
 @property (nonatomic, strong) NITConfiguration *configuration;
 @property (nonatomic, strong) NITRecipeHistory *recipeHistory;
 @property (nonatomic, strong) NITEvaluationBodyBuilder *evaluationBodyBuilder;
+@property (nonatomic, strong) NITTimestampsManager *timestampsManager;
 
 @end
 
@@ -41,6 +45,7 @@
     self.configuration = mock([NITConfiguration class]);
     self.recipeHistory = mock([NITRecipeHistory class]);
     self.evaluationBodyBuilder = mock([NITEvaluationBodyBuilder class]);
+    self.timestampsManager = mock([NITTimestampsManager class]);
     [given([self.evaluationBodyBuilder buildEvaluationBody]) willReturn:[self simpleJsonApi]];
 }
 
@@ -61,7 +66,7 @@
     self.networkManager.mock = ^NITJSONAPI *(NSURLRequest *request) {
         return nil;
     };
-    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:self.networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory evaluationBodyBuilder:self.evaluationBodyBuilder];
+    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:self.networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory evaluationBodyBuilder:self.evaluationBodyBuilder timestampsManager:self.timestampsManager];
     [verifyCount(self.cacheManager, times(1)) loadArrayForKey:RecipesCacheKey];
     
     XCTestExpectation *recipesExp = [self expectationWithDescription:@"Recipes"];
@@ -83,7 +88,7 @@
         return recipesJson;
     };
     
-    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:self.networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory evaluationBodyBuilder:self.evaluationBodyBuilder];
+    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:self.networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory evaluationBodyBuilder:self.evaluationBodyBuilder timestampsManager:self.timestampsManager];
     [verifyCount(self.cacheManager, times(1)) loadArrayForKey:RecipesCacheKey];
     
     XCTestExpectation *exp = [self expectationWithDescription:@"Recipes"];
@@ -106,7 +111,7 @@
         return recipesJson;
     };
     
-    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:self.networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory evaluationBodyBuilder:self.evaluationBodyBuilder];
+    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:self.networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory evaluationBodyBuilder:self.evaluationBodyBuilder timestampsManager:self.timestampsManager];
     [verifyCount(self.cacheManager, times(1)) loadArrayForKey:RecipesCacheKey];
     
     XCTestExpectation *exp = [self expectationWithDescription:@"Recipes"];
@@ -121,15 +126,19 @@
 
 // MARK: - Timestamps check
 
-- (void)testRecipesCheckTimeEmptyCache {
+- (void)testRecipesCheckTimeNeedToSync {
     NITJSONAPI *recipesJson = [self jsonApiWithContentsOfFile:@"recipes"];
-    NSTimeInterval time = 10000;
+    
+    [givenVoid([self.timestampsManager checkTimestampWithType:anything() referenceTime:TimestampInvalidTime completionHandler:anything()]) willDo:^id _Nonnull(NSInvocation * _Nonnull invocation) {
+        TimestampsCheckBlock block = [invocation mkt_arguments][2];
+        block(YES);
+        return nil;
+    }];
     
     NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
     [self setNetworkMockForRecipesProcessWithJsonApi:recipesJson networkManager:networkManager];
-    [self setNetworkMockForTimestampsWithTime:time networkManager:networkManager];
     
-    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory evaluationBodyBuilder:self.evaluationBodyBuilder];
+    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory evaluationBodyBuilder:self.evaluationBodyBuilder timestampsManager:self.timestampsManager];
     [verifyCount(self.cacheManager, times(1)) loadArrayForKey:RecipesCacheKey];
     [verifyCount(self.cacheManager, times(1)) loadNumberForKey:RecipesLastEditedTimeCacheKey];
     
@@ -140,47 +149,26 @@
     }];
 }
 
-- (void)testRecipesCheckTimeCacheIsUpdated {
+- (void)testRecipesCheckTimeDontNeedToSync {
     NITJSONAPI *recipesJson = [self jsonApiWithContentsOfFile:@"recipes"];
-    [recipesJson registerClass:[NITRecipe class] forType:@"recipes"];
-    NSArray<NITRecipe*> *recipes = [recipesJson parseToArrayOfObjects];
-    [given([self.cacheManager loadArrayForKey:RecipesCacheKey]) willReturn:recipes];
     
-    NSTimeInterval time = 10000;
-    [given([self.cacheManager loadNumberForKey:RecipesLastEditedTimeCacheKey]) willReturn:[NSNumber numberWithDouble:time + 10]];
+    [givenVoid([self.timestampsManager checkTimestampWithType:anything() referenceTime:TimestampInvalidTime completionHandler:anything()]) willDo:^id _Nonnull(NSInvocation * _Nonnull invocation) {
+        TimestampsCheckBlock block = [invocation mkt_arguments][2];
+        block(NO);
+        return nil;
+    }];
     
     NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
     [self setNetworkMockForRecipesProcessWithJsonApi:recipesJson networkManager:networkManager];
-    [self setNetworkMockForTimestampsWithTime:time networkManager:networkManager];
     
-    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory evaluationBodyBuilder:self.evaluationBodyBuilder];
+    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory evaluationBodyBuilder:self.evaluationBodyBuilder timestampsManager:self.timestampsManager];
+    [verifyCount(self.cacheManager, times(1)) loadArrayForKey:RecipesCacheKey];
+    [verifyCount(self.cacheManager, times(1)) loadNumberForKey:RecipesLastEditedTimeCacheKey];
     
     [repository refreshConfigCheckTimeWithCompletionHandler:^(NSError * _Nullable error) {
         XCTAssertNil(error);
         [verifyCount(self.cacheManager, never()) saveWithObject:anything() forKey:RecipesCacheKey];
         [verifyCount(self.cacheManager, never()) saveWithObject:anything() forKey:RecipesLastEditedTimeCacheKey];
-    }];
-}
-
-- (void)testRecipesCheckTimeCacheIsOld {
-    NITJSONAPI *recipesJson = [self jsonApiWithContentsOfFile:@"recipes"];
-    [recipesJson registerClass:[NITRecipe class] forType:@"recipes"];
-    NSArray<NITRecipe*> *recipes = [recipesJson parseToArrayOfObjects];
-    [given([self.cacheManager loadArrayForKey:RecipesCacheKey]) willReturn:recipes];
-    
-    NSTimeInterval time = 10000;
-    [given([self.cacheManager loadNumberForKey:RecipesLastEditedTimeCacheKey]) willReturn:[NSNumber numberWithDouble:time - 10]];
-    
-    NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
-    [self setNetworkMockForRecipesProcessWithJsonApi:recipesJson networkManager:networkManager];
-    [self setNetworkMockForTimestampsWithTime:time networkManager:networkManager];
-    
-    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager networkManager:networkManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory evaluationBodyBuilder:self.evaluationBodyBuilder];
-    
-    [repository refreshConfigCheckTimeWithCompletionHandler:^(NSError * _Nullable error) {
-        XCTAssertNil(error);
-        [verifyCount(self.cacheManager, times(1)) saveWithObject:anything() forKey:RecipesCacheKey];
-        [verifyCount(self.cacheManager, times(1)) saveWithObject:anything() forKey:RecipesLastEditedTimeCacheKey];
     }];
 }
 
@@ -193,15 +181,6 @@
         }
         return nil;
     } forKey:@"recipes"];
-}
-
-- (void)setNetworkMockForTimestampsWithTime:(NSTimeInterval)time networkManager:(NITNetworkMockManger*)networkManager {
-    [networkManager setMock:^NITJSONAPI *(NSURLRequest *request) {
-        if ([request.URL.absoluteString containsString:@"/timestamps"]) {
-            return [self makeTimestampsResponseWithTimeInterval:time];
-        }
-        return nil;
-    } forKey:@"timestamps"];
 }
 
 @end

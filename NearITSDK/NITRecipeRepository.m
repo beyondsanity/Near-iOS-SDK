@@ -17,6 +17,7 @@
 #import "NITConfiguration.h"
 #import "NITRecipeHistory.h"
 #import "NITEvaluationBodyBuilder.h"
+#import "NITTimestampsManager.h"
 
 NSString* const RecipesCacheKey = @"Recipes";
 NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
@@ -31,6 +32,7 @@ NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
 @property (nonatomic, strong) NITConfiguration *configuration;
 @property (nonatomic, strong) NITRecipeHistory *recipeHistory;
 @property (nonatomic, strong) NITEvaluationBodyBuilder *evaluationBodyBuilder;
+@property (nonatomic, strong) NITTimestampsManager *timestampsManager;
 @property (nonatomic) NSTimeInterval lastEditedTime;
 @property (nonatomic) BOOL pulseEvaluationOnline;
 
@@ -38,7 +40,7 @@ NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
 
 @implementation NITRecipeRepository
 
-- (instancetype)initWithCacheManager:(NITCacheManager *)cacheManager networkManager:(id<NITNetworkManaging>)networkManager dateManager:(NITDateManager *)dateManager configuration:(NITConfiguration *)configuration recipeHistory:(NITRecipeHistory * _Nonnull)recipeHistory evaluationBodyBuilder:(NITEvaluationBodyBuilder * _Nonnull)evaluationBodyBuilder {
+- (instancetype)initWithCacheManager:(NITCacheManager *)cacheManager networkManager:(id<NITNetworkManaging>)networkManager dateManager:(NITDateManager *)dateManager configuration:(NITConfiguration *)configuration recipeHistory:(NITRecipeHistory * _Nonnull)recipeHistory evaluationBodyBuilder:(NITEvaluationBodyBuilder * _Nonnull)evaluationBodyBuilder timestampsManager:(NITTimestampsManager * _Nonnull)timestampsManager {
     self = [super init];
     if (self) {
         self.cacheManager = cacheManager;
@@ -47,6 +49,7 @@ NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
         self.configuration = configuration;
         self.recipeHistory = recipeHistory;
         self.evaluationBodyBuilder = evaluationBodyBuilder;
+        self.timestampsManager = timestampsManager;
         self.recipes = [self.cacheManager loadArrayForKey:RecipesCacheKey];
         NSNumber *time = [self.cacheManager loadNumberForKey:RecipesLastEditedTimeCacheKey];
         if (time) {
@@ -123,18 +126,15 @@ NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
 }
 
 - (void)refreshConfigCheckTimeWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler {
-    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] timestamps] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
-        if (error) {
+    [self.timestampsManager checkTimestampWithType:@"recipes" referenceTime:self.lastEditedTime completionHandler:^(BOOL needToSync) {
+        if (needToSync) {
             [self refreshConfigWithCompletionHandler:^(NSError * _Nullable error) {
-                completionHandler(error);
+                if (completionHandler) {
+                    completionHandler(error);
+                }
             }];
         } else {
-            NITTimestampsManager *timestampsManager = [[NITTimestampsManager alloc] initWithJsonApi:json];
-            if ([timestampsManager needsToUpdateForType:@"recipes" referenceTime:self.lastEditedTime]) {
-                [self refreshConfigWithCompletionHandler:^(NSError * _Nullable error) {
-                    completionHandler(error);
-                }];
-            } else {
+            if (completionHandler) {
                 completionHandler(nil);
             }
         }

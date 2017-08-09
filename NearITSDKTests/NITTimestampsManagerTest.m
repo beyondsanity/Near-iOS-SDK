@@ -10,8 +10,14 @@
 #import "NITTestCase.h"
 #import "NITTimestampsManager.h"
 #import "NITTimestamp.h"
+#import "NITConfiguration.h"
+#import "NITNetworkMockManger.h"
+#import <OCMockitoIOS/OCMockitoIOS.h>
+#import <OCHamcrestIOS/OCHamcrestIOS.h>
 
 @interface NITTimestampsManagerTest : NITTestCase
+
+@property (nonatomic, strong) NITConfiguration *configuration;
 
 @end
 
@@ -20,6 +26,7 @@
 - (void)setUp {
     [super setUp];
     // Put setup code here. This method is called before the invocation of each test method in the class.
+    self.configuration = mock([NITConfiguration class]);
 }
 
 - (void)tearDown {
@@ -68,6 +75,32 @@
     NITTimestampsManager *manager = [[NITTimestampsManager alloc] initWithJsonApi:jsonApi];
     
     XCTAssertFalse([manager needsToUpdateForType:@"geopolis" referenceTime:15000]);
+}
+
+- (void)testCheckTimestampWithType {
+    NSTimeInterval time = 15000;
+    NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
+    [self setNetworkMockForTimestampsWithTime:time networkManager:networkManager];
+    
+    NITTimestampsManager *timestampsManager = [[NITTimestampsManager alloc] initWithNetworkManager:networkManager configuration:self.configuration];
+    [timestampsManager checkTimestampWithType:@"recipes" referenceTime:time - 10 completionHandler:^(BOOL needToSync) {
+        XCTAssertTrue(needToSync);
+    }];
+    
+    [timestampsManager checkTimestampWithType:@"recipes" referenceTime:time + 10 completionHandler:^(BOOL needToSync) {
+        XCTAssertFalse(needToSync);
+    }];
+}
+
+// MARK: - Utils
+
+- (void)setNetworkMockForTimestampsWithTime:(NSTimeInterval)time networkManager:(NITNetworkMockManger*)networkManager {
+    [networkManager setMock:^NITJSONAPI *(NSURLRequest *request) {
+        if ([request.URL.absoluteString containsString:@"/timestamps"]) {
+            return [self makeTimestampsResponseWithTimeInterval:time];
+        }
+        return nil;
+    } forKey:@"timestamps"];
 }
 
 @end
