@@ -25,6 +25,7 @@
 #import "NITGeopolisRadar.h"
 #import "NITTimestampsManager.h"
 #import "NITDateManager.h"
+#import "NITTriggerRequest.h"
 #import <CoreLocation/CoreLocation.h>
 
 #define LOGTAG @"GeopolisManager"
@@ -155,20 +156,17 @@ NSString* const NodeLastEditedTimeCacheKey = @"GeopolisNodesLastEditedTime";
     
     [self trackEventWithIdentifier:node.identifier event:event];
     
-    BOOL hasIdentifier = NO;
-    BOOL hasTags = NO;
     NSString *pulseAction = [NITUtils stringFromRegionEvent:event];
+    NSString *tagAction = [NITUtils stringTagFromRegionEvent:event];
     
-    if([self.recipesManager respondsToSelector:@selector(gotPulseWithPulsePlugin:pulseAction:pulseBundle:)]) {
-        hasIdentifier = [self.recipesManager gotPulseWithPulsePlugin:self.pluginName pulseAction:pulseAction pulseBundle:node.identifier];
-    }
-    if (!hasIdentifier && [self.recipesManager respondsToSelector:@selector(gotPulseWithPulsePlugin:pulseAction:tags:)]) {
-        NSString *pulseTagAction = [NITUtils stringTagFromRegionEvent:event];
-        hasTags = [self.recipesManager gotPulseWithPulsePlugin:self.pluginName pulseAction:pulseTagAction tags:node.tags];
-    }
-    if (!hasIdentifier && !hasTags && [self.recipesManager respondsToSelector:@selector(gotPulseOnlineWithPulsePlugin:pulseAction:pulseBundle:)]) {
-        [self.recipesManager gotPulseOnlineWithPulsePlugin:self.pluginName pulseAction:pulseAction pulseBundle:node.identifier];
-    }
+    NITTriggerRequest *request = [[NITTriggerRequest alloc] init];
+    request.pulseAction = pulseAction;
+    request.pulsePlugin = self.pluginName;
+    request.pulseBundle = node.identifier;
+    request.tagAction = tagAction;
+    request.tags = node.tags;
+    
+    [self.recipesManager gotTriggerRequest:request];
 }
 
 - (void)trackEventWithIdentifier:(NSString*)identifier event:(NITRegionEvent)event {

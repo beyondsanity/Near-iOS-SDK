@@ -16,12 +16,11 @@
 @class NITRecipeRepository;
 @class NITRecipeTrackSender;
 @class NITEvaluationBodyBuilder;
+@class NITTriggerRequest;
 
 @protocol NITRecipesManaging <NSObject>
 
-- (BOOL)gotPulseWithPulsePlugin:(NSString* _Nonnull)pulsePlugin pulseAction:(NSString* _Nonnull)pulseAction pulseBundle:(NSString* _Nullable)pulseBundle;
-- (BOOL)gotPulseWithPulsePlugin:(NSString* _Nonnull)pulsePlugin pulseAction:(NSString* _Nonnull)pulseAction tags:(NSArray<NSString*>* _Nullable)tags;
-- (void)gotPulseOnlineWithPulsePlugin:(NSString* _Nonnull)pulsePlugin pulseAction:(NSString* _Nonnull)pulseAction pulseBundle:(NSString* _Nullable)pulseBundle;
+- (void)gotTriggerRequest:(NITTriggerRequest* _Nonnull)request;
 
 @end
 

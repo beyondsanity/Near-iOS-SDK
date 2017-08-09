@@ -211,6 +211,8 @@
 		2638E4011F39BB0800D3B194 /* NITRecipeTrackSenderTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 2638E4001F39BB0800D3B194 /* NITRecipeTrackSenderTest.m */; };
 		2638E4041F39C65F00D3B194 /* NITEvaluationBodyBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 2638E4021F39C65F00D3B194 /* NITEvaluationBodyBuilder.h */; };
 		2638E4051F39C65F00D3B194 /* NITEvaluationBodyBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 2638E4031F39C65F00D3B194 /* NITEvaluationBodyBuilder.m */; };
+		2643E3941F3B0CFA00D2A47F /* NITTriggerRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 2643E3921F3B0CFA00D2A47F /* NITTriggerRequest.h */; };
+		2643E3951F3B0CFA00D2A47F /* NITTriggerRequest.m in Sources */ = {isa = PBXBuildFile; fileRef = 2643E3931F3B0CFA00D2A47F /* NITTriggerRequest.m */; };
 		264F851D1F346EB500241376 /* NITTimestampsManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 264F851B1F346EB500241376 /* NITTimestampsManager.h */; };
 		264F851E1F346EB500241376 /* NITTimestampsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 264F851C1F346EB500241376 /* NITTimestampsManager.m */; };
 		264F85221F346FCC00241376 /* NITTimestamp.h in Headers */ = {isa = PBXBuildFile; fileRef = 264F85201F346FCC00241376 /* NITTimestamp.h */; };
@@ -491,6 +493,8 @@
 		2638E4001F39BB0800D3B194 /* NITRecipeTrackSenderTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITRecipeTrackSenderTest.m; sourceTree = "<group>"; };
 		2638E4021F39C65F00D3B194 /* NITEvaluationBodyBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NITEvaluationBodyBuilder.h; sourceTree = "<group>"; };
 		2638E4031F39C65F00D3B194 /* NITEvaluationBodyBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITEvaluationBodyBuilder.m; sourceTree = "<group>"; };
+		2643E3921F3B0CFA00D2A47F /* NITTriggerRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NITTriggerRequest.h; sourceTree = "<group>"; };
+		2643E3931F3B0CFA00D2A47F /* NITTriggerRequest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITTriggerRequest.m; sourceTree = "<group>"; };
 		264F851B1F346EB500241376 /* NITTimestampsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NITTimestampsManager.h; sourceTree = "<group>"; };
 		264F851C1F346EB500241376 /* NITTimestampsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITTimestampsManager.m; sourceTree = "<group>"; };
 		264F85201F346FCC00241376 /* NITTimestamp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NITTimestamp.h; sourceTree = "<group>"; };
@@ -711,6 +715,8 @@
 				1349EEBD1E7A9264000B0666 /* Nodes */,
 				1349EEB61E797045000B0666 /* NITGeopolisManager.h */,
 				1349EEB71E797045000B0666 /* NITGeopolisManager.m */,
+				2643E3921F3B0CFA00D2A47F /* NITTriggerRequest.h */,
+				2643E3931F3B0CFA00D2A47F /* NITTriggerRequest.m */,
 			);
 			name = Geopolis;
 			sourceTree = "<group>";
@@ -1198,6 +1204,7 @@
 				132296F81E8D140B00AE6EFC /* NITClaim.h in Headers */,
 				1322970A1E8E350500AE6EFC /* NITCustomJSONReaction.h in Headers */,
 				135CD7D01E9F7A1F005C75A4 /* NITLog.h in Headers */,
+				2643E3941F3B0CFA00D2A47F /* NITTriggerRequest.h in Headers */,
 				135A70881E85328900D4C9EC /* NITContentReaction.h in Headers */,
 				1327D8961E82824800C6689E /* NITBeaconProximityManager.h in Headers */,
 				1327D8A31E83B7C400C6689E /* NITConstants.h in Headers */,
@@ -1455,6 +1462,7 @@
 				2638E3F91F399E4600D3B194 /* NITRecipeRepository.m in Sources */,
 				264F85231F346FCC00241376 /* NITTimestamp.m in Sources */,
 				1352CA841E78294E00C0E98E /* NITManager.m in Sources */,
+				2643E3951F3B0CFA00D2A47F /* NITTriggerRequest.m in Sources */,
 				135A707A1E851F1F00D4C9EC /* NITSimpleNotificationReaction.m in Sources */,
 				13423EE41E7BCB07008CAAC8 /* NITGeofenceNode.m in Sources */,
 				130FB37F1EEE8E78008B24C1 /* NITRecipeHistory.m in Sources */,

@@ -21,6 +21,7 @@
 #import "NITRecipeRepository.h"
 #import "NITRecipeTrackSender.h"
 #import "NITEvaluationBodyBuilder.h"
+#import "NITTriggerRequest.h"
 
 #define LOGTAG @"RecipesManager"
 
@@ -116,6 +117,16 @@
 
 - (void)gotPulseOnlineWithPulsePlugin:(NSString *)pulsePlugin pulseAction:(NSString *)pulseAction pulseBundle:(NSString *)pulseBundle {
     [self onlinePulseEvaluationWithPlugin:pulsePlugin action:pulseAction bundle:pulseBundle];
+}
+
+- (void)gotTriggerRequest:(NITTriggerRequest *)request {
+    BOOL handledPulseLocal = [self gotPulseWithPulsePlugin:request.pulsePlugin pulseAction:request.pulseAction pulseBundle:request.pulseBundle];
+    if (!handledPulseLocal) {
+        BOOL handledTags = [self gotPulseWithPulsePlugin:request.pulsePlugin pulseAction:request.tagAction tags:request.tags];
+        if (!handledTags) {
+            [self gotPulseOnlineWithPulsePlugin:request.pulsePlugin pulseAction:request.pulseAction pulseBundle:request.pulseBundle];
+        }
+    }
 }
 
 - (BOOL)handleRecipesValidation:(NSArray<NITRecipe*>*)matchingRecipes {

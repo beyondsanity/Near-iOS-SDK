@@ -747,66 +747,6 @@
     }];
 }
 
-// MARK: - Test gotPulse
-
-- (void)testGotPulse {
-    NITJSONAPI *jsonApi = [self jsonApiWithContentsOfFile:@"config_22"];
-    NITGeopolisNodesManager *nodesManager = [[NITGeopolisNodesManager alloc] init];
-    [nodesManager setNodesWithJsonApi:jsonApi];
-    
-    NITCacheManager *cacheManager = mock([NITCacheManager class]);
-    NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
-    networkManager.mock = ^NITJSONAPI *(NSURLRequest *request) {
-        return nil;
-    };
-    NITRecipesManager *recipeManager = mock([NITRecipesManager class]);
-    
-    NITGeopolisManager *geopolisManager = [[NITGeopolisManager alloc] initWithNodesManager:nodesManager cachaManager:cacheManager networkManager:networkManager configuration:self.configuration trackManager:self.trackManager dateManager:self.dateManager];
-    geopolisManager.recipesManager = recipeManager;
-    
-    // Check pulseBundle
-    NITNode *nodeIdf = [[NITNode alloc] init];
-    nodeIdf.identifier = @"idf";
-    nodeIdf.tags = @[ @"idf", @"tags" ];
-    
-    [given([recipeManager gotPulseWithPulsePlugin:anything() pulseAction:@"enter_place" pulseBundle:nodeIdf.identifier]) willReturnBool:YES];
-    [given([recipeManager gotPulseWithPulsePlugin:anything() pulseAction:@"enter_tags" tags:nodeIdf.tags]) willReturnBool:NO];
-    
-    [geopolisManager triggerWithEvent:NITRegionEventEnterPlace node:nodeIdf];
-    
-    [verifyCount(recipeManager, times(1)) gotPulseWithPulsePlugin:anything() pulseAction:@"enter_place" pulseBundle:nodeIdf.identifier];
-    [verifyCount(recipeManager, never()) gotPulseWithPulsePlugin:anything() pulseAction:anything() tags:nodeIdf.tags];
-    [verifyCount(recipeManager, never()) gotPulseOnlineWithPulsePlugin:anything() pulseAction:anything() pulseBundle:nodeIdf.identifier];
-    
-    // Check tags
-    NITNode *nodeTags = [[NITNode alloc] init];
-    nodeTags.identifier = @"idtags";
-    nodeTags.tags = @[ @"idtags", @"mytags" ];
-    
-    [given([recipeManager gotPulseWithPulsePlugin:anything() pulseAction:@"enter_place" pulseBundle:nodeTags.identifier]) willReturnBool:NO];
-    [given([recipeManager gotPulseWithPulsePlugin:anything() pulseAction:@"enter_tags" tags:nodeTags.tags]) willReturnBool:YES];
-    
-    [geopolisManager triggerWithEvent:NITRegionEventEnterPlace node:nodeTags];
-    
-    [verifyCount(recipeManager, times(1)) gotPulseWithPulsePlugin:anything() pulseAction:@"enter_place" pulseBundle:nodeTags.identifier];
-    [verifyCount(recipeManager, times(1)) gotPulseWithPulsePlugin:anything() pulseAction:@"enter_tags" tags:nodeTags.tags];
-    [verifyCount(recipeManager, never()) gotPulseOnlineWithPulsePlugin:anything() pulseAction:anything() pulseBundle:nodeTags.identifier];
-    
-    // Check online
-    NITNode *nodeOnline = [[NITNode alloc] init];
-    nodeOnline.identifier = @"idonline";
-    nodeOnline.tags = nil;
-    
-    [given([recipeManager gotPulseWithPulsePlugin:anything() pulseAction:@"enter_place" pulseBundle:nodeOnline.identifier]) willReturnBool:NO];
-    [given([recipeManager gotPulseWithPulsePlugin:anything() pulseAction:@"enter_tags" tags:nodeOnline.tags]) willReturnBool:NO];
-    
-    [geopolisManager triggerWithEvent:NITRegionEventEnterPlace node:nodeOnline];
-    
-    [verifyCount(recipeManager, times(1)) gotPulseWithPulsePlugin:anything() pulseAction:@"enter_place" pulseBundle:nodeOnline.identifier];
-    [verifyCount(recipeManager, times(1)) gotPulseWithPulsePlugin:anything() pulseAction:@"enter_tags" tags:nodeOnline.tags];
-    [verifyCount(recipeManager, times(1)) gotPulseOnlineWithPulsePlugin:anything() pulseAction:@"enter_place" pulseBundle:nodeOnline.identifier];
-}
-
 // MARK: - Utils
 
 - (BOOL)checkIfArrayOfNodesContainsIds:(NSArray<NSString*>*)ids array:(NSArray<NITNode*>*)nodes {
@@ -837,19 +777,10 @@
 
 // MARK: - RecipesManaging
 
-- (BOOL)gotPulseWithPulsePlugin:(NSString *)pulsePlugin pulseAction:(NSString *)pulseAction pulseBundle:(NSString *)pulseBundle {
+- (void)gotTriggerRequest:(NITTriggerRequest *)request {
     if ([self.recipesManagingId isEqualToString:@"visitedNodes"]) {
         [self.recipesManagingExpectation fulfill];
     }
-    return YES;
-}
-
-- (BOOL)gotPulseWithPulsePlugin:(NSString *)pulsePlugin pulseAction:(NSString *)pulseAction tags:(NSArray<NSString *> *)tags {
-    return YES;
-}
-
-- (void)gotPulseOnlineWithPulsePlugin:(NSString *)pulsePlugin pulseAction:(NSString *)pulseAction pulseBundle:(NSString *)pulseBundle {
-    
 }
 
 @end
