@@ -115,8 +115,8 @@
     return handled;
 }
 
-- (void)gotPulseOnlineWithPulsePlugin:(NSString *)pulsePlugin pulseAction:(NSString *)pulseAction pulseBundle:(NSString *)pulseBundle {
-    [self onlinePulseEvaluationWithPlugin:pulsePlugin action:pulseAction bundle:pulseBundle];
+- (void)gotPulseOnlineWithTriggerRequest:(NITTriggerRequest*)request {
+    [self onlinePulseEvaluationWithPlugin:request.pulsePlugin action:request.pulseAction bundle:request.pulseBundle];
 }
 
 - (void)gotTriggerRequest:(NITTriggerRequest *)request {
@@ -124,7 +124,7 @@
     if (!handledPulseLocal) {
         BOOL handledTags = [self gotPulseWithPulsePlugin:request.pulsePlugin pulseAction:request.tagAction tags:request.tags];
         if (!handledTags) {
-            [self gotPulseOnlineWithPulsePlugin:request.pulsePlugin pulseAction:request.pulseAction pulseBundle:request.pulseBundle];
+            [self gotPulseOnlineWithTriggerRequest:request];
         }
     }
 }

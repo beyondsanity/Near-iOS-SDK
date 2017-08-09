@@ -21,6 +21,7 @@
 #import "NITRecipeRepository.h"
 #import "NITRecipeTrackSender.h"
 #import "NITEvaluationBodyBuilder.h"
+#import "NITTriggerRequest.h"
 #import <OCMockitoIOS/OCMockitoIOS.h>
 #import <OCHamcrestIOS/OCHamcrestIOS.h>
 
@@ -28,7 +29,7 @@
 
 - (BOOL)gotPulseWithPulsePlugin:(NSString *)pulsePlugin pulseAction:(NSString *)pulseAction pulseBundle:(NSString *)pulseBundle;
 - (BOOL)gotPulseWithPulsePlugin:(NSString *)pulsePlugin pulseAction:(NSString *)pulseAction tags:(NSArray<NSString *> *)tags;
-- (void)gotPulseOnlineWithPulsePlugin:(NSString *)pulsePlugin pulseAction:(NSString *)pulseAction pulseBundle:(NSString *)pulseBundle;
+- (void)gotPulseOnlineWithTriggerRequest:(NITTriggerRequest*)request;
 
 @end
 
@@ -80,7 +81,12 @@
         return [self jsonApiWithContentsOfFile:@"response_online_recipe"];
     };
     
-    [recipesManager gotPulseOnlineWithPulsePlugin:@"geopolis" pulseAction:@"leave_place" pulseBundle:@"9712e11a-ef3a-4b34-bdf6-413a84146f2e"];
+    NITTriggerRequest *request = [[NITTriggerRequest alloc] init];
+    request.pulsePlugin = @"geopolis";
+    request.pulseAction = @"leave_place";
+    request.pulseBundle = @"9712e11a-ef3a-4b34-bdf6-413a84146f2e";
+    
+    [recipesManager gotPulseOnlineWithTriggerRequest:request];
     
     [self waitForExpectationsWithTimeout:4.0 handler:nil];
 }
@@ -98,7 +104,12 @@
         return [self jsonApiWithContentsOfFile:@"response_pulse_evaluation"];
     };
     
-    [recipesManager gotPulseOnlineWithPulsePlugin:@"beacon_forest" pulseAction:@"always_evaluated" pulseBundle:@"e11f58db-054e-4df1-b09b-d0cbe2676031"];
+    NITTriggerRequest *request = [[NITTriggerRequest alloc] init];
+    request.pulsePlugin = @"beacon_forest";
+    request.pulseAction = @"always_evaluated";
+    request.pulseBundle = @"e11f58db-054e-4df1-b09b-d0cbe2676031";
+    
+    [recipesManager gotPulseOnlineWithTriggerRequest:request];
     
     [self waitForExpectationsWithTimeout:4.0 handler:nil];
 }
