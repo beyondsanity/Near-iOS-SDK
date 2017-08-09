@@ -19,6 +19,7 @@
 @class CLLocationManager;
 @class NITTrackManager;
 @class NITDateManager;
+@class NITTimestampsManager;
 
 extern NSString* _Nonnull const NodeLastEditedTimeCacheKey;
 extern NSString* _Nonnull const NodeJSONCacheKey;
@@ -27,7 +28,7 @@ extern NSString* _Nonnull const NodeJSONCacheKey;
 
 @property (nonatomic, weak) id<NITRecipesManaging> _Nullable recipesManager;
 
-- (instancetype _Nonnull)initWithNodesManager:(NITGeopolisNodesManager* _Nonnull)nodesManager cachaManager:(NITCacheManager* _Nonnull)cacheManager networkManager:(id<NITNetworkManaging> _Nonnull)networkManager configuration:(NITConfiguration* _Nonnull)configuration trackManager:(NITTrackManager* _Nonnull)trackManager dateManager:(NITDateManager* _Nonnull)dateManager;
+- (instancetype _Nonnull)initWithNodesManager:(NITGeopolisNodesManager* _Nonnull)nodesManager cachaManager:(NITCacheManager* _Nonnull)cacheManager networkManager:(id<NITNetworkManaging> _Nonnull)networkManager configuration:(NITConfiguration* _Nonnull)configuration trackManager:(NITTrackManager* _Nonnull)trackManager dateManager:(NITDateManager* _Nonnull)dateManager timestampsManager:(NITTimestampsManager* _Nonnull)timestampsManager;
 
 - (void)refreshConfigWithCompletionHandler:(void (^_Nonnull)(NSError * _Nullable error))completionHandler;
 - (void)refreshConfigCheckTimeWithCompletionHandler:(void (^_Nullable)(NSError * _Nullable error))completionHandler;

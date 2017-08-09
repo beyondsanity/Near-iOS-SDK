@@ -184,8 +184,9 @@ static NITManager *defaultManager;
 
 + (NITGeopolisManager*)makeGeopolisManagerWithNetworkManager:(id<NITNetworkManaging>)networkManager cacheManager:(NITCacheManager*)cacheManager configuration:(NITConfiguration*)configuration trackManager:(NITTrackManager*)trackManager {
     NITGeopolisNodesManager *nodesManager = [[NITGeopolisNodesManager alloc] init];
+    NITTimestampsManager *timestampsManager = [[NITTimestampsManager alloc] initWithNetworkManager:networkManager configuration:configuration];
     NITDateManager *dateManager = [[NITDateManager alloc] init];
-    NITGeopolisManager *geopolisManager = [[NITGeopolisManager alloc] initWithNodesManager:nodesManager cachaManager:cacheManager networkManager:networkManager configuration:configuration trackManager:trackManager dateManager:dateManager];
+    NITGeopolisManager *geopolisManager = [[NITGeopolisManager alloc] initWithNodesManager:nodesManager cachaManager:cacheManager networkManager:networkManager configuration:configuration trackManager:trackManager dateManager:dateManager timestampsManager:timestampsManager];
     return geopolisManager;
 }
 
