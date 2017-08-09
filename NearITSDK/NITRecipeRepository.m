@@ -18,6 +18,9 @@
 #import "NITRecipeHistory.h"
 #import "NITEvaluationBodyBuilder.h"
 #import "NITTimestampsManager.h"
+#import "NITCoupon.h"
+#import "NITClaim.h"
+#import "NITImage.h"
 
 NSString* const RecipesCacheKey = @"Recipes";
 NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
@@ -68,7 +71,7 @@ NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
 }
 
 - (void)setRecipesWithJsonApi:(NITJSONAPI*)json {
-    [json registerClass:[NITRecipe class] forType:@"recipes"];
+    [self registerClassesWithJsonApi:json];
     self.recipes = [json parseToArrayOfObjects];
 }
 
@@ -94,7 +97,7 @@ NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
             NSDate *today = [self.dateManager currentDate];
             self.lastEditedTime = [today timeIntervalSince1970];
             [self.cacheManager saveWithObject:[NSNumber numberWithDouble:self.lastEditedTime] forKey:RecipesLastEditedTimeCacheKey];
-            [json registerClass:[NITRecipe class] forType:@"recipes"];
+            [self registerClassesWithJsonApi:json];
             id onlineEvaluation = [json metaForKey:@"online_evaluation"];
             if (onlineEvaluation && [onlineEvaluation isKindOfClass:[NSNumber class]]) {
                 self.pulseEvaluationOnline = [onlineEvaluation boolValue];
@@ -117,7 +120,7 @@ NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
             }
         } else {
             if (completionHandler) {
-                [json registerClass:[NITRecipe class] forType:@"recipes"];
+                [self registerClassesWithJsonApi:json];
                 NSArray<NITRecipe*>* recipes = [json parseToArrayOfObjects];
                 completionHandler(recipes, nil);
             }
@@ -143,6 +146,13 @@ NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
 
 - (BOOL)isPulseOnlineEvaluationAvaialble {
     return self.pulseEvaluationOnline;
+}
+
+- (void)registerClassesWithJsonApi:(NITJSONAPI*)jsonApi {
+    [jsonApi registerClass:[NITRecipe class] forType:@"recipes"];
+    [jsonApi registerClass:[NITCoupon class] forType:@"coupons"];
+    [jsonApi registerClass:[NITClaim class] forType:@"claims"];
+    [jsonApi registerClass:[NITImage class] forType:@"images"];
 }
 
 @end
