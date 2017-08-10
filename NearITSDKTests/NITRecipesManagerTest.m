@@ -104,6 +104,7 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
         block(recipe, nil);
         return nil;
     }];
+    [given(self.repository.isPulseOnlineEvaluationAvaialble) willReturnBool:YES];
     
     NITTriggerRequest *request = [[NITTriggerRequest alloc] init];
     request.pulsePlugin = @"beacon_forest";
