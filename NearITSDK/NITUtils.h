@@ -16,5 +16,6 @@
 + (NSString* _Nonnull)stringFromRegionEvent:(NITRegionEvent)event;
 + (NSString* _Nonnull)stringTagFromRegionEvent:(NITRegionEvent)event;
 + (NSString* _Nonnull)stringFromBluetoothState:(CBManagerState)state;
++ (NSString* _Nonnull)generateUUID;
 
 @end
