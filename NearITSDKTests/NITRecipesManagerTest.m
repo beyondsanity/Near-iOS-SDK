@@ -10,9 +10,6 @@
 #import "NITTestCase.h"
 #import "NITRecipesManager.h"
 #import "NITRecipeCooler.h"
-#import "NITCacheManager.h"
-#import "NITNetworkManager.h"
-#import "NITNetworkMockManger.h"
 #import "NITConfiguration.h"
 #import "NITReachability.h"
 #import "NITRecipeHistory.h"
@@ -20,7 +17,6 @@
 #import "NITPulseBundle.h"
 #import "NITRecipeRepository.h"
 #import "NITRecipeTrackSender.h"
-#import "NITEvaluationBodyBuilder.h"
 #import "NITTriggerRequest.h"
 #import "NITRecipesApi.h"
 #import <OCMockitoIOS/OCMockitoIOS.h>
@@ -43,10 +39,8 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
 @property (nonatomic, strong) NITReachability *reachability;
 @property (nonatomic, strong) NITRecipeHistory *recipeHistory;
 @property (nonatomic, strong) NITRecipeValidationFilter *recipeValidationFilter;
-@property (nonatomic, strong) NITCacheManager *cacheManager;
 @property (nonatomic, strong) NITRecipeRepository *repository;
 @property (nonatomic, strong) NITRecipeTrackSender *trackSender;
-@property (nonatomic, strong) NITEvaluationBodyBuilder *evaluationBodyBuilder;
 @property (nonatomic, strong) NITRecipesApi *api;
 
 @end
@@ -60,13 +54,9 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
     [given([self.reachability currentReachabilityStatus]) willReturnInteger:NotReachable];
     self.recipeHistory = mock([NITRecipeHistory class]);
     self.recipeValidationFilter = mock([NITRecipeValidationFilter class]);
-    self.cacheManager = mock([NITCacheManager class]);
     self.repository = mock([NITRecipeRepository class]);
     self.trackSender = mock([NITRecipeTrackSender class]);
-    self.evaluationBodyBuilder = mock([NITEvaluationBodyBuilder class]);
     self.api = mock([NITRecipesApi class]);
-    [given([self.evaluationBodyBuilder buildEvaluationBody]) willReturn:[self simpleJsonApi]];
-    [given([self.evaluationBodyBuilder buildEvaluationBodyWithPlugin:anything() action:anything() bundle:anything()]) willReturn:[self simpleJsonApi]];
 }
 
 - (void)tearDown {
@@ -76,9 +66,7 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
 
 - (void)testOnlineEvaluation {
     self.expectation = [self expectationWithDescription:@"expectation"];
-    [given([self.cacheManager loadArrayForKey:RecipesCacheKey]) willReturn:nil];
     
-    NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
     NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithRecipeValidationFilter:self.recipeValidationFilter repository:self.repository trackSender:self.trackSender api:self.api];
     [given([self.repository recipes]) willReturn:[self recipesFromJsonWithName:@"online_recipe"]];
     recipesManager.manager = self;
@@ -102,9 +90,7 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
 
 - (void)testOnlinePulseEvaluation {
     self.expectation = [self expectationWithDescription:@"expectation"];
-    [given([self.cacheManager loadArrayForKey:RecipesCacheKey]) willReturn:nil];
     
-    NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
     NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithRecipeValidationFilter:self.recipeValidationFilter repository:self.repository trackSender:self.trackSender api:self.api];
     [given([self.repository recipes]) willReturn:[self recipesFromJsonWithName:@"online_recipe"]];
     recipesManager.manager = self;
