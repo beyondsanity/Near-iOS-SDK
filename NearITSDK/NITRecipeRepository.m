@@ -12,11 +12,9 @@
 #import "NITJSONAPI.h"
 #import "NITJSONAPIResource.h"
 #import "NITDateManager.h"
-#import "NITNetworkProvider.h"
 #import "NITTimestampsManager.h"
 #import "NITConfiguration.h"
 #import "NITRecipeHistory.h"
-#import "NITEvaluationBodyBuilder.h"
 #import "NITTimestampsManager.h"
 #import "NITCoupon.h"
 #import "NITClaim.h"
@@ -31,11 +29,9 @@ NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
 
 @property (nonatomic, strong) NSArray<NITRecipe*> *recipes;
 @property (nonatomic, strong) NITCacheManager *cacheManager;
-@property (nonatomic, strong) id<NITNetworkManaging> networkManager;
 @property (nonatomic, strong) NITDateManager *dateManager;
 @property (nonatomic, strong) NITConfiguration *configuration;
 @property (nonatomic, strong) NITRecipeHistory *recipeHistory;
-@property (nonatomic, strong) NITEvaluationBodyBuilder *evaluationBodyBuilder;
 @property (nonatomic, strong) NITTimestampsManager *timestampsManager;
 @property (nonatomic, strong) NITRecipesApi *api;
 @property (nonatomic) NSTimeInterval lastEditedTime;
@@ -45,15 +41,13 @@ NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
 
 @implementation NITRecipeRepository
 
-- (instancetype)initWithCacheManager:(NITCacheManager *)cacheManager networkManager:(id<NITNetworkManaging>)networkManager dateManager:(NITDateManager *)dateManager configuration:(NITConfiguration *)configuration recipeHistory:(NITRecipeHistory * _Nonnull)recipeHistory evaluationBodyBuilder:(NITEvaluationBodyBuilder * _Nonnull)evaluationBodyBuilder timestampsManager:(NITTimestampsManager * _Nonnull)timestampsManager api:(NITRecipesApi * _Nonnull)api {
+- (instancetype)initWithCacheManager:(NITCacheManager *)cacheManager dateManager:(NITDateManager *)dateManager configuration:(NITConfiguration *)configuration recipeHistory:(NITRecipeHistory * _Nonnull)recipeHistory timestampsManager:(NITTimestampsManager * _Nonnull)timestampsManager api:(NITRecipesApi * _Nonnull)api {
     self = [super init];
     if (self) {
         self.cacheManager = cacheManager;
-        self.networkManager = networkManager;
         self.dateManager = dateManager;
         self.configuration = configuration;
         self.recipeHistory = recipeHistory;
-        self.evaluationBodyBuilder = evaluationBodyBuilder;
         self.timestampsManager = timestampsManager;
         self.api = api;
         self.recipes = [self.cacheManager loadArrayForKey:RecipesCacheKey];
