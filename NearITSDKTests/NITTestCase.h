@@ -27,5 +27,6 @@
 - (void)executeOnClientRunLoopAfterDelay:(NSTimeInterval)delayInSeconds block:(dispatch_block_t)block;
 - (NITJSONAPI*)makeTimestampsResponseWithTimeInterval:(NSTimeInterval)timeInterval;
 - (NITJSONAPI*)simpleJsonApi;
+- (NITRecipe*)makeRecipeWithPulsePlugin:(NSString*)pulsePlugin pulseAction:(NSString *)pulseAction pulseBundle:(NSString *)pulseBundle tags:(NSArray<NSString *> *)tags;
 
 @end

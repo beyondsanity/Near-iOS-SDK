@@ -17,11 +17,19 @@
 #import "NITEvaluationBodyBuilder.h"
 #import "NITTimestampsManager.h"
 #import "NITRecipesApi.h"
+#import "NITResource.h"
 #import <OCMockitoIOS/OCMockitoIOS.h>
 #import <OCHamcrestIOS/OCHamcrestIOS.h>
 
 typedef void (^TimestampsCheckBlock)(BOOL needToSync);
 typedef void (^ProcessRecipesBlock)(NSArray<NITRecipe*>*, BOOL, NSError*);
+
+@interface NITRecipeRepository (Tests)
+
+- (void)setRecipes:(NSArray<NITRecipe *> *)recipes;
+- (BOOL)verifyTags:(NSArray<NSString*>*)tags recipeTags:(NSArray<NSString*>*)recipeTags;
+
+@end
 
 @interface NITRecipeRepositoryTest : NITTestCase
 
@@ -161,6 +169,54 @@ typedef void (^ProcessRecipesBlock)(NSArray<NITRecipe*>*, BOOL, NSError*);
         [verifyCount(self.cacheManager, never()) saveWithObject:anything() forKey:RecipesCacheKey];
         [verifyCount(self.cacheManager, never()) saveWithObject:anything() forKey:RecipesLastEditedTimeCacheKey];
     }];
+}
+
+// MARK: - Matchings
+
+- (void)testMatchingWithPulseBundle {
+    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory timestampsManager:self.timestampsManager api:self.recipesApi];
+    
+    NITRecipe *recipe1 = [self makeRecipeWithPulsePlugin:@"plugin1" pulseAction:@"action1" pulseBundle:@"bundle1" tags:nil];
+    NITRecipe *recipe2 = [self makeRecipeWithPulsePlugin:@"plugin2" pulseAction:@"action2" pulseBundle:@"bundle2" tags:nil];
+    repository.recipes = @[recipe1, recipe2];
+    
+    NSArray<NITRecipe*>* matchingRecipes = [repository matchingRecipesWithPulsePlugin:recipe1.pulsePluginId pulseAction:recipe1.pulseAction.ID pulseBundle:recipe1.pulseBundle.ID];
+    XCTAssertTrue(matchingRecipes.count == 1);
+    
+    matchingRecipes = [repository matchingRecipesWithPulsePlugin:@"plugin1" pulseAction:@"action2" pulseBundle:@"bundle1"];
+    XCTAssertTrue(matchingRecipes.count == 0);
+}
+
+- (void)testMatchingWithTags {
+    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory timestampsManager:self.timestampsManager api:self.recipesApi];
+    
+    NITRecipe *recipe1 = [self makeRecipeWithPulsePlugin:@"plugin1" pulseAction:@"action1" pulseBundle:@"bundle1" tags:@[@"tagA", @"tagB"]];
+    NITRecipe *recipe2 = [self makeRecipeWithPulsePlugin:@"plugin2" pulseAction:@"action2" pulseBundle:@"bundle2" tags:@[@"tagA"]];
+    repository.recipes = @[recipe1, recipe2];
+    
+    NSArray<NITRecipe*>* matchingRecipes = [repository matchingRecipesWithPulsePlugin:recipe1.pulsePluginId pulseAction:recipe1.pulseAction.ID tags:recipe1.tags];
+    XCTAssertTrue(matchingRecipes.count == 1);
+    
+    matchingRecipes = [repository matchingRecipesWithPulsePlugin:recipe2.pulsePluginId pulseAction:recipe2.pulseAction.ID tags:recipe1.tags];
+    XCTAssertTrue(matchingRecipes.count == 1);
+    
+    matchingRecipes = [repository matchingRecipesWithPulsePlugin:recipe1.pulsePluginId pulseAction:recipe1.pulseAction.ID tags:@[@"tagA"]];
+    XCTAssertTrue(matchingRecipes.count == 0);
+}
+
+- (void)testVerifyTags {
+    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory timestampsManager:self.timestampsManager api:self.recipesApi];
+    
+    XCTAssertFalse([repository verifyTags:nil recipeTags:@[@"tag1"]]);
+    XCTAssertFalse([repository verifyTags:@[@"tag1"] recipeTags:nil]);
+    XCTAssertFalse([repository verifyTags:nil recipeTags:nil]);
+    
+    BOOL check = [repository verifyTags:@[@"tag1", @"tag2"] recipeTags:@[@"tag1", @"tag2", @"tag3"]];
+    XCTAssertFalse(check);
+    check = [repository verifyTags:@[@"tag1", @"tag2", @"tag3"] recipeTags:@[@"tag1", @"tag2"]];
+    XCTAssertTrue(check);
+    check = [repository verifyTags:@[@"tag1", @"tag3"] recipeTags:@[@"tag1", @"tag2"]];
+    XCTAssertFalse(check);
 }
 
 @end

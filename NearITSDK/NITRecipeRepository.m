@@ -130,6 +130,47 @@ NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
     }];
 }
 
+- (NSArray<NITRecipe*>*)matchingRecipesWithPulsePlugin:(NSString*)pulsePlugin pulseAction:(NSString *)pulseAction pulseBundle:(NSString *)pulseBundle {
+    NSMutableArray<NITRecipe*> *matchingRecipes = [[NSMutableArray alloc] init];
+    
+    for (NITRecipe *recipe in self.recipes) {
+        if ([recipe.pulsePluginId isEqualToString:pulsePlugin] && [recipe.pulseAction.ID isEqualToString:pulseAction] && [recipe.pulseBundle.ID isEqualToString:pulseBundle]) {
+            [matchingRecipes addObject:recipe];
+        }
+    }
+    
+    return [NSArray arrayWithArray:matchingRecipes];
+}
+
+- (NSArray<NITRecipe *> *)matchingRecipesWithPulsePlugin:(NSString *)pulsePlugin pulseAction:(NSString *)pulseAction tags:(NSArray<NSString *> *)tags {
+    NSMutableArray<NITRecipe*> *matchingRecipes = [[NSMutableArray alloc] init];
+    
+    for (NITRecipe *recipe in self.recipes) {
+        if ([recipe.pulsePluginId isEqualToString:pulsePlugin] && [recipe.pulseAction.ID isEqualToString:pulseAction] && [self verifyTags:tags recipeTags:recipe.tags]) {
+            [matchingRecipes addObject:recipe];
+        }
+    }
+    
+    return [NSArray arrayWithArray:matchingRecipes];
+}
+
+- (BOOL)verifyTags:(NSArray<NSString*>*)tags recipeTags:(NSArray<NSString*>*)recipeTags {
+    if (tags == nil || recipeTags == nil) {
+        return NO;
+    }
+    
+    NSInteger trueCount = 0;
+    for(NSString *tag in tags) {
+        if ([recipeTags indexOfObjectIdenticalTo:tag] != NSNotFound) {
+            trueCount++;
+        }
+    }
+    if (trueCount == recipeTags.count) {
+        return YES;
+    }
+    return NO;
+}
+
 - (BOOL)isPulseOnlineEvaluationAvaialble {
     return self.pulseEvaluationOnline;
 }

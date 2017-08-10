@@ -132,4 +132,21 @@
     return jsonApi;
 }
 
+- (NITRecipe*)makeRecipeWithPulsePlugin:(NSString*)pulsePlugin pulseAction:(NSString *)pulseAction pulseBundle:(NSString *)pulseBundle tags:(NSArray<NSString *> *)tags {
+    NITRecipe *recipe = [[NITRecipe alloc] init];
+    recipe.pulsePluginId = pulsePlugin;
+    
+    NITResource *pulseActionRes = [[NITResource alloc] init];
+    pulseActionRes.ID = pulseAction;
+    recipe.pulseAction = pulseActionRes;
+    
+    NITResource *pulseBundleRes = [[NITResource alloc] init];
+    pulseBundleRes.ID = pulseBundle;
+    recipe.pulseBundle = pulseBundleRes;
+    
+    recipe.tags = tags;
+    
+    return recipe;
+}
+
 @end

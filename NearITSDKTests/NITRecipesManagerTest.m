@@ -132,13 +132,8 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
 }
 
 - (void)testGotPulseBundleMatchingWithValidation {
-    NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
     NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithRecipeValidationFilter:self.recipeValidationFilter repository:self.repository trackSender:self.trackSender api:self.api requestQueue:self.requestQueue];
     [given([self.repository recipes]) willReturn:[self recipesFromJsonWithName:@"recipes"]];
-    
-    networkManager.mock = ^NITJSONAPI *(NSURLRequest *request) {
-        return nil;
-    };
     
     [given([self.recipeValidationFilter filterRecipes:anything()]) willReturn:nil];
     
