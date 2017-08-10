@@ -114,17 +114,17 @@ NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
     }];
 }
 
-- (void)refreshConfigCheckTimeWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler {
+- (void)syncWithCompletionHandler:(void (^)(NSError * _Nullable, BOOL))completionHandler {
     [self.timestampsManager checkTimestampWithType:@"recipes" referenceTime:self.lastEditedTime completionHandler:^(BOOL needToSync) {
         if (needToSync) {
             [self refreshConfigWithCompletionHandler:^(NSError * _Nullable error) {
                 if (completionHandler) {
-                    completionHandler(error);
+                    completionHandler(error, YES);
                 }
             }];
         } else {
             if (completionHandler) {
-                completionHandler(nil);
+                completionHandler(nil, NO);
             }
         }
     }];

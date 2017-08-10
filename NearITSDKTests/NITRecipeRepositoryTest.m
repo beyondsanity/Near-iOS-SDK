@@ -138,7 +138,7 @@ typedef void (^ProcessRecipesBlock)(NSArray<NITRecipe*>*, BOOL, NSError*);
     [verifyCount(self.cacheManager, times(1)) loadArrayForKey:RecipesCacheKey];
     [verifyCount(self.cacheManager, times(1)) loadNumberForKey:RecipesLastEditedTimeCacheKey];
     
-    [repository refreshConfigCheckTimeWithCompletionHandler:^(NSError * _Nullable error) {
+    [repository syncWithCompletionHandler:^(NSError * _Nullable error, BOOL isUpdated) {
         XCTAssertNil(error);
         [verifyCount(self.cacheManager, times(1)) saveWithObject:anything() forKey:RecipesCacheKey];
         [verifyCount(self.cacheManager, times(1)) saveWithObject:anything() forKey:RecipesLastEditedTimeCacheKey];
@@ -156,7 +156,7 @@ typedef void (^ProcessRecipesBlock)(NSArray<NITRecipe*>*, BOOL, NSError*);
     [verifyCount(self.cacheManager, times(1)) loadArrayForKey:RecipesCacheKey];
     [verifyCount(self.cacheManager, times(1)) loadNumberForKey:RecipesLastEditedTimeCacheKey];
     
-    [repository refreshConfigCheckTimeWithCompletionHandler:^(NSError * _Nullable error) {
+    [repository syncWithCompletionHandler:^(NSError * _Nullable error, BOOL isUpdated) {
         XCTAssertNil(error);
         [verifyCount(self.cacheManager, never()) saveWithObject:anything() forKey:RecipesCacheKey];
         [verifyCount(self.cacheManager, never()) saveWithObject:anything() forKey:RecipesLastEditedTimeCacheKey];

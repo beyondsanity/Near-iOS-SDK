@@ -14,7 +14,7 @@
 #import <OCMockitoIOS/OCMockitoIOS.h>
 #import <OCHamcrestIOS/OCHamcrestIOS.h>
 
-typedef void (^RefreshRecipesBlock) (NSError*);
+typedef void (^RefreshRecipesBlock) (NSError*, BOOL);
 
 @interface NITTriggerRequestQueue (Tests)
 
@@ -43,10 +43,10 @@ typedef void (^RefreshRecipesBlock) (NSError*);
     [super tearDown];
 }
 
-- (void)testQueue {
+- (void)testQueueIsUpdated {
     NITRecipeRepository *repository = mock([NITRecipeRepository class]);
     __block RefreshRecipesBlock repoBlock;
-    [givenVoid([repository refreshConfigCheckTimeWithCompletionHandler:anything()]) willDo:^id _Nonnull(NSInvocation * _Nonnull invocation) {
+    [givenVoid([repository syncWithCompletionHandler:anything()]) willDo:^id _Nonnull(NSInvocation * _Nonnull invocation) {
         repoBlock = [invocation mkt_arguments][0];
         return nil;
     }];
@@ -64,7 +64,7 @@ typedef void (^RefreshRecipesBlock) (NSError*);
     XCTAssertTrue(queue.isBusy);
     XCTAssertTrue(queue.requests.count == 2);
     
-    repoBlock(nil);
+    repoBlock(nil, YES);
     
     [verifyCount(self.delegate, times(2)) triggerRequestQueue:anything() didFinishWithRequest:anything()];
     XCTAssertFalse(queue.isBusy);
@@ -73,7 +73,40 @@ typedef void (^RefreshRecipesBlock) (NSError*);
     [queue processQueue];
     XCTAssertFalse(queue.isBusy);
     XCTAssertTrue(queue.requests.count == 0);
-    [verifyCount(repository, times(1)) refreshConfigCheckTimeWithCompletionHandler:anything()];
+    [verifyCount(repository, times(1)) syncWithCompletionHandler:anything()];
+}
+
+- (void)testQueueIsNotUpdated {
+    NITRecipeRepository *repository = mock([NITRecipeRepository class]);
+    __block RefreshRecipesBlock repoBlock;
+    [givenVoid([repository syncWithCompletionHandler:anything()]) willDo:^id _Nonnull(NSInvocation * _Nonnull invocation) {
+        repoBlock = [invocation mkt_arguments][0];
+        return nil;
+    }];
+    
+    NITTriggerRequestQueue *queue = [[NITTriggerRequestQueue alloc] initWithRepository:repository];
+    queue.delegate = self.delegate;
+    XCTAssertFalse(queue.isBusy);
+    XCTAssertTrue(queue.requests.count == 0);
+    
+    [queue addRequest:[self makeRequest]];
+    XCTAssertTrue(queue.isBusy);
+    XCTAssertTrue(queue.requests.count == 1);
+    
+    [queue addRequest:[self makeRequest]];
+    XCTAssertTrue(queue.isBusy);
+    XCTAssertTrue(queue.requests.count == 2);
+    
+    repoBlock(nil, NO);
+    
+    [verifyCount(self.delegate, never()) triggerRequestQueue:anything() didFinishWithRequest:anything()];
+    XCTAssertFalse(queue.isBusy);
+    XCTAssertTrue(queue.requests.count == 0);
+    
+    [queue processQueue];
+    XCTAssertFalse(queue.isBusy);
+    XCTAssertTrue(queue.requests.count == 0);
+    [verifyCount(repository, times(1)) syncWithCompletionHandler:anything()];
 }
 
 // MARK - Utils

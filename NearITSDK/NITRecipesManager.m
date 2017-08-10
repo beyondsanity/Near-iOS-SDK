@@ -62,7 +62,7 @@
 }
 
 - (void)refreshConfigCheckTimeWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler {
-    [self.repository refreshConfigCheckTimeWithCompletionHandler:^(NSError * _Nullable error) {
+    [self.repository syncWithCompletionHandler:^(NSError * _Nullable error, BOOL isUpdated) {
         if (completionHandler) {
             completionHandler(error);
         }

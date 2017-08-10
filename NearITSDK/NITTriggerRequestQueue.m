@@ -46,11 +46,14 @@
     }
     
     self.isBusy = YES;
-    
-    [self.repository refreshConfigCheckTimeWithCompletionHandler:^(NSError * _Nullable error) {
-        if (error == nil) {
-            NSArray<NITTriggerRequest*>* queuedRequests = [self.requests copy];
+    [self.repository syncWithCompletionHandler:^(NSError * _Nullable error, BOOL isUpdated) {
+        NSArray<NITTriggerRequest*>* queuedRequests = [self.requests copy];
+        if (isUpdated) {
             [self finishQueueWithRequests: queuedRequests];
+        } else {
+            for(NITTriggerRequest *request in queuedRequests) {
+                [self.requests removeObject:request];
+            }
         }
         self.isBusy = NO;
         [self processQueue];
