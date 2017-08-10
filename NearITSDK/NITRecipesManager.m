@@ -7,7 +7,6 @@
 //
 
 #import "NITRecipesManager.h"
-#import "NITNetworkProvider.h"
 #import "NITJSONAPI.h"
 #import "NITRecipe.h"
 #import "NITJSONAPIResource.h"
@@ -15,12 +14,10 @@
 #import "NITConstants.h"
 #import "NITImage.h"
 #import "NITClaim.h"
-#import "NITCacheManager.h"
 #import "NITRecipeValidationFilter.h"
 #import "NITTimestampsManager.h"
 #import "NITRecipeRepository.h"
 #import "NITRecipeTrackSender.h"
-#import "NITEvaluationBodyBuilder.h"
 #import "NITTriggerRequest.h"
 #import "NITRecipesApi.h"
 
@@ -28,27 +25,21 @@
 
 @interface NITRecipesManager()
 
-@property (nonatomic, strong) NITCacheManager *cacheManager;
-@property (nonatomic, strong) id<NITNetworkManaging> networkManager;
 @property (nonatomic, strong) NITRecipeValidationFilter *recipeValidationFilter;
 @property (nonatomic, strong) NITRecipeRepository *repository;
 @property (nonatomic, strong) NITRecipeTrackSender *trackSender;
-@property (nonatomic, strong) NITEvaluationBodyBuilder *evaluationBodyBuilder;
 @property (nonatomic, strong) NITRecipesApi *api;
 
 @end
 
 @implementation NITRecipesManager
 
-- (instancetype)initWithCacheManager:(NITCacheManager*)cacheManager networkManager:(id<NITNetworkManaging>)networkManager recipeValidationFilter:(NITRecipeValidationFilter * _Nonnull)recipeValidationFilter repository:(NITRecipeRepository * _Nonnull)repository trackSender:(NITRecipeTrackSender * _Nonnull)trackSender evaluationBodyBuilder:(NITEvaluationBodyBuilder *)evaluationBodyBuilder api:(NITRecipesApi * _Nonnull)api {
+- (instancetype)initWithRecipeValidationFilter:(NITRecipeValidationFilter * _Nonnull)recipeValidationFilter repository:(NITRecipeRepository * _Nonnull)repository trackSender:(NITRecipeTrackSender * _Nonnull)trackSender api:(NITRecipesApi * _Nonnull)api {
     self = [super init];
     if (self) {
-        self.cacheManager = cacheManager;
-        self.networkManager = networkManager;
         self.recipeValidationFilter = recipeValidationFilter;
         self.repository = repository;
         self.trackSender = trackSender;
-        self.evaluationBodyBuilder = evaluationBodyBuilder;
         self.api = api;
     }
     return self;
