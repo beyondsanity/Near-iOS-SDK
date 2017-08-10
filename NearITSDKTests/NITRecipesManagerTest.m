@@ -34,7 +34,7 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
 
 @end
 
-@interface NITRecipesManagerTest : NITTestCase<NITManaging>
+@interface NITRecipesManagerTest : NITTestCase
 
 @property (nonatomic, strong) XCTestExpectation *expectation;
 @property (nonatomic, strong) NITReachability *reachability;
@@ -68,15 +68,16 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
 }
 
 - (void)testOnlineEvaluation {
-    self.expectation = [self expectationWithDescription:@"expectation"];
+    id<NITManaging> managing = mockProtocol(@protocol(NITManaging));
     
     NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithRecipeValidationFilter:self.recipeValidationFilter repository:self.repository trackSender:self.trackSender api:self.api requestQueue:self.requestQueue];
     [given([self.repository recipes]) willReturn:[self recipesFromJsonWithName:@"online_recipe"]];
-    recipesManager.manager = self;
+    recipesManager.manager = managing;
     
-    [givenVoid([self.api evaluateRecipeWithId:@"recipeId" completionHandler:anything()]) willDo:^id _Nonnull(NSInvocation * _Nonnull invocation) {
+    NITRecipe *recipe = [[NITRecipe alloc] init];
+    recipe.ID = @"recipeId";
+    [givenVoid([self.api evaluateRecipeWithId:recipe.ID completionHandler:anything()]) willDo:^id _Nonnull(NSInvocation * _Nonnull invocation) {
         SingleRecipeBlock block = [invocation mkt_arguments][1];
-        NITRecipe *recipe = [[NITRecipe alloc] init];
         block(recipe, nil);
         return nil;
     }];
@@ -86,21 +87,20 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
     request.pulseAction = @"leave_place";
     request.pulseBundle = @"9712e11a-ef3a-4b34-bdf6-413a84146f2e";
     
-    [recipesManager evaluateRecipeWithId:@"recipeId"];
-    
-    [self waitForExpectationsWithTimeout:4.0 handler:nil];
+    [recipesManager evaluateRecipeWithId:recipe.ID];
+    [verifyCount(managing, times(1)) recipesManager:anything() gotRecipe:sameInstance(recipe)];
 }
 
 - (void)testOnlinePulseEvaluation {
-    self.expectation = [self expectationWithDescription:@"expectation"];
+    id<NITManaging> managing = mockProtocol(@protocol(NITManaging));
     
     NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithRecipeValidationFilter:self.recipeValidationFilter repository:self.repository trackSender:self.trackSender api:self.api requestQueue:self.requestQueue];
     [given([self.repository recipes]) willReturn:[self recipesFromJsonWithName:@"online_recipe"]];
-    recipesManager.manager = self;
+    recipesManager.manager = managing;
     
+    NITRecipe *recipe = [[NITRecipe alloc] init];
     [givenVoid([self.api onlinePulseEvaluationWithPlugin:anything() action:anything() bundle:anything() completionHandler:anything()]) willDo:^id _Nonnull(NSInvocation * _Nonnull invocation) {
         SingleRecipeBlock block = [invocation mkt_arguments][3];
-        NITRecipe *recipe = [[NITRecipe alloc] init];
         block(recipe, nil);
         return nil;
     }];
@@ -112,8 +112,7 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
     request.pulseBundle = @"e11f58db-054e-4df1-b09b-d0cbe2676031";
     
     [recipesManager gotPulseOnlineWithTriggerRequest:request];
-    
-    [self waitForExpectationsWithTimeout:4.0 handler:nil];
+    [verifyCount(managing, times(1)) recipesManager:anything() gotRecipe:sameInstance(recipe)];
 }
 
 - (void)testGotPulseBundleNoMatching {
@@ -182,18 +181,6 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
                     break;
             }
         }
-    }
-}
-
-// MARK: - NITManaging delegate
-
-- (void)recipesManager:(NITRecipesManager *)recipesManager gotRecipe:(NITRecipe *)recipe {
-    if ([self.name containsString:@"testOnlineEvaluation"]) {
-        XCTAssertNotNil(recipe);
-        [self.expectation fulfill];
-    } else if([self.name containsString:@"testOnlinePulseEvaluation"]) {
-        XCTAssertNotNil(recipe);
-        [self.expectation fulfill];
     }
 }
 
