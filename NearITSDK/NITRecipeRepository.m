@@ -21,6 +21,7 @@
 #import "NITCoupon.h"
 #import "NITClaim.h"
 #import "NITImage.h"
+#import "NITRecipesApi.h"
 
 NSString* const RecipesCacheKey = @"Recipes";
 NSString* const RecipesLastEditedTimeCacheKey = @"RecipesLastEditedTime";
@@ -36,6 +37,7 @@ NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
 @property (nonatomic, strong) NITRecipeHistory *recipeHistory;
 @property (nonatomic, strong) NITEvaluationBodyBuilder *evaluationBodyBuilder;
 @property (nonatomic, strong) NITTimestampsManager *timestampsManager;
+@property (nonatomic, strong) NITRecipesApi *api;
 @property (nonatomic) NSTimeInterval lastEditedTime;
 @property (nonatomic) BOOL pulseEvaluationOnline;
 
@@ -43,7 +45,7 @@ NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
 
 @implementation NITRecipeRepository
 
-- (instancetype)initWithCacheManager:(NITCacheManager *)cacheManager networkManager:(id<NITNetworkManaging>)networkManager dateManager:(NITDateManager *)dateManager configuration:(NITConfiguration *)configuration recipeHistory:(NITRecipeHistory * _Nonnull)recipeHistory evaluationBodyBuilder:(NITEvaluationBodyBuilder * _Nonnull)evaluationBodyBuilder timestampsManager:(NITTimestampsManager * _Nonnull)timestampsManager {
+- (instancetype)initWithCacheManager:(NITCacheManager *)cacheManager networkManager:(id<NITNetworkManaging>)networkManager dateManager:(NITDateManager *)dateManager configuration:(NITConfiguration *)configuration recipeHistory:(NITRecipeHistory * _Nonnull)recipeHistory evaluationBodyBuilder:(NITEvaluationBodyBuilder * _Nonnull)evaluationBodyBuilder timestampsManager:(NITTimestampsManager * _Nonnull)timestampsManager api:(NITRecipesApi * _Nonnull)api {
     self = [super init];
     if (self) {
         self.cacheManager = cacheManager;
@@ -53,6 +55,7 @@ NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
         self.recipeHistory = recipeHistory;
         self.evaluationBodyBuilder = evaluationBodyBuilder;
         self.timestampsManager = timestampsManager;
+        self.api = api;
         self.recipes = [self.cacheManager loadArrayForKey:RecipesCacheKey];
         NSNumber *time = [self.cacheManager loadNumberForKey:RecipesLastEditedTimeCacheKey];
         if (time) {
@@ -70,17 +73,12 @@ NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
     return self;
 }
 
-- (void)setRecipesWithJsonApi:(NITJSONAPI*)json {
-    [self registerClassesWithJsonApi:json];
-    self.recipes = [json parseToArrayOfObjects];
-}
-
 - (NSInteger)recipesCount {
     return [self.recipes count];
 }
 
 - (void)refreshConfigWithCompletionHandler:(void (^)(NSError * _Nullable))completionHandler {
-    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] recipesProcessListWithJsonApi:[self.evaluationBodyBuilder buildEvaluationBody]] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
+    [self.api processRecipesWithCompletionHandler:^(NSArray<NITRecipe *> * _Nullable recipes, BOOL pulseOnlineEvaluation, NSError * _Nullable error) {
         if (error) {
             NSArray<NITRecipe*> *cachedRecipes = [self.cacheManager loadArrayForKey:RecipesCacheKey];
             if (cachedRecipes) {
@@ -97,13 +95,9 @@ NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
             NSDate *today = [self.dateManager currentDate];
             self.lastEditedTime = [today timeIntervalSince1970];
             [self.cacheManager saveWithObject:[NSNumber numberWithDouble:self.lastEditedTime] forKey:RecipesLastEditedTimeCacheKey];
-            [self registerClassesWithJsonApi:json];
-            id onlineEvaluation = [json metaForKey:@"online_evaluation"];
-            if (onlineEvaluation && [onlineEvaluation isKindOfClass:[NSNumber class]]) {
-                self.pulseEvaluationOnline = [onlineEvaluation boolValue];
-                [self.cacheManager saveWithObject:onlineEvaluation forKey:RecipePulseOnlineAvailable];
-            }
-            self.recipes = [json parseToArrayOfObjects];
+            self.pulseEvaluationOnline = pulseOnlineEvaluation;
+            [self.cacheManager saveWithObject:[NSNumber numberWithBool:pulseOnlineEvaluation] forKey:RecipePulseOnlineAvailable];
+            self.recipes = recipes;
             [self.cacheManager saveWithObject:self.recipes forKey:RecipesCacheKey];
             if (completionHandler) {
                 completionHandler(nil);
@@ -113,15 +107,13 @@ NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
 }
 
 - (void)recipesWithCompletionHandler:(void (^)(NSArray<NITRecipe *> * _Nullable, NSError * _Nullable))completionHandler {
-    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] recipesProcessListWithJsonApi:[self.evaluationBodyBuilder buildEvaluationBody]] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
+    [self.api processRecipesWithCompletionHandler:^(NSArray<NITRecipe *> * _Nullable recipes, BOOL pulseOnlineEvaluation, NSError * _Nullable error) {
         if (error) {
             if (completionHandler) {
                 completionHandler(nil, error);
             }
         } else {
             if (completionHandler) {
-                [self registerClassesWithJsonApi:json];
-                NSArray<NITRecipe*>* recipes = [json parseToArrayOfObjects];
                 completionHandler(recipes, nil);
             }
         }
@@ -146,13 +138,6 @@ NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
 
 - (BOOL)isPulseOnlineEvaluationAvaialble {
     return self.pulseEvaluationOnline;
-}
-
-- (void)registerClassesWithJsonApi:(NITJSONAPI*)jsonApi {
-    [jsonApi registerClass:[NITRecipe class] forType:@"recipes"];
-    [jsonApi registerClass:[NITCoupon class] forType:@"coupons"];
-    [jsonApi registerClass:[NITClaim class] forType:@"claims"];
-    [jsonApi registerClass:[NITImage class] forType:@"images"];
 }
 
 @end

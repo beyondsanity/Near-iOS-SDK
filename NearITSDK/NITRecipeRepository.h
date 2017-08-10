@@ -17,13 +17,14 @@
 @class NITRecipe;
 @class NITEvaluationBodyBuilder;
 @class NITTimestampsManager;
+@class NITRecipesApi;
 
 extern NSString* _Nonnull const RecipesCacheKey;
 extern NSString* _Nonnull const RecipesLastEditedTimeCacheKey;
 
 @interface NITRecipeRepository : NSObject
 
-- (instancetype _Nonnull)initWithCacheManager:(NITCacheManager* _Nonnull)cacheManager networkManager:(id<NITNetworkManaging> _Nonnull)networkManager dateManager:(NITDateManager* _Nonnull)dateManager configuration:(NITConfiguration* _Nonnull)configuration recipeHistory:(NITRecipeHistory* _Nonnull)recipeHistory evaluationBodyBuilder:(NITEvaluationBodyBuilder* _Nonnull)evaluationBodyBuilder timestampsManager:(NITTimestampsManager* _Nonnull)timestampsManager;
+- (instancetype _Nonnull)initWithCacheManager:(NITCacheManager* _Nonnull)cacheManager networkManager:(id<NITNetworkManaging> _Nonnull)networkManager dateManager:(NITDateManager* _Nonnull)dateManager configuration:(NITConfiguration* _Nonnull)configuration recipeHistory:(NITRecipeHistory* _Nonnull)recipeHistory evaluationBodyBuilder:(NITEvaluationBodyBuilder* _Nonnull)evaluationBodyBuilder timestampsManager:(NITTimestampsManager* _Nonnull)timestampsManager api:(NITRecipesApi* _Nonnull)api;
 
 - (NSArray<NITRecipe *> * _Nullable)recipes;
 - (void)refreshConfigWithCompletionHandler:(void (^_Nullable)(NSError * _Nullable))completionHandler;
