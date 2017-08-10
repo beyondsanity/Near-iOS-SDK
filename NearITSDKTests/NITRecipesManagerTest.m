@@ -136,6 +136,8 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
     [given([self.repository recipes]) willReturn:[self recipesFromJsonWithName:@"recipes"]];
     
     [given([self.recipeValidationFilter filterRecipes:anything()]) willReturn:nil];
+    NITRecipe *recipe = [self makeRecipeWithPulsePlugin:@"geopolis" pulseAction:@"ranging.near" pulseBundle:@"8373e68b-7c5d-411c-9a9c-3cc7ebf039e4" tags:nil];
+    [given([self.repository matchingRecipesWithPulsePlugin:anything() pulseAction:anything() pulseBundle:anything()]) willReturn:@[recipe]];
     
     // Has matching but the validation has empty recipes
     BOOL hasIdentifier = [recipesManager gotPulseWithPulsePlugin:@"geopolis" pulseAction:@"ranging.near" pulseBundle:@"8373e68b-7c5d-411c-9a9c-3cc7ebf039e4"];
