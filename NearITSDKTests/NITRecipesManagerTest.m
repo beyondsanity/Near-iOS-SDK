@@ -31,6 +31,7 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
 - (BOOL)gotPulseWithPulsePlugin:(NSString *)pulsePlugin pulseAction:(NSString *)pulseAction tags:(NSArray<NSString *> *)tags;
 - (void)gotPulseOnlineWithTriggerRequest:(NITTriggerRequest*)request;
 - (void)evaluateRecipeWithId:(NSString*)recipeId;
+- (void)gotTriggerRequestReevaluation:(NITTriggerRequest *)request;
 
 @end
 
@@ -151,6 +152,73 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
     XCTAssertTrue(hasIdentifier);
 }
 
+// MARK: - Trigger request reevaluation
+
+- (void)testTriggerRequestReevaluationLocal {
+    NITTriggerRequest *request = [self makeSimpleTriggerRequest];
+    
+    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithRecipeValidationFilter:self.recipeValidationFilter repository:self.repository trackSender:self.trackSender api:self.api requestQueue:self.requestQueue];
+    
+    NITRecipe *localBundleRecipe = [self makeRecipeWithPulsePlugin:@"plugin" pulseAction:@"action" pulseBundle:@"bundle" tags:@[@"tag1", @"tag2"]];
+    NSArray *recipes = @[localBundleRecipe];
+    [given([self.repository matchingRecipesWithPulsePlugin:anything() pulseAction:anything() pulseBundle:anything()]) willReturn:recipes];
+    [given(self.repository.isPulseOnlineEvaluationAvaialble) willReturnBool:YES];
+    [given([self.recipeValidationFilter filterRecipes:anything()]) willReturn:recipes];
+    
+    [recipesManager gotTriggerRequestReevaluation:request];
+    
+    [verifyCount(self.repository, times(1)) matchingRecipesWithPulsePlugin:anything() pulseAction:anything() pulseBundle:anything()];
+    [verifyCount(self.repository, never()) matchingRecipesWithPulsePlugin:anything() pulseAction:anything() tags:anything()];
+    [verifyCount(self.api, never()) onlinePulseEvaluationWithPlugin:anything() action:anything() bundle:anything() completionHandler:anything()];
+}
+
+- (void)testTriggerRequestReevaluationLocalTags {
+    NITTriggerRequest *request = [self makeSimpleTriggerRequest];
+    
+    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithRecipeValidationFilter:self.recipeValidationFilter repository:self.repository trackSender:self.trackSender api:self.api requestQueue:self.requestQueue];
+    
+    NITRecipe *localBundleRecipe = [self makeRecipeWithPulsePlugin:@"plugin" pulseAction:@"action" pulseBundle:@"bundle" tags:@[@"tag1", @"tag2"]];
+    NSArray *recipes = @[localBundleRecipe];
+    [given([self.repository matchingRecipesWithPulsePlugin:anything() pulseAction:anything() pulseBundle:anything()]) willReturn:@[]];
+    [given([self.repository matchingRecipesWithPulsePlugin:anything() pulseAction:anything() tags:anything()]) willReturn:recipes];
+    [given(self.repository.isPulseOnlineEvaluationAvaialble) willReturnBool:YES];
+    [given([self.recipeValidationFilter filterRecipes:anything()]) willReturn:recipes];
+    
+    [recipesManager gotTriggerRequestReevaluation:request];
+    
+    [verifyCount(self.repository, times(1)) matchingRecipesWithPulsePlugin:anything() pulseAction:anything() pulseBundle:anything()];
+    [verifyCount(self.repository, times(1)) matchingRecipesWithPulsePlugin:anything() pulseAction:anything() tags:anything()];
+    [verifyCount(self.api, never()) onlinePulseEvaluationWithPlugin:anything() action:anything() bundle:anything() completionHandler:anything()];
+}
+
+- (void)testTriggerRequestReevaluationLocalNotFound {
+    NITTriggerRequest *request = [self makeSimpleTriggerRequest];
+    
+    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithRecipeValidationFilter:self.recipeValidationFilter repository:self.repository trackSender:self.trackSender api:self.api requestQueue:self.requestQueue];
+    
+    NITRecipe *localBundleRecipe = [self makeRecipeWithPulsePlugin:@"plugin" pulseAction:@"action" pulseBundle:@"bundle" tags:@[@"tag1", @"tag2"]];
+    NSArray *recipes = @[localBundleRecipe];
+    [given([self.repository matchingRecipesWithPulsePlugin:anything() pulseAction:anything() pulseBundle:anything()]) willReturn:@[]];
+    [given([self.repository matchingRecipesWithPulsePlugin:anything() pulseAction:anything() tags:anything()]) willReturn:@[]];
+    [given(self.repository.isPulseOnlineEvaluationAvaialble) willReturnBool:YES];
+    [given([self.recipeValidationFilter filterRecipes:anything()]) willReturn:recipes];
+    
+    // Test with "isPulseOnlineEvaluationAvaialble" set to YES
+    [recipesManager gotTriggerRequestReevaluation:request];
+    
+    [verifyCount(self.repository, times(1)) matchingRecipesWithPulsePlugin:anything() pulseAction:anything() pulseBundle:anything()];
+    [verifyCount(self.repository, times(1)) matchingRecipesWithPulsePlugin:anything() pulseAction:anything() tags:anything()];
+    [verifyCount(self.api, times(1)) onlinePulseEvaluationWithPlugin:anything() action:anything() bundle:anything() completionHandler:anything()];
+    
+    // Test with "isPulseOnlineEvaluationAvaialble" set to NO
+    [given(self.repository.isPulseOnlineEvaluationAvaialble) willReturnBool:NO];
+    [recipesManager gotTriggerRequestReevaluation:request];
+    
+    [verifyCount(self.repository, times(1)) matchingRecipesWithPulsePlugin:anything() pulseAction:anything() pulseBundle:anything()];
+    [verifyCount(self.repository, times(1)) matchingRecipesWithPulsePlugin:anything() pulseAction:anything() tags:anything()];
+    [verifyCount(self.api, never()) onlinePulseEvaluationWithPlugin:anything() action:anything() bundle:anything() completionHandler:anything()];
+}
+
 // MARK: - Tags loading
 
 - (void)testLoadingRecipesWithPulseBundleTags {
@@ -188,6 +256,16 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
     [recipesJson registerClass:[NITRecipe class] forType:@"recipes"];
     NSArray<NITRecipe*> *recipes = [recipesJson parseToArrayOfObjects];
     return recipes;
+}
+
+- (NITTriggerRequest*)makeSimpleTriggerRequest {
+    NITTriggerRequest *request = [[NITTriggerRequest alloc] init];
+    request.pulseAction = @"action";
+    request.pulseBundle = @"bundle";
+    request.pulsePlugin = @"plugin";
+    request.tagAction = @"tagAction";
+    request.tags = @[@"tagA", @"tagB"];
+    return request;
 }
 
 @end
