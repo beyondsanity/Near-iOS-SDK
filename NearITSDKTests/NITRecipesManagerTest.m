@@ -19,6 +19,7 @@
 #import "NITRecipeTrackSender.h"
 #import "NITTriggerRequest.h"
 #import "NITRecipesApi.h"
+#import "NITTriggerRequestQueue.h"
 #import <OCMockitoIOS/OCMockitoIOS.h>
 #import <OCHamcrestIOS/OCHamcrestIOS.h>
 
@@ -42,6 +43,7 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
 @property (nonatomic, strong) NITRecipeRepository *repository;
 @property (nonatomic, strong) NITRecipeTrackSender *trackSender;
 @property (nonatomic, strong) NITRecipesApi *api;
+@property (nonatomic, strong) NITTriggerRequestQueue *requestQueue;
 
 @end
 
@@ -57,6 +59,7 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
     self.repository = mock([NITRecipeRepository class]);
     self.trackSender = mock([NITRecipeTrackSender class]);
     self.api = mock([NITRecipesApi class]);
+    self.requestQueue = mock([NITTriggerRequestQueue class]);
 }
 
 - (void)tearDown {
@@ -67,7 +70,7 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
 - (void)testOnlineEvaluation {
     self.expectation = [self expectationWithDescription:@"expectation"];
     
-    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithRecipeValidationFilter:self.recipeValidationFilter repository:self.repository trackSender:self.trackSender api:self.api];
+    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithRecipeValidationFilter:self.recipeValidationFilter repository:self.repository trackSender:self.trackSender api:self.api requestQueue:self.requestQueue];
     [given([self.repository recipes]) willReturn:[self recipesFromJsonWithName:@"online_recipe"]];
     recipesManager.manager = self;
     
@@ -91,7 +94,7 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
 - (void)testOnlinePulseEvaluation {
     self.expectation = [self expectationWithDescription:@"expectation"];
     
-    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithRecipeValidationFilter:self.recipeValidationFilter repository:self.repository trackSender:self.trackSender api:self.api];
+    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithRecipeValidationFilter:self.recipeValidationFilter repository:self.repository trackSender:self.trackSender api:self.api requestQueue:self.requestQueue];
     [given([self.repository recipes]) willReturn:[self recipesFromJsonWithName:@"online_recipe"]];
     recipesManager.manager = self;
     
@@ -114,7 +117,7 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
 
 - (void)testGotPulseBundleNoMatching {
     NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
-    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithRecipeValidationFilter:self.recipeValidationFilter repository:self.repository trackSender:self.trackSender api:self.api];
+    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithRecipeValidationFilter:self.recipeValidationFilter repository:self.repository trackSender:self.trackSender api:self.api requestQueue:self.requestQueue];
     [given([self.repository recipes]) willReturn:[self recipesFromJsonWithName:@"recipes"]];
     
     networkManager.mock = ^NITJSONAPI *(NSURLRequest *request) {
@@ -130,7 +133,7 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
 
 - (void)testGotPulseBundleMatchingWithValidation {
     NITNetworkMockManger *networkManager = [[NITNetworkMockManger alloc] init];
-    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithRecipeValidationFilter:self.recipeValidationFilter repository:self.repository trackSender:self.trackSender api:self.api];
+    NITRecipesManager *recipesManager = [[NITRecipesManager alloc] initWithRecipeValidationFilter:self.recipeValidationFilter repository:self.repository trackSender:self.trackSender api:self.api requestQueue:self.requestQueue];
     [given([self.repository recipes]) willReturn:[self recipesFromJsonWithName:@"recipes"]];
     
     networkManager.mock = ^NITJSONAPI *(NSURLRequest *request) {

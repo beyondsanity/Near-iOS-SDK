@@ -15,6 +15,7 @@
 @class NITRecipeTrackSender;
 @class NITTriggerRequest;
 @class NITRecipesApi;
+@class NITTriggerRequestQueue;
 
 @protocol NITRecipesManaging <NSObject>
 
@@ -26,7 +27,7 @@
 
 @property (nonatomic, strong) id<NITManaging> _Nullable manager;
 
-- (instancetype _Nonnull)initWithRecipeValidationFilter:(NITRecipeValidationFilter* _Nonnull)recipeValidationFilter repository:(NITRecipeRepository* _Nonnull)repository trackSender:(NITRecipeTrackSender* _Nonnull)trackSender api:(NITRecipesApi* _Nonnull)api;
+- (instancetype _Nonnull)initWithRecipeValidationFilter:(NITRecipeValidationFilter* _Nonnull)recipeValidationFilter repository:(NITRecipeRepository* _Nonnull)repository trackSender:(NITRecipeTrackSender* _Nonnull)trackSender api:(NITRecipesApi* _Nonnull)api requestQueue:(NITTriggerRequestQueue* _Nonnull)requestQueue;
 
 - (void)refreshConfigWithCompletionHandler:(void (^_Nullable)(NSError * _Nullable error))completionHandler;
 - (void)recipesWithCompletionHandler:(void (^_Nullable)(NSArray<NITRecipe*>* _Nullable recipes, NSError * _Nullable error))completionHandler;

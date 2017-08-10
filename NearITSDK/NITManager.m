@@ -41,6 +41,7 @@
 #import "NITEvaluationBodyBuilder.h"
 #import "NITTimestampsManager.h"
 #import "NITRecipesApi.h"
+#import "NITTriggerRequestQueue.h"
 #import <CoreBluetooth/CoreBluetooth.h>
 #import <UserNotifications/UserNotifications.h>
 
@@ -181,7 +182,8 @@ static NITManager *defaultManager;
     NITRecipesApi *recipesApi = [[NITRecipesApi alloc] initWithNetworkManager:networkManager configuration:configuration evaluationBodyBuilder:evaluationBodyBuilder];
     NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:cacheManager dateManager:dateManager configuration:configuration recipeHistory:recipeHistory timestampsManager:timestampsManager api:recipesApi];
     NITRecipeTrackSender *trackSender = [[NITRecipeTrackSender alloc] initWithConfiguration:configuration history:recipeHistory trackManager:trackManager dateManager:dateManager];
-    return [[NITRecipesManager alloc] initWithRecipeValidationFilter:recipeValidationFilter repository:repository trackSender:trackSender api:recipesApi];
+    NITTriggerRequestQueue *requestQueue = [[NITTriggerRequestQueue alloc] initWithRepository:repository];
+    return [[NITRecipesManager alloc] initWithRecipeValidationFilter:recipeValidationFilter repository:repository trackSender:trackSender api:recipesApi requestQueue:requestQueue];
 }
 
 + (NITGeopolisManager*)makeGeopolisManagerWithNetworkManager:(id<NITNetworkManaging>)networkManager cacheManager:(NITCacheManager*)cacheManager configuration:(NITConfiguration*)configuration trackManager:(NITTrackManager*)trackManager {

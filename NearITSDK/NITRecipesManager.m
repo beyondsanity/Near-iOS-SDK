@@ -20,27 +20,31 @@
 #import "NITRecipeTrackSender.h"
 #import "NITTriggerRequest.h"
 #import "NITRecipesApi.h"
+#import "NITTriggerRequestQueue.h"
 
 #define LOGTAG @"RecipesManager"
 
-@interface NITRecipesManager()
+@interface NITRecipesManager()<NITTriggerRequestQueueDelegate>
 
 @property (nonatomic, strong) NITRecipeValidationFilter *recipeValidationFilter;
 @property (nonatomic, strong) NITRecipeRepository *repository;
 @property (nonatomic, strong) NITRecipeTrackSender *trackSender;
 @property (nonatomic, strong) NITRecipesApi *api;
+@property (nonatomic, strong) NITTriggerRequestQueue *requestQueue;
 
 @end
 
 @implementation NITRecipesManager
 
-- (instancetype)initWithRecipeValidationFilter:(NITRecipeValidationFilter * _Nonnull)recipeValidationFilter repository:(NITRecipeRepository * _Nonnull)repository trackSender:(NITRecipeTrackSender * _Nonnull)trackSender api:(NITRecipesApi * _Nonnull)api {
+- (instancetype)initWithRecipeValidationFilter:(NITRecipeValidationFilter * _Nonnull)recipeValidationFilter repository:(NITRecipeRepository * _Nonnull)repository trackSender:(NITRecipeTrackSender * _Nonnull)trackSender api:(NITRecipesApi * _Nonnull)api requestQueue:(NITTriggerRequestQueue * _Nonnull)requestQueue {
     self = [super init];
     if (self) {
         self.recipeValidationFilter = recipeValidationFilter;
         self.repository = repository;
         self.trackSender = trackSender;
         self.api = api;
+        self.requestQueue = requestQueue;
+        self.requestQueue.delegate = self;
     }
     return self;
 }
@@ -110,7 +114,11 @@
 }
 
 - (void)gotPulseOnlineWithTriggerRequest:(NITTriggerRequest*)request {
-    [self onlinePulseEvaluationWithPlugin:request.pulsePlugin action:request.pulseAction bundle:request.pulseBundle];
+    if (self.repository.isPulseOnlineEvaluationAvaialble) {
+        [self onlinePulseEvaluationWithPlugin:request.pulsePlugin action:request.pulseAction bundle:request.pulseBundle];
+    } else {
+        [self.requestQueue addRequest:request];
+    }
 }
 
 - (void)gotTriggerRequest:(NITTriggerRequest *)request {
@@ -119,6 +127,16 @@
         BOOL handledTags = [self gotPulseWithPulsePlugin:request.pulsePlugin pulseAction:request.tagAction tags:request.tags];
         if (!handledTags) {
             [self gotPulseOnlineWithTriggerRequest:request];
+        }
+    }
+}
+
+- (void)gotTriggerRequestReevaluation:(NITTriggerRequest *)request {
+    BOOL handledPulseLocal = [self gotPulseWithPulsePlugin:request.pulsePlugin pulseAction:request.pulseAction pulseBundle:request.pulseBundle];
+    if (!handledPulseLocal) {
+        BOOL handledTags = [self gotPulseWithPulsePlugin:request.pulsePlugin pulseAction:request.tagAction tags:request.tags];
+        if (!handledTags && self.repository.isPulseOnlineEvaluationAvaialble) {
+            [self onlinePulseEvaluationWithPlugin:request.pulsePlugin action:request.pulseAction bundle:request.pulseBundle];
         }
     }
 }
@@ -208,6 +226,12 @@
 
 - (NSInteger)recipesCount {
     return [self.repository.recipes count];
+}
+
+// MARK - Trigger request queue delegate
+
+- (void)triggerRequestQueue:(NITTriggerRequestQueue *)queue didFinishWithRequest:(NITTriggerRequest *)request {
+    [self gotTriggerRequestReevaluation:request];
 }
 
 @end
