@@ -22,6 +22,7 @@
 #import "NITRecipeTrackSender.h"
 #import "NITEvaluationBodyBuilder.h"
 #import "NITTriggerRequest.h"
+#import "NITRecipesApi.h"
 
 #define LOGTAG @"RecipesManager"
 
@@ -33,12 +34,13 @@
 @property (nonatomic, strong) NITRecipeRepository *repository;
 @property (nonatomic, strong) NITRecipeTrackSender *trackSender;
 @property (nonatomic, strong) NITEvaluationBodyBuilder *evaluationBodyBuilder;
+@property (nonatomic, strong) NITRecipesApi *api;
 
 @end
 
 @implementation NITRecipesManager
 
-- (instancetype)initWithCacheManager:(NITCacheManager*)cacheManager networkManager:(id<NITNetworkManaging>)networkManager recipeValidationFilter:(NITRecipeValidationFilter * _Nonnull)recipeValidationFilter repository:(NITRecipeRepository * _Nonnull)repository trackSender:(NITRecipeTrackSender * _Nonnull)trackSender evaluationBodyBuilder:(NITEvaluationBodyBuilder *)evaluationBodyBuilder {
+- (instancetype)initWithCacheManager:(NITCacheManager*)cacheManager networkManager:(id<NITNetworkManaging>)networkManager recipeValidationFilter:(NITRecipeValidationFilter * _Nonnull)recipeValidationFilter repository:(NITRecipeRepository * _Nonnull)repository trackSender:(NITRecipeTrackSender * _Nonnull)trackSender evaluationBodyBuilder:(NITEvaluationBodyBuilder *)evaluationBodyBuilder api:(NITRecipesApi * _Nonnull)api {
     self = [super init];
     if (self) {
         self.cacheManager = cacheManager;
@@ -47,6 +49,7 @@
         self.repository = repository;
         self.trackSender = trackSender;
         self.evaluationBodyBuilder = evaluationBodyBuilder;
+        self.api = api;
     }
     return self;
 }
@@ -172,46 +175,31 @@
 }
 
 - (void)processRecipe:(NSString*)recipeId completion:(void (^_Nullable)(NITRecipe * _Nullable recipe, NSError * _Nullable error))completionHandler {
-    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] processRecipeWithId:recipeId] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
-        if (json) {
-            [self registerClassesWithJsonApi:json];
-            NSArray<NITRecipe*> *recipes = [json parseToArrayOfObjects];
-            if ([recipes count] > 0) {
-                NITRecipe *recipe = [recipes objectAtIndex:0];
-                if (completionHandler) {
-                    completionHandler(recipe, nil);
-                    return;
-                }
+    [self.api fetchRecipeWithId:recipeId completionHandler:^(NITRecipe * _Nullable recipe, NSError * _Nullable error) {
+        if (error) {
+            if (completionHandler) {
+                completionHandler(nil, error);
+            }
+        } else {
+            if (completionHandler) {
+                completionHandler(recipe, error);
             }
         }
-        NSError *anError = [NSError errorWithDomain:NITRecipeErrorDomain code:151 userInfo:@{NSLocalizedDescriptionKey:@"Invalid recipe data", NSUnderlyingErrorKey: error}];
-        completionHandler(nil, anError);
     }];
 }
 
 - (void)onlinePulseEvaluationWithPlugin:(NSString*)plugin action:(NSString*)action bundle:(NSString*)bundle {
-    NITJSONAPI *jsonApi = [self.evaluationBodyBuilder buildEvaluationBodyWithPlugin:plugin action:action bundle:bundle];
-    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] onlinePulseEvaluationWithJsonApi:jsonApi] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
-        if (json) {
-            [self registerClassesWithJsonApi:json];
-            NSArray<NITRecipe*> *recipes = [json parseToArrayOfObjects];
-            if ([recipes count] > 0) {
-                NITRecipe *recipe = [recipes objectAtIndex:0];
-                [self gotRecipe:recipe];
-            }
+    [self.api onlinePulseEvaluationWithPlugin:plugin action:action bundle:bundle completionHandler:^(NITRecipe * _Nullable recipe, NSError * _Nullable error) {
+        if (recipe) {
+            [self gotRecipe:recipe];
         }
     }];
 }
 
 - (void)evaluateRecipeWithId:(NSString*)recipeId {
-    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] evaluateRecipeWithId:recipeId jsonApi:[self.evaluationBodyBuilder buildEvaluationBody]] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
-        if (json) {
-            [self registerClassesWithJsonApi:json];
-            NSArray<NITRecipe*> *recipes = [json parseToArrayOfObjects];
-            if([recipes count] > 0) {
-                NITRecipe *recipe = [recipes objectAtIndex:0];
-                [self gotRecipe:recipe];
-            }
+    [self.api evaluateRecipeWithId:recipeId completionHandler:^(NITRecipe * _Nullable recipe, NSError * _Nullable error) {
+        if (recipe) {
+            [self gotRecipe:recipe];
         }
     }];
 }
@@ -225,13 +213,6 @@
     if ([self.manager respondsToSelector:@selector(recipesManager:gotRecipe:)]) {
         [self.manager recipesManager:self gotRecipe:recipe];
     }
-}
-
-- (void)registerClassesWithJsonApi:(NITJSONAPI*)jsonApi {
-    [jsonApi registerClass:[NITRecipe class] forType:@"recipes"];
-    [jsonApi registerClass:[NITCoupon class] forType:@"coupons"];
-    [jsonApi registerClass:[NITClaim class] forType:@"claims"];
-    [jsonApi registerClass:[NITImage class] forType:@"images"];
 }
 
 - (NSInteger)recipesCount {
