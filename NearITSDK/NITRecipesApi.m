@@ -15,6 +15,7 @@
 #import "NITClaim.h"
 #import "NITImage.h"
 #import "NITNetworkProvider.h"
+#import "NITConstants.h"
 
 @interface NITRecipesApi()
 
@@ -49,6 +50,61 @@
             }
             NSArray<NITRecipe*>* recipes = [json parseToArrayOfObjects];
             completionHandler(recipes, onlineEvaluation, nil);
+        }
+    }];
+}
+
+- (void)fetchRecipeWithId:(NSString *)recipeId completionHandler:(void (^)(NITRecipe * _Nullable, NSError * _Nullable))completionHandler {
+    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] processRecipeWithId:recipeId] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
+        if (json) {
+            [self registerClassesWithJsonApi:json];
+            NSArray<NITRecipe*> *recipes = [json parseToArrayOfObjects];
+            if ([recipes count] > 0) {
+                NITRecipe *recipe = [recipes objectAtIndex:0];
+                completionHandler(recipe, nil);
+            } else {
+                NSError *anError = [NSError errorWithDomain:NITRecipeErrorDomain code:151 userInfo:@{NSLocalizedDescriptionKey:@"Invalid recipe data"}];
+                completionHandler(nil, anError);
+            }
+        } else {
+            completionHandler(nil, error);
+        }
+    }];
+}
+
+- (void)evaluateRecipeWithId:(NSString *)recipeId completionHandler:(void (^)(NITRecipe * _Nullable, NSError * _Nullable))completionHandler {
+    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] evaluateRecipeWithId:recipeId jsonApi:[self.evaluationBodyBuilder buildEvaluationBody]] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
+        if (json) {
+            [self registerClassesWithJsonApi:json];
+            NSArray<NITRecipe*> *recipes = [json parseToArrayOfObjects];
+            if([recipes count] > 0) {
+                NITRecipe *recipe = [recipes objectAtIndex:0];
+                completionHandler(recipe, nil);
+            } else {
+                NSError *anError = [NSError errorWithDomain:NITRecipeErrorDomain code:151 userInfo:@{NSLocalizedDescriptionKey:@"Invalid recipe data"}];
+                completionHandler(nil, anError);
+            }
+        } else {
+            completionHandler(nil, error);
+        }
+    }];
+}
+
+- (void)onlinePulseEvaluationWithPlugin:(NSString *)plugin action:(NSString *)action bundle:(NSString *)bundle completionHandler:(void (^)(NITRecipe * _Nullable, NSError * _Nullable))completionHandler {
+    NITJSONAPI *jsonApi = [self.evaluationBodyBuilder buildEvaluationBodyWithPlugin:plugin action:action bundle:bundle];
+    [self.networkManager makeRequestWithURLRequest:[[NITNetworkProvider sharedInstance] onlinePulseEvaluationWithJsonApi:jsonApi] jsonApicompletionHandler:^(NITJSONAPI * _Nullable json, NSError * _Nullable error) {
+        if (json) {
+            [self registerClassesWithJsonApi:json];
+            NSArray<NITRecipe*> *recipes = [json parseToArrayOfObjects];
+            if ([recipes count] > 0) {
+                NITRecipe *recipe = [recipes objectAtIndex:0];
+                completionHandler(recipe, nil);
+            } else {
+                NSError *anError = [NSError errorWithDomain:NITRecipeErrorDomain code:151 userInfo:@{NSLocalizedDescriptionKey:@"Invalid recipe data"}];
+                completionHandler(nil, anError);
+            }
+        } else {
+            completionHandler(nil, error);
         }
     }];
 }
