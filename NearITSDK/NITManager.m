@@ -327,6 +327,10 @@ static NITManager *defaultManager;
     [self.recipesManager sendTrackingWithRecipeId:recipeId event:event];
 }
 
+- (void)sendTrackingWithTrackingInfo:(NITTrackingInfo *)trackingInfo event:(NSString *)event {
+    [self.recipesManager sendTrackingWithTrackingInfo:trackingInfo event:event];
+}
+
 - (void)setUserDataWithKey:(NSString *)key value:(NSString *)value completionHandler:(void (^)(NSError * _Nullable))handler {
     NITRecipesManager *recipesManager = self.recipesManager;
     [self.profile setUserDataWithKey:key value:value completionHandler:^(NSError * _Nullable error) {

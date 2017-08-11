@@ -82,8 +82,8 @@ public final class NearManager: NSObject, NITManagerDelegate {
         return false
     }
     
-    public func sendTracking(_ recipeId: String, event: NearRecipeTracking) {
-        manager.sendTracking(withRecipeId: recipeId, event: event.rawValue)
+    public func sendTracking(_ trackingInfo: NITTrackingInfo?, event: String?) {
+        manager.sendTracking(with: trackingInfo, event: event)
     }
     
     public func setUserData(_ key: String, value: String?, completionHandler: ((Error?) -> Void)?) {

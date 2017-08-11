@@ -72,6 +72,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func handleNearContent(content: Any, trackingInfo: NITTrackingInfo) {
+        NearManager.shared.sendTracking(trackingInfo, event: NearRecipeTracking.engaged.rawValue)
         if let simple = content as? NITSimpleNotification {
             
             let banner = Banner(title: "Simple notification", subtitle: simple.message, image: UIImage(named: "icona-notifica"), backgroundColor: .black, didTapBlock: nil)
