@@ -15,10 +15,11 @@
 @class NITCoupon;
 @class UNNotificationResponse;
 @class UILocalNotification;
+@class NITTrackingInfo;
 
 @protocol NITManaging <NSObject>
 
-- (void)recipesManager:(NITRecipesManager* _Nonnull)recipesManager gotRecipe:(NITRecipe* _Nonnull)recipe;
+- (void)recipesManager:(NITRecipesManager* _Nonnull)recipesManager gotRecipe:(NITRecipe* _Nonnull)recipe trackingInfo:(NITTrackingInfo* _Nonnull)trackingInfo;
 
 @end
 

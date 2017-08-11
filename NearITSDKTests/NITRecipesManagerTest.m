@@ -20,6 +20,7 @@
 #import "NITTriggerRequest.h"
 #import "NITRecipesApi.h"
 #import "NITTriggerRequestQueue.h"
+#import "NITTrackingInfo.h"
 #import <OCMockitoIOS/OCMockitoIOS.h>
 #import <OCHamcrestIOS/OCHamcrestIOS.h>
 
@@ -27,10 +28,10 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
 
 @interface NITRecipesManager (Tests)
 
-- (BOOL)gotPulseWithPulsePlugin:(NSString *)pulsePlugin pulseAction:(NSString *)pulseAction pulseBundle:(NSString *)pulseBundle;
-- (BOOL)gotPulseWithPulsePlugin:(NSString *)pulsePlugin pulseAction:(NSString *)pulseAction tags:(NSArray<NSString *> *)tags;
+- (BOOL)gotPulseLocalWithTriggerRequest:(NITTriggerRequest*)request;
+- (BOOL)gotPulseTagsWithTriggerRequest:(NITTriggerRequest*)request;
 - (void)gotPulseOnlineWithTriggerRequest:(NITTriggerRequest*)request;
-- (void)evaluateRecipeWithId:(NSString*)recipeId;
+- (void)evaluateRecipeWithId:(NSString*)recipeId trackingInfo:(NITTrackingInfo*)trackingInfo;
 - (void)gotTriggerRequestReevaluation:(NITTriggerRequest *)request;
 
 @end
@@ -88,8 +89,8 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
     request.pulseAction = @"leave_place";
     request.pulseBundle = @"9712e11a-ef3a-4b34-bdf6-413a84146f2e";
     
-    [recipesManager evaluateRecipeWithId:recipe.ID];
-    [verifyCount(managing, times(1)) recipesManager:anything() gotRecipe:sameInstance(recipe)];
+    [recipesManager evaluateRecipeWithId:recipe.ID trackingInfo:[NITTrackingInfo trackingInfoFromRecipeId:recipe.ID]];
+    [verifyCount(managing, times(1)) recipesManager:anything() gotRecipe:sameInstance(recipe) trackingInfo:anything()];
 }
 
 - (void)testOnlinePulseEvaluation {
@@ -113,7 +114,7 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
     request.pulseBundle = @"e11f58db-054e-4df1-b09b-d0cbe2676031";
     
     [recipesManager gotPulseOnlineWithTriggerRequest:request];
-    [verifyCount(managing, times(1)) recipesManager:anything() gotRecipe:sameInstance(recipe)];
+    [verifyCount(managing, times(1)) recipesManager:anything() gotRecipe:sameInstance(recipe) trackingInfo:anything()];
 }
 
 - (void)testGotPulseBundleNoMatching {
@@ -128,7 +129,7 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
     NITRecipe *fakeRecipe = [[NITRecipe alloc] init];
     [given([self.recipeValidationFilter filterRecipes:anything()]) willReturn:@[fakeRecipe]];
     
-    BOOL hasIdentifier = [recipesManager gotPulseWithPulsePlugin:@"geopolis" pulseAction:@"enter_place" pulseBundle:@"average_bundle"];
+    BOOL hasIdentifier = [recipesManager gotPulseLocalWithTriggerRequest:[self makeSimpleTriggerRequest]];
     XCTAssertFalse(hasIdentifier);
 }
 
@@ -141,14 +142,14 @@ typedef void (^SingleRecipeBlock) (NITRecipe*, NSError*);
     [given([self.repository matchingRecipesWithPulsePlugin:anything() pulseAction:anything() pulseBundle:anything()]) willReturn:@[recipe]];
     
     // Has matching but the validation has empty recipes
-    BOOL hasIdentifier = [recipesManager gotPulseWithPulsePlugin:@"geopolis" pulseAction:@"ranging.near" pulseBundle:@"8373e68b-7c5d-411c-9a9c-3cc7ebf039e4"];
+    BOOL hasIdentifier = [recipesManager gotPulseLocalWithTriggerRequest:[self makeSimpleTriggerRequest]];
     XCTAssertFalse(hasIdentifier);
     
     NITRecipe *fakeRecipe = [[NITRecipe alloc] init];
     [given([self.recipeValidationFilter filterRecipes:anything()]) willReturn:@[fakeRecipe]];
     
     // Has matching and the validation has at least one recipes
-    hasIdentifier = [recipesManager gotPulseWithPulsePlugin:@"geopolis" pulseAction:@"ranging.near" pulseBundle:@"8373e68b-7c5d-411c-9a9c-3cc7ebf039e4"];
+    hasIdentifier = [recipesManager gotPulseLocalWithTriggerRequest:[self makeSimpleTriggerRequest]];
     XCTAssertTrue(hasIdentifier);
 }
 

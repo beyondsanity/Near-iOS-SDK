@@ -21,6 +21,7 @@
 #import "NITTriggerRequest.h"
 #import "NITRecipesApi.h"
 #import "NITTriggerRequestQueue.h"
+#import "NITTrackingInfo.h"
 
 #define LOGTAG @"RecipesManager"
 
@@ -75,46 +76,46 @@
 
 // MARK: - NITRecipesManaging
 
-- (BOOL)gotPulseWithPulsePlugin:(NSString *)pulsePlugin pulseAction:(NSString *)pulseAction pulseBundle:(NSString *)pulseBundle {
+- (BOOL)gotPulseLocalWithTriggerRequest:(NITTriggerRequest*)request {
     BOOL handled = NO;
     
-    NSArray<NITRecipe*>* matchingRecipes = [self.repository matchingRecipesWithPulsePlugin:pulsePlugin pulseAction:pulseAction pulseBundle:pulseBundle];
+    NSArray<NITRecipe*>* matchingRecipes = [self.repository matchingRecipesWithPulsePlugin:request.pulsePlugin pulseAction:request.pulseAction pulseBundle:request.pulseBundle];
     
     if (matchingRecipes.count > 0) {
         handled = YES;
     }
     
-    handled &= [self handleRecipesValidation:matchingRecipes];
+    handled &= [self handleRecipesValidation:matchingRecipes triggerRequest:request];
     
     return handled;
 }
 
-- (BOOL)gotPulseWithPulsePlugin:(NSString *)pulsePlugin pulseAction:(NSString *)pulseAction tags:(NSArray<NSString *> *)tags {
+- (BOOL)gotPulseTagsWithTriggerRequest:(NITTriggerRequest*)request {
     BOOL handled = NO;
     
-    NSArray<NITRecipe*>* matchingRecipes = [self.repository matchingRecipesWithPulsePlugin:pulsePlugin pulseAction:pulseAction tags:tags];
+    NSArray<NITRecipe*>* matchingRecipes = [self.repository matchingRecipesWithPulsePlugin:request.pulsePlugin pulseAction:request.tagAction tags:request.tags];
     
     if (matchingRecipes.count > 0) {
         handled = YES;
     }
     
-    handled &= [self handleRecipesValidation:matchingRecipes];
+    handled &= [self handleRecipesValidation:matchingRecipes triggerRequest:request];
     
     return handled;
 }
 
 - (void)gotPulseOnlineWithTriggerRequest:(NITTriggerRequest*)request {
     if (self.repository.isPulseOnlineEvaluationAvaialble) {
-        [self onlinePulseEvaluationWithPlugin:request.pulsePlugin action:request.pulseAction bundle:request.pulseBundle];
+        [self onlinePulseEvaluationWithTriggerRequest:request];
     } else {
         [self.requestQueue addRequest:request];
     }
 }
 
 - (void)gotTriggerRequest:(NITTriggerRequest *)request {
-    BOOL handledPulseLocal = [self gotPulseWithPulsePlugin:request.pulsePlugin pulseAction:request.pulseAction pulseBundle:request.pulseBundle];
+    BOOL handledPulseLocal = [self gotPulseLocalWithTriggerRequest:request];
     if (!handledPulseLocal) {
-        BOOL handledTags = [self gotPulseWithPulsePlugin:request.pulsePlugin pulseAction:request.tagAction tags:request.tags];
+        BOOL handledTags = [self gotPulseTagsWithTriggerRequest:request];
         if (!handledTags) {
             [self gotPulseOnlineWithTriggerRequest:request];
         }
@@ -122,16 +123,16 @@
 }
 
 - (void)gotTriggerRequestReevaluation:(NITTriggerRequest *)request {
-    BOOL handledPulseLocal = [self gotPulseWithPulsePlugin:request.pulsePlugin pulseAction:request.pulseAction pulseBundle:request.pulseBundle];
+    BOOL handledPulseLocal = [self gotPulseLocalWithTriggerRequest:request];
     if (!handledPulseLocal) {
-        BOOL handledTags = [self gotPulseWithPulsePlugin:request.pulsePlugin pulseAction:request.tagAction tags:request.tags];
+        BOOL handledTags = [self gotPulseTagsWithTriggerRequest:request];
         if (!handledTags && self.repository.isPulseOnlineEvaluationAvaialble) {
-            [self onlinePulseEvaluationWithPlugin:request.pulsePlugin action:request.pulseAction bundle:request.pulseBundle];
+            [self onlinePulseEvaluationWithTriggerRequest:request];
         }
     }
 }
 
-- (BOOL)handleRecipesValidation:(NSArray<NITRecipe*>*)matchingRecipes {
+- (BOOL)handleRecipesValidation:(NSArray<NITRecipe*>*)matchingRecipes triggerRequest:(NITTriggerRequest*)request {
     NSArray<NITRecipe*> *recipes = [self.recipeValidationFilter filterRecipes:matchingRecipes];
     
     if ([recipes count] == 0) {
@@ -139,9 +140,9 @@
     } else {
         NITRecipe *recipe = [recipes objectAtIndex:0];
         if(recipe.isEvaluatedOnline) {
-            [self evaluateRecipeWithId:recipe.ID];
+            [self evaluateRecipeWithId:recipe.ID trackingInfo:request.trackingInfo];
         } else {
-            [self gotRecipe:recipe];
+            [self gotRecipe:recipe trackingInfo:request.trackingInfo];
         }
     }
     
@@ -151,7 +152,7 @@
 - (void)processRecipe:(NSString*)recipeId {
     [self processRecipe:recipeId completion:^(NITRecipe * _Nullable recipe, NSError * _Nullable error) {
         if (recipe) {
-            [self gotRecipe:recipe];
+            [self gotRecipe:recipe trackingInfo:[NITTrackingInfo trackingInfoFromRecipeId:recipe.ID]];
         }
     }];
 }
@@ -170,18 +171,18 @@
     }];
 }
 
-- (void)onlinePulseEvaluationWithPlugin:(NSString*)plugin action:(NSString*)action bundle:(NSString*)bundle {
-    [self.api onlinePulseEvaluationWithPlugin:plugin action:action bundle:bundle completionHandler:^(NITRecipe * _Nullable recipe, NSError * _Nullable error) {
+- (void)onlinePulseEvaluationWithTriggerRequest:(NITTriggerRequest *)request {
+    [self.api onlinePulseEvaluationWithPlugin:request.pulsePlugin action:request.pulseAction bundle:request.pulseBundle completionHandler:^(NITRecipe * _Nullable recipe, NSError * _Nullable error) {
         if (recipe) {
-            [self gotRecipe:recipe];
+            [self gotRecipe:recipe trackingInfo:request.trackingInfo];
         }
     }];
 }
 
-- (void)evaluateRecipeWithId:(NSString*)recipeId {
+- (void)evaluateRecipeWithId:(NSString*)recipeId trackingInfo:(NITTrackingInfo*)trackingInfo {
     [self.api evaluateRecipeWithId:recipeId completionHandler:^(NITRecipe * _Nullable recipe, NSError * _Nullable error) {
         if (recipe) {
-            [self gotRecipe:recipe];
+            [self gotRecipe:recipe trackingInfo:trackingInfo];
         }
     }];
 }
@@ -190,10 +191,13 @@
     [self.trackSender sendTrackingWithRecipeId:recipeId event:event];
 }
 
-- (void)gotRecipe:(NITRecipe*)recipe {
+- (void)gotRecipe:(NITRecipe*)recipe trackingInfo:(NITTrackingInfo*)trackingInfo {
     NITLogD(LOGTAG, @"Got a recipe: %@", recipe.ID);
-    if ([self.manager respondsToSelector:@selector(recipesManager:gotRecipe:)]) {
-        [self.manager recipesManager:self gotRecipe:recipe];
+    if (trackingInfo) {
+        trackingInfo.recipeId = recipe.ID;
+    }
+    if ([self.manager respondsToSelector:@selector(recipesManager:gotRecipe:trackingInfo:)]) {
+        [self.manager recipesManager:self gotRecipe:recipe trackingInfo:trackingInfo];
     }
 }
 

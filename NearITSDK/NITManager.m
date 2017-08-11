@@ -42,6 +42,7 @@
 #import "NITTimestampsManager.h"
 #import "NITRecipesApi.h"
 #import "NITTriggerRequestQueue.h"
+#import "NITTrackingInfo.h"
 #import <CoreBluetooth/CoreBluetooth.h>
 #import <UserNotifications/UserNotifications.h>
 
@@ -430,7 +431,7 @@ static NITManager *defaultManager;
 
 // MARK: - NITManaging
 
-- (void)recipesManager:(NITRecipesManager *)recipesManager gotRecipe:(NITRecipe *)recipe {
+- (void)recipesManager:(NITRecipesManager *)recipesManager gotRecipe:(NITRecipe *)recipe trackingInfo:(NITTrackingInfo * _Nonnull)trackingInfo {
     //Handle reaction
     NITReaction *reaction = [self.reactions objectForKey:recipe.reactionPluginId];
     if(reaction) {

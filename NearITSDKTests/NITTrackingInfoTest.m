@@ -46,4 +46,10 @@
     XCTAssertFalse([info.recipeId isEqualToString:newSampleRecipeId]);
 }
 
+- (void)testFromRecipeId {
+    NSString *sampleRecipeId = @"recipe-id";
+    NITTrackingInfo *info = [NITTrackingInfo trackingInfoFromRecipeId:sampleRecipeId];
+    XCTAssertTrue([info.recipeId isEqualToString:sampleRecipeId]);
+}
+
 @end

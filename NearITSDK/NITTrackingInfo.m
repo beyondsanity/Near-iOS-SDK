@@ -46,4 +46,10 @@
     return [NSDictionary dictionaryWithDictionary:self.extras];
 }
 
++ (NITTrackingInfo *)trackingInfoFromRecipeId:(NSString *)recipeId {
+    NITTrackingInfo *info = [[NITTrackingInfo alloc] init];
+    info.recipeId = recipeId;
+    return info;
+}
+
 @end

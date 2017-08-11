@@ -15,4 +15,6 @@
 - (void)setRecipeId:(NSString *)recipeId;
 - (NSDictionary*)extrasDictionary;
 
++ (NITTrackingInfo*)trackingInfoFromRecipeId:(NSString* _Nonnull)recipeId;
+
 @end
