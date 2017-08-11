@@ -27,6 +27,7 @@
 #import "NITDateManager.h"
 #import "NITTriggerRequest.h"
 #import "NITTimestampsManager.h"
+#import "NITTrackingInfo.h"
 #import <CoreLocation/CoreLocation.h>
 
 #define LOGTAG @"GeopolisManager"
@@ -163,8 +164,19 @@ NSString* const NodeLastEditedTimeCacheKey = @"GeopolisNodesLastEditedTime";
     request.pulseBundle = node.identifier;
     request.tagAction = tagAction;
     request.tags = node.tags;
+    request.trackingInfo = [self buildTrackingInfoWithNode:node];
     
     [self.recipesManager gotTriggerRequest:request];
+}
+
+- (NITTrackingInfo*)buildTrackingInfoWithNode:(NITNode*)node {
+    NITTrackingInfo *trackingInfo = [[NITTrackingInfo alloc] init];
+    [trackingInfo addExtraWithObject:node.identifier key:@"node_id"];
+    [trackingInfo addExtraWithObject:NSStringFromClass([node class]) key:@"node_type"];
+    if (node.tags) {
+        [trackingInfo addExtraWithObject:node.tags key:@"tags"];
+    }
+    return trackingInfo;
 }
 
 - (void)trackEventWithIdentifier:(NSString*)identifier event:(NITRegionEvent)event {

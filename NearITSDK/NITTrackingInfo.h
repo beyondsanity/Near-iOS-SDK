@@ -10,8 +10,9 @@
 
 @interface NITTrackingInfo : NSObject
 
-- (BOOL)addExtraWithObject:(NSString*)object key:(NSString*)key;
+- (BOOL)addExtraWithObject:(id)object key:(NSString*)key;
 - (NSString *)recipeId;
 - (void)setRecipeId:(NSString *)recipeId;
+- (NSDictionary*)extrasDictionary;
 
 @end

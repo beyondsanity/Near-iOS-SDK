@@ -27,7 +27,7 @@
     return self;
 }
 
-- (BOOL)addExtraWithObject:(NSString *)object key:(NSString *)key {
+- (BOOL)addExtraWithObject:(id)object key:(NSString *)key {
     NSString *savedObj = [self.extras objectForKey:key];
     if (savedObj) {
         return NO;
@@ -40,6 +40,10 @@
     if (_recipeId == nil) {
         _recipeId = recipeId;
     }
+}
+
+- (NSDictionary *)extrasDictionary {
+    return [NSDictionary dictionaryWithDictionary:self.extras];
 }
 
 @end
