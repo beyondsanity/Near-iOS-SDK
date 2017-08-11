@@ -8,13 +8,14 @@
 
 #import <Foundation/Foundation.h>
 
-@interface NITTrackingInfo : NSObject
+@interface NITTrackingInfo : NSObject<NSCoding>
 
-- (BOOL)addExtraWithObject:(id)object key:(NSString*)key;
-- (NSString *)recipeId;
-- (void)setRecipeId:(NSString *)recipeId;
-- (NSDictionary*)extrasDictionary;
+- (BOOL)addExtraWithObject:(id<NSCoding> _Nonnull)object key:(NSString* _Nonnull)key;
+- (NSString * _Nullable)recipeId;
+- (void)setRecipeId:(NSString * _Nonnull)recipeId;
+- (NSDictionary* _Nonnull)extrasDictionary;
+- (BOOL)existsExtraForKey:(NSString* _Nonnull)key;
 
-+ (NITTrackingInfo*)trackingInfoFromRecipeId:(NSString* _Nonnull)recipeId;
++ (NITTrackingInfo* _Nonnull)trackingInfoFromRecipeId:(NSString* _Nonnull)recipeId;
 
 @end

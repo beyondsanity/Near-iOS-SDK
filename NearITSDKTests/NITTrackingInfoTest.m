@@ -52,4 +52,20 @@
     XCTAssertTrue([info.recipeId isEqualToString:sampleRecipeId]);
 }
 
+- (void)testNSCoding {
+    NSString *recipeId = @"recipe-id";
+    NITTrackingInfo *info = [[NITTrackingInfo alloc] init];
+    info.recipeId = recipeId;
+    [info addExtraWithObject:@"obj1" key:@"key1"];
+    
+    NSData *infoData = [NSKeyedArchiver archivedDataWithRootObject:info];
+    NITTrackingInfo *loadedInfo = [NSKeyedUnarchiver unarchiveObjectWithData:infoData];
+    
+    XCTAssertTrue([loadedInfo.recipeId isEqualToString:info.recipeId]);
+    XCTAssertTrue([loadedInfo existsExtraForKey:@"key1"]);
+    
+    [loadedInfo addExtraWithObject:@"obj2" key:@"key2"];
+    XCTAssertTrue([loadedInfo existsExtraForKey:@"key2"]);
+}
+
 @end
