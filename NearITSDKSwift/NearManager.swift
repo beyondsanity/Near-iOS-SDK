@@ -16,8 +16,8 @@ public enum NearRecipeTracking : String {
 }
 
 public protocol NearManagerDelegate {
-    func manager(_ manager: NearManager, eventWithContent content: Any, recipe: NITRecipe);
-    func manager(_ manager: NearManager, eventFailureWithError error: Error, recipe: NITRecipe);
+    func manager(_ manager: NearManager, eventWithContent content: Any, trackingInfo: NITTrackingInfo);
+    func manager(_ manager: NearManager, eventFailureWithError error: Error);
 }
 
 public final class NearManager: NSObject, NITManagerDelegate {
@@ -126,11 +126,11 @@ public final class NearManager: NSObject, NITManagerDelegate {
         manager.processRecipe(withId: id)
     }
     
-    public func manager(_ manager: NITManager, eventWithContent content: Any, recipe: NITRecipe) {
-        delegate?.manager(self, eventWithContent: content, recipe: recipe)
+    public func manager(_ manager: NITManager, eventFailureWithError error: Error) {
+        delegate?.manager(self, eventFailureWithError: error);
     }
     
-    public func manager(_ manager: NITManager, eventFailureWithError error: Error, recipe: NITRecipe) {
-        delegate?.manager(self, eventFailureWithError: error, recipe: recipe);
+    public func manager(_ manager: NITManager, eventWithContent content: Any, trackingInfo: NITTrackingInfo) {
+        delegate?.manager(self, eventWithContent: content, trackingInfo: trackingInfo)
     }
 }

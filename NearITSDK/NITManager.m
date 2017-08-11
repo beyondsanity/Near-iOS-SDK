@@ -270,25 +270,27 @@ static NITManager *defaultManager;
         return [self.notificationProcessor processNotificationWithUserInfo:userInfo completion:^(id  _Nullable content, NSString * _Nullable recipeId, NSError * _Nullable error) {
             NITRecipe *recipe = [[NITRecipe alloc] init];
             recipe.ID = recipeId;
-            if([self.delegate respondsToSelector:@selector(manager:eventFailureWithError:recipe:)] && error) {
+            NITTrackingInfo *trackingInfo = [NITTrackingInfo trackingInfoFromRecipeId:recipeId];
+            if([self.delegate respondsToSelector:@selector(manager:eventFailureWithError:)] && error) {
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [self.delegate manager:self eventFailureWithError:error recipe:recipe];
+                    [self.delegate manager:self eventFailureWithError:error];
                 }];
-            } else if ([self.delegate respondsToSelector:@selector(manager:eventWithContent:recipe:)]) {
+            } else if ([self.delegate respondsToSelector:@selector(manager:eventWithContent:trackingInfo:)]) {
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [self.delegate manager:self eventWithContent:content recipe:recipe];
+                    [self.delegate manager:self eventWithContent:content trackingInfo:trackingInfo];
                 }];
             }
         }];
     } else {
         return [self handleLocalUserInfo:userInfo completionHandler:^(id _Nullable content, NITRecipe * _Nullable recipe, NSError * _Nullable error) {
-            if([self.delegate respondsToSelector:@selector(manager:eventFailureWithError:recipe:)] && error) {
+            NITTrackingInfo *trackingInfo = [NITTrackingInfo trackingInfoFromRecipeId:recipe.ID];
+            if([self.delegate respondsToSelector:@selector(manager:eventFailureWithError:)] && error) {
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [self.delegate manager:self eventFailureWithError:error recipe:recipe];
+                    [self.delegate manager:self eventFailureWithError:error];
                 }];
-            } else if ([self.delegate respondsToSelector:@selector(manager:eventWithContent:recipe:)]) {
+            } else if ([self.delegate respondsToSelector:@selector(manager:eventWithContent:trackingInfo:)]) {
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                    [self.delegate manager:self eventWithContent:content recipe:recipe];
+                    [self.delegate manager:self eventWithContent:content trackingInfo:trackingInfo];
                 }];
             }
         }];
@@ -437,9 +439,9 @@ static NITManager *defaultManager;
     if(reaction) {
         [reaction contentWithRecipe:recipe completionHandler:^(id _Nonnull content, NSError * _Nullable error) {
             if(error) {
-                if([self.delegate respondsToSelector:@selector(manager:eventFailureWithError:recipe:)]) {
+                if([self.delegate respondsToSelector:@selector(manager:eventFailureWithError:)]) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        [self.delegate manager:self eventFailureWithError:error recipe:recipe];
+                        [self.delegate manager:self eventFailureWithError:error];
                     }];
                 }
             } else {
@@ -478,9 +480,9 @@ static NITManager *defaultManager;
                         notification.fireDate = [NSDate date];
                         [self.application scheduleLocalNotification:notification];
                     }
-                } else if ([self.delegate respondsToSelector:@selector(manager:eventWithContent:recipe:)]) {
+                } else if ([self.delegate respondsToSelector:@selector(manager:eventWithContent:trackingInfo:)]) {
                     [[NSOperationQueue mainQueue] addOperationWithBlock:^{
-                        [self.delegate manager:self eventWithContent:content recipe:recipe];
+                        [self.delegate manager:self eventWithContent:content trackingInfo:trackingInfo];
                     }];
                 }
             }

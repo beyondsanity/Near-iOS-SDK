@@ -25,8 +25,8 @@
 
 @protocol NITManagerDelegate <NSObject>
 
-- (void)manager:(NITManager* _Nonnull)manager eventWithContent:(id _Nonnull)content recipe:(NITRecipe* _Nonnull)recipe;
-- (void)manager:(NITManager* _Nonnull)manager eventFailureWithError:(NSError* _Nonnull)error recipe:(NITRecipe* _Nonnull)recipe;
+- (void)manager:(NITManager* _Nonnull)manager eventWithContent:(id _Nonnull)content trackingInfo:(NITTrackingInfo* _Nonnull)trackingInfo;
+- (void)manager:(NITManager* _Nonnull)manager eventFailureWithError:(NSError* _Nonnull)error;
 
 @end
 
