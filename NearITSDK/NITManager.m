@@ -433,6 +433,8 @@ static NITManager *defaultManager;
     }
     
     NITRecipe *recipe = [NSKeyedUnarchiver unarchiveObjectWithData:recipeData];
+    NITTrackingInfo *trackingInfo = [NITTrackingInfo trackingInfoFromRecipeId:recipe.ID];
+    [self.recipesManager sendTrackingWithTrackingInfo:trackingInfo event:NITRecipeEngaged];
     id content = [NSKeyedUnarchiver unarchiveObjectWithData:contentData];
     if (completionHandler) {
         completionHandler(content, recipe.ID, nil);
