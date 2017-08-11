@@ -51,7 +51,7 @@
 - (void)couponsWithCompletionHandler:(void (^ _Nullable)(NSArray<NITCoupon*>* _Nullable, NSError* _Nullable))handler;
 - (void)recipesWithCompletionHandler:(void (^_Nullable)(NSArray<NITRecipe*>* _Nullable recipes, NSError * _Nullable error))completionHandler;
 - (void)processRecipeWithId:(NSString* _Nonnull)recipeId;
-- (BOOL)processRecipeWithUserInfo:(NSDictionary<NSString *,id> * _Nonnull)userInfo completion:(void (^_Nullable)(id _Nullable object, NITRecipe* _Nullable recipe, NSError* _Nullable error))completionHandler;
+- (BOOL)processRecipeWithUserInfo:(NSDictionary<NSString *,id> * _Nonnull)userInfo completion:(void (^_Nullable)(id _Nullable object, NITTrackingInfo * _Nullable trackingInfo, NSError* _Nullable error))completionHandler;
 - (void)resetProfile;
 - (NSString* _Nullable)profileId;
 - (void)setProfileId:(NSString * _Nonnull)profileId;

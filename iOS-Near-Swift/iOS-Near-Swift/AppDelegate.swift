@@ -71,7 +71,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return ""
     }
     
-    func handleNearContent(content: Any, trackingInfo: NITTrackingInfo?) {
+    func handleNearContent(content: Any, trackingInfo: NITTrackingInfo) {
         if let simple = content as? NITSimpleNotification {
             
             let banner = Banner(title: "Simple notification", subtitle: simple.message, image: UIImage(named: "icona-notifica"), backgroundColor: .black, didTapBlock: nil)
@@ -101,20 +101,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any]) {
-        let _ = NearManager.shared.processRecipe(userInfo) { (content, recipe, error) in
-            if let content = content, let _ = recipe {
-                self.handleNearContent(content: content, trackingInfo: nil)
+        let _ = NearManager.shared.processRecipe(userInfo, completion: { (content, trackingInfo, error) in
+            if let content = content, let trackingInfo = trackingInfo {
+                self.handleNearContent(content: content, trackingInfo: trackingInfo)
             }
-        }
+        })
     }
     
     func application(_ application: UIApplication, didReceive notification: UILocalNotification) {
         if let userInfo = notification.userInfo {
-            let _ = NearManager.shared.processRecipe(userInfo) { (content, recipe, error) in
-                if let content = content, let _ = recipe {
-                    self.handleNearContent(content: content, trackingInfo: nil)
+            let _ = NearManager.shared.processRecipe(userInfo, completion: { (content, trackingInfo, error) in
+                if let content = content, let trackingInfo = trackingInfo {
+                    self.handleNearContent(content: content, trackingInfo: trackingInfo)
                 }
-            }
+            })
         }
     }
 }
@@ -137,9 +137,9 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     @available(iOS 10.0, *)
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
-        let _ = NearManager.shared.processRecipe(userInfo) { (content, recipe, error) in
-            if let content = content, let _ = recipe {
-                self.handleNearContent(content: content, trackingInfo: nil)
+        let _ = NearManager.shared.processRecipe(userInfo) { (content, trackingInfo, error) in
+            if let content = content, let trackingInfo = trackingInfo {
+                self.handleNearContent(content: content, trackingInfo: trackingInfo)
             }
         }
         completionHandler()

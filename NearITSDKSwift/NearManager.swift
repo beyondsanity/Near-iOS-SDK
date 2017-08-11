@@ -71,11 +71,11 @@ public final class NearManager: NSObject, NITManagerDelegate {
         return false
     }
     
-    public func processRecipe(_ userInfo: [AnyHashable : Any], completion: ((Any?, NITRecipe?, Error?) -> Void)?) -> Bool {
+    public func processRecipe(_ userInfo: [AnyHashable : Any], completion: ((Any?, NITTrackingInfo?, Error?) -> Void)?) -> Bool {
         if let ui = userInfo as? [String : Any] {
-            return manager.processRecipe(userInfo: ui, completion: { (content, recipe, error) in
+            return manager.processRecipe(userInfo: ui, completion: { (content, trackingInfo, error) in
                 if completion != nil {
-                    completion!(content, recipe, error)
+                    completion!(content, trackingInfo, error)
                 }
             })
         }

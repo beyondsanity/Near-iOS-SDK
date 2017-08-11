@@ -282,8 +282,8 @@ static NITManager *defaultManager;
             }
         }];
     } else {
-        return [self handleLocalUserInfo:userInfo completionHandler:^(id _Nullable content, NITRecipe * _Nullable recipe, NSError * _Nullable error) {
-            NITTrackingInfo *trackingInfo = [NITTrackingInfo trackingInfoFromRecipeId:recipe.ID];
+        return [self handleLocalUserInfo:userInfo completionHandler:^(id _Nullable content, NSString * _Nullable recipeId, NSError * _Nullable error) {
+            NITTrackingInfo *trackingInfo = [NITTrackingInfo trackingInfoFromRecipeId:recipeId];
             if([self.delegate respondsToSelector:@selector(manager:eventFailureWithError:)] && error) {
                 [[NSOperationQueue mainQueue] addOperationWithBlock:^{
                     [self.delegate manager:self eventFailureWithError:error];
@@ -297,18 +297,28 @@ static NITManager *defaultManager;
     }
 }
 
-- (BOOL)processRecipeWithUserInfo:(NSDictionary<NSString *,id> *)userInfo completion:(void (^)(id _Nullable, NITRecipe * _Nullable, NSError * _Nullable))completionHandler {
+- (BOOL)processRecipeWithUserInfo:(NSDictionary<NSString *,id> *)userInfo completion:(void (^)(id _Nullable, NITTrackingInfo * _Nullable, NSError * _Nullable))completionHandler {
     if ([self.notificationProcessor isRemoteNotificationWithUserInfo:userInfo]) {
         return [self.notificationProcessor processNotificationWithUserInfo:userInfo completion:^(id  _Nullable content, NSString * _Nullable recipeId, NSError * _Nullable error) {
             if (completionHandler) {
-                NITRecipe *recipe = [[NITRecipe alloc] init];
-                recipe.ID = recipeId;
-                completionHandler(content, recipe, error);
+                if (recipeId) {
+                    NITTrackingInfo *trackingInfo = [NITTrackingInfo trackingInfoFromRecipeId:recipeId];
+                    completionHandler(content, trackingInfo, error);
+                } else {
+                    completionHandler(content, nil, error);
+                }
             }
         }];
     } else {
-        return [self handleLocalUserInfo:userInfo completionHandler:^(id _Nullable content, NITRecipe * _Nullable recipe, NSError * _Nullable error) {
-            completionHandler(content, recipe, error);
+        return [self handleLocalUserInfo:userInfo completionHandler:^(id _Nullable content, NSString * _Nullable recipeId, NSError * _Nullable error) {
+            if (completionHandler) {
+                if (recipeId) {
+                    NITTrackingInfo *trackingInfo = [NITTrackingInfo trackingInfoFromRecipeId:recipeId];
+                    completionHandler(content, trackingInfo, error);
+                } else {
+                    completionHandler(content, nil, error);
+                }
+            }
         }];
     }
 }
@@ -408,7 +418,7 @@ static NITManager *defaultManager;
     [self.profile setProfileId:profileId];
 }
 
-- (BOOL)handleLocalUserInfo:(NSDictionary* _Nonnull)userInfo completionHandler:(void (^)(id _Nullable, NITRecipe * _Nullable, NSError * _Nullable))completionHandler {
+- (BOOL)handleLocalUserInfo:(NSDictionary* _Nonnull)userInfo completionHandler:(void (^)(id _Nullable, NSString * _Nullable recipeId, NSError * _Nullable))completionHandler {
     NSString *owner = [userInfo objectForKey:@"owner"];
     NSString *type = [userInfo objectForKey:@"type"];
     NSData *recipeData = [userInfo objectForKey:@"recipe"];
@@ -425,7 +435,7 @@ static NITManager *defaultManager;
     NITRecipe *recipe = [NSKeyedUnarchiver unarchiveObjectWithData:recipeData];
     id content = [NSKeyedUnarchiver unarchiveObjectWithData:contentData];
     if (completionHandler) {
-        completionHandler(content, recipe, nil);
+        completionHandler(content, recipe.ID, nil);
     }
     
     return YES;
