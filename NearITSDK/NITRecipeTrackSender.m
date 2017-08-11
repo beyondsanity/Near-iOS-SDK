@@ -72,7 +72,10 @@
     }
     [resource addAttributeObject:trackingInfo.recipeId forKey:@"recipe_id"];
     [resource addAttributeObject:event forKey:@"event"];
-    [resource addAttributeObject:[trackingInfo extrasDictionary] forKey:@"metadata"];
+    NSDictionary *extras = [trackingInfo extrasDictionary];
+    if (extras.count > 0) {
+        [resource addAttributeObject:extras forKey:@"metadata"];
+    }
     
     NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
     dateFormatter.dateFormat = ISO8601DateFormatMilliseconds;
