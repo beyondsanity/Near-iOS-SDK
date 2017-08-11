@@ -191,6 +191,10 @@
     [self.trackSender sendTrackingWithRecipeId:recipeId event:event];
 }
 
+- (void)sendTrackingWithTrackingInfo:(NITTrackingInfo *)trackingInfo event:(NSString *)event {
+    [self.trackSender sendTrackingWithTrackingInfo:trackingInfo event:event];
+}
+
 - (void)gotRecipe:(NITRecipe*)recipe trackingInfo:(NITTrackingInfo*)trackingInfo {
     NITLogD(LOGTAG, @"Got a recipe: %@", recipe.ID);
     if (trackingInfo) {

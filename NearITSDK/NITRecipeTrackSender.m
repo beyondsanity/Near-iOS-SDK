@@ -17,6 +17,7 @@
 #import "NITRecipe.h"
 #import "NITConstants.h"
 #import "NITNetworkProvider.h"
+#import "NITTrackingInfo.h"
 
 #define LOGTAG @"RecipeTrackSender"
 
@@ -53,6 +54,21 @@
     }
 }
 
+- (void)sendTrackingWithTrackingInfo:(NITTrackingInfo *)trackingInfo event:(NSString *)event {
+    if (trackingInfo == nil || trackingInfo.recipeId == nil || event == nil) {
+        return;
+    }
+    
+    if ([event isEqualToString:NITRecipeNotified]) {
+        [self.history markRecipeAsShownWithId:trackingInfo.recipeId];
+    }
+    
+    NITJSONAPI *jsonApi = [self buildTrackingBodyWithTrackingInfo:trackingInfo event:event];
+    if (jsonApi) {
+        [self.trackManager addTrackWithRequest:[[NITNetworkProvider sharedInstance] sendTrackingsWithJsonApi:jsonApi]];
+    }
+}
+
 - (NITJSONAPI*)buildTrackingBodyWithRecipeId:(NSString*)recipeId event:(NSString*)event {
     NITJSONAPI *jsonApi = [[NITJSONAPI alloc] init];
     NITJSONAPIResource *resource = [[NITJSONAPIResource alloc] init];
@@ -67,6 +83,32 @@
     }
     [resource addAttributeObject:recipeId forKey:@"recipe_id"];
     [resource addAttributeObject:event forKey:@"event"];
+    
+    NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
+    dateFormatter.dateFormat = ISO8601DateFormatMilliseconds;
+    [dateFormatter setTimeZone:[NSTimeZone timeZoneWithName:@"UTC"]];
+    [resource addAttributeObject:[dateFormatter stringFromDate:[NSDate date]] forKey:@"tracked_at"];
+    
+    [jsonApi setDataWithResourceObject:resource];
+    
+    return jsonApi;
+}
+
+- (NITJSONAPI*)buildTrackingBodyWithTrackingInfo:(NITTrackingInfo*)trackingInfo event:(NSString*)event {
+    NITJSONAPI *jsonApi = [[NITJSONAPI alloc] init];
+    NITJSONAPIResource *resource = [[NITJSONAPIResource alloc] init];
+    resource.type = @"trackings";
+    if (self.configuration.profileId && self.configuration.installationId && self.configuration.appId) {
+        [resource addAttributeObject:self.configuration.profileId forKey:@"profile_id"];
+        [resource addAttributeObject:self.configuration.installationId forKey:@"installation_id"];
+        [resource addAttributeObject:self.configuration.appId forKey:@"app_id"];
+    } else {
+        NITLogW(LOGTAG, @"Can't send geopolis tracking: missing data");
+        return nil;
+    }
+    [resource addAttributeObject:trackingInfo.recipeId forKey:@"recipe_id"];
+    [resource addAttributeObject:event forKey:@"event"];
+    [resource addAttributeObject:[trackingInfo extrasDictionary] forKey:@"metadata"];
     
     NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
     dateFormatter.dateFormat = ISO8601DateFormatMilliseconds;
