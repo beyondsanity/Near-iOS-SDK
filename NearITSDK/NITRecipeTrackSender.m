@@ -43,17 +43,6 @@
     return self;
 }
 
-- (void)sendTrackingWithRecipeId:(NSString * _Nonnull)recipeId event:(NSString* _Nonnull)event {
-    if ([event isEqualToString:NITRecipeNotified]) {
-        [self.history markRecipeAsShownWithId:recipeId];
-    }
-    
-    NITJSONAPI *jsonApi = [self buildTrackingBodyWithRecipeId:recipeId event:event];
-    if (jsonApi) {
-        [self.trackManager addTrackWithRequest:[[NITNetworkProvider sharedInstance] sendTrackingsWithJsonApi:jsonApi]];
-    }
-}
-
 - (void)sendTrackingWithTrackingInfo:(NITTrackingInfo *)trackingInfo event:(NSString *)event {
     if (trackingInfo == nil || trackingInfo.recipeId == nil || event == nil) {
         return;
@@ -67,31 +56,6 @@
     if (jsonApi) {
         [self.trackManager addTrackWithRequest:[[NITNetworkProvider sharedInstance] sendTrackingsWithJsonApi:jsonApi]];
     }
-}
-
-- (NITJSONAPI*)buildTrackingBodyWithRecipeId:(NSString*)recipeId event:(NSString*)event {
-    NITJSONAPI *jsonApi = [[NITJSONAPI alloc] init];
-    NITJSONAPIResource *resource = [[NITJSONAPIResource alloc] init];
-    resource.type = @"trackings";
-    if (self.configuration.profileId && self.configuration.installationId && self.configuration.appId) {
-        [resource addAttributeObject:self.configuration.profileId forKey:@"profile_id"];
-        [resource addAttributeObject:self.configuration.installationId forKey:@"installation_id"];
-        [resource addAttributeObject:self.configuration.appId forKey:@"app_id"];
-    } else {
-        NITLogW(LOGTAG, @"Can't send geopolis tracking: missing data");
-        return nil;
-    }
-    [resource addAttributeObject:recipeId forKey:@"recipe_id"];
-    [resource addAttributeObject:event forKey:@"event"];
-    
-    NSDateFormatter* dateFormatter = [[NSDateFormatter alloc] init];
-    dateFormatter.dateFormat = ISO8601DateFormatMilliseconds;
-    [dateFormatter setTimeZone:[NSTimeZone timeZoneWithName:@"UTC"]];
-    [resource addAttributeObject:[dateFormatter stringFromDate:[NSDate date]] forKey:@"tracked_at"];
-    
-    [jsonApi setDataWithResourceObject:resource];
-    
-    return jsonApi;
 }
 
 - (NITJSONAPI*)buildTrackingBodyWithTrackingInfo:(NITTrackingInfo*)trackingInfo event:(NSString*)event {

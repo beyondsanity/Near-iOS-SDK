@@ -187,10 +187,6 @@
     }];
 }
 
-- (void)sendTrackingWithRecipeId:(NSString *)recipeId event:(NSString*)event {
-    [self.trackSender sendTrackingWithRecipeId:recipeId event:event];
-}
-
 - (void)sendTrackingWithTrackingInfo:(NITTrackingInfo *)trackingInfo event:(NSString *)event {
     [self.trackSender sendTrackingWithTrackingInfo:trackingInfo event:event];
 }

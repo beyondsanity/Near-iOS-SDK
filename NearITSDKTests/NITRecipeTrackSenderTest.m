@@ -13,6 +13,7 @@
 #import "NITRecipeHistory.h"
 #import "NITTrackManager.h"
 #import "NITDateManager.h"
+#import "NITTrackingInfo.h"
 #import <OCMockitoIOS/OCMockitoIOS.h>
 #import <OCHamcrestIOS/OCHamcrestIOS.h>
 
@@ -52,7 +53,8 @@ NSString *const APP_ID = @"app-id";
 
 - (void)testSendNotified {
     NITRecipeTrackSender *sender = [[NITRecipeTrackSender alloc] initWithConfiguration:self.configuration history:self.history trackManager:self.trackManager dateManager:self.dateManager];
-    [sender sendTrackingWithRecipeId:RECIPE_ID event:NITRecipeNotified];
+    NITTrackingInfo *trackingInfo = [NITTrackingInfo trackingInfoFromRecipeId:RECIPE_ID];
+    [sender sendTrackingWithTrackingInfo:trackingInfo event:NITRecipeNotified];
     
     [verifyCount(self.history, times(1)) markRecipeAsShownWithId:RECIPE_ID];
     [verifyCount(self.trackManager, times(1)) addTrackWithRequest:anything()];
@@ -60,7 +62,8 @@ NSString *const APP_ID = @"app-id";
 
 - (void)testSendEngaged {
     NITRecipeTrackSender *sender = [[NITRecipeTrackSender alloc] initWithConfiguration:self.configuration history:self.history trackManager:self.trackManager dateManager:self.dateManager];
-    [sender sendTrackingWithRecipeId:RECIPE_ID event:NITRecipeEngaged];
+    NITTrackingInfo *trackingInfo = [NITTrackingInfo trackingInfoFromRecipeId:RECIPE_ID];
+    [sender sendTrackingWithTrackingInfo:trackingInfo event:NITRecipeEngaged];
     
     [verifyCount(self.history, never()) markRecipeAsShownWithId:RECIPE_ID];
     [verifyCount(self.trackManager, times(1)) addTrackWithRequest:anything()];
@@ -68,7 +71,8 @@ NSString *const APP_ID = @"app-id";
 
 - (void)testSendCustom {
     NITRecipeTrackSender *sender = [[NITRecipeTrackSender alloc] initWithConfiguration:self.configuration history:self.history trackManager:self.trackManager dateManager:self.dateManager];
-    [sender sendTrackingWithRecipeId:RECIPE_ID event:@"custom"];
+    NITTrackingInfo *trackingInfo = [NITTrackingInfo trackingInfoFromRecipeId:RECIPE_ID];
+    [sender sendTrackingWithTrackingInfo:trackingInfo event:@"custom"];
     
     [verifyCount(self.history, never()) markRecipeAsShownWithId:RECIPE_ID];
     [verifyCount(self.trackManager, times(1)) addTrackWithRequest:anything()];
@@ -77,7 +81,8 @@ NSString *const APP_ID = @"app-id";
 - (void)testSendNotifiedWithMissingProfileId {
     [given(self.configuration.profileId) willReturn:nil];
     NITRecipeTrackSender *sender = [[NITRecipeTrackSender alloc] initWithConfiguration:self.configuration history:self.history trackManager:self.trackManager dateManager:self.dateManager];
-    [sender sendTrackingWithRecipeId:RECIPE_ID event:NITRecipeNotified];
+    NITTrackingInfo *trackingInfo = [NITTrackingInfo trackingInfoFromRecipeId:RECIPE_ID];
+    [sender sendTrackingWithTrackingInfo:trackingInfo event:NITRecipeNotified];
     
     [verifyCount(self.history, times(1)) markRecipeAsShownWithId:RECIPE_ID];
     [verifyCount(self.trackManager, never()) addTrackWithRequest:anything()];

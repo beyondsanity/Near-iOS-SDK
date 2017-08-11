@@ -16,6 +16,7 @@
 #import "NITSimpleNotification.h"
 #import "NITLog.h"
 #import "NITSimpleNotificationReaction.h"
+#import "NITTrackingInfo.h"
 
 #define LOGTAG @"NotificationProcessor"
 
@@ -139,7 +140,10 @@
     BOOL isRemote = [self isRemoteNotificationWithUserInfo:userInfo];
     
     if (isRemote) {
-        [self.recipesManager sendTrackingWithRecipeId:recipeId event:NITRecipeNotified];
+        if (recipeId) {
+            NITTrackingInfo *trackingInfo = [NITTrackingInfo trackingInfoFromRecipeId:recipeId];
+            [self.recipesManager sendTrackingWithTrackingInfo:trackingInfo event:NITRecipeEngaged];
+        }
         return YES;
     } else {
         NITLogE(LOGTAG, @"Invalid recipe");

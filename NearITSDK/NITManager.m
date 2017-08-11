@@ -323,10 +323,6 @@ static NITManager *defaultManager;
     }
 }
 
-- (void)sendTrackingWithRecipeId:(NSString *)recipeId event:(NSString *)event {
-    [self.recipesManager sendTrackingWithRecipeId:recipeId event:event];
-}
-
 - (void)sendTrackingWithTrackingInfo:(NITTrackingInfo *)trackingInfo event:(NSString *)event {
     [self.recipesManager sendTrackingWithTrackingInfo:trackingInfo event:event];
 }
@@ -461,7 +457,7 @@ static NITManager *defaultManager;
             } else {
                 //Notify the delegate
                 if (self.application.applicationState != UIApplicationStateActive && self.showBackgroundNotification) {
-                    [self sendTrackingWithRecipeId:recipe.ID event:NITRecipeNotified];
+                    [self sendTrackingWithTrackingInfo:trackingInfo event:NITRecipeNotified];
                     if (NSClassFromString(@"UNMutableNotificationContent")) {
                         UNMutableNotificationContent *notification = [[UNMutableNotificationContent alloc] init];
                         notification.body = recipe.notificationBody;
