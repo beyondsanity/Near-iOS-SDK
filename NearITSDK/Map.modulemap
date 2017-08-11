@@ -21,5 +21,6 @@ framework module NearITSDK {
         header "NITUpload.h"
         header "NITLogger.h"
         header "NITLog.h"
+        header "NITTrackingInfo.h"
     }
 }

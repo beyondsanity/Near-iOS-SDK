@@ -203,6 +203,9 @@
 		1382502F1E88F8E500264BAC /* NearManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1382502E1E88F8E500264BAC /* NearManager.swift */; };
 		13AB72901F01596600FE14D9 /* NSData+Zip.m in Sources */ = {isa = PBXBuildFile; fileRef = 13AB728F1F01596600FE14D9 /* NSData+Zip.m */; };
 		13AB72921F015A3800FE14D9 /* NITZipTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 13AB72911F015A3800FE14D9 /* NITZipTest.m */; };
+		260827AE1F3D8CFE00820CB8 /* NITTrackingInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 260827AC1F3D8CFE00820CB8 /* NITTrackingInfo.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		260827AF1F3D8CFE00820CB8 /* NITTrackingInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 260827AD1F3D8CFE00820CB8 /* NITTrackingInfo.m */; };
+		260827B21F3D8ED500820CB8 /* NITTrackingInfoTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 260827B11F3D8ED500820CB8 /* NITTrackingInfoTest.m */; };
 		2638E3F81F399E4600D3B194 /* NITRecipeRepository.h in Headers */ = {isa = PBXBuildFile; fileRef = 2638E3F61F399E4600D3B194 /* NITRecipeRepository.h */; };
 		2638E3F91F399E4600D3B194 /* NITRecipeRepository.m in Sources */ = {isa = PBXBuildFile; fileRef = 2638E3F71F399E4600D3B194 /* NITRecipeRepository.m */; };
 		2638E3FB1F39A56E00D3B194 /* NITRecipeRepositoryTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 2638E3FA1F39A56E00D3B194 /* NITRecipeRepositoryTest.m */; };
@@ -491,6 +494,9 @@
 		13AB728E1F0158E600FE14D9 /* NSData+Zip.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSData+Zip.h"; sourceTree = "<group>"; };
 		13AB728F1F01596600FE14D9 /* NSData+Zip.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+Zip.m"; sourceTree = "<group>"; };
 		13AB72911F015A3800FE14D9 /* NITZipTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITZipTest.m; sourceTree = "<group>"; };
+		260827AC1F3D8CFE00820CB8 /* NITTrackingInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NITTrackingInfo.h; sourceTree = "<group>"; };
+		260827AD1F3D8CFE00820CB8 /* NITTrackingInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITTrackingInfo.m; sourceTree = "<group>"; };
+		260827B11F3D8ED500820CB8 /* NITTrackingInfoTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITTrackingInfoTest.m; sourceTree = "<group>"; };
 		2638E3F61F399E4600D3B194 /* NITRecipeRepository.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NITRecipeRepository.h; sourceTree = "<group>"; };
 		2638E3F71F399E4600D3B194 /* NITRecipeRepository.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITRecipeRepository.m; sourceTree = "<group>"; };
 		2638E3FA1F39A56E00D3B194 /* NITRecipeRepositoryTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITRecipeRepositoryTest.m; sourceTree = "<group>"; };
@@ -849,6 +855,7 @@
 				1349EEAA1E7948CD000B0666 /* Fixtures */,
 				130FB3891EEEA258008B24C1 /* Test Recipes */,
 				13423EE71E7BE15D008CAAC8 /* Constants.h */,
+				260827B01F3D8EA900820CB8 /* Trackings */,
 				1352CA721E7807FE00C0E98E /* NearITSDKTests.m */,
 				1352CA901E78372B00C0E98E /* NITUtilsTest.m */,
 				1349EEA81E793833000B0666 /* NITJSONAPITests.m */,
@@ -862,7 +869,6 @@
 				135370531F15FF0000231790 /* NITUserDataBackoffTest.m */,
 				1374E0D41EA89DDF00D613A5 /* NITManagerTest.m */,
 				1374E0D61EA8C00200D613A5 /* NITLogTest.m */,
-				1374E0FB1EAA305A00D613A5 /* NITTrackManagerTest.m */,
 				13AB72911F015A3800FE14D9 /* NITZipTest.m */,
 				130CCF9B1F02690D00876327 /* NITNotificationProcessorTest.m */,
 				134F99911F0BA02300B464B4 /* NITGeopolisRadarTest.m */,
@@ -1072,6 +1078,8 @@
 				1374E0EC1EA9FBFF00D613A5 /* NITTrackManager.m */,
 				1374E0F71EAA194800D613A5 /* NITTrackRequest.h */,
 				1374E0F81EAA194800D613A5 /* NITTrackRequest.m */,
+				260827AC1F3D8CFE00820CB8 /* NITTrackingInfo.h */,
+				260827AD1F3D8CFE00820CB8 /* NITTrackingInfo.m */,
 			);
 			name = Track;
 			sourceTree = "<group>";
@@ -1159,6 +1167,15 @@
 			path = NearITSDKSwiftTests;
 			sourceTree = "<group>";
 		};
+		260827B01F3D8EA900820CB8 /* Trackings */ = {
+			isa = PBXGroup;
+			children = (
+				1374E0FB1EAA305A00D613A5 /* NITTrackManagerTest.m */,
+				260827B11F3D8ED500820CB8 /* NITTrackingInfoTest.m */,
+			);
+			name = Trackings;
+			sourceTree = "<group>";
+		};
 		264F851F1F346F0000241376 /* Timestamps */ = {
 			isa = PBXGroup;
 			children = (
@@ -1185,6 +1202,7 @@
 				135CD7A51E9F5B13005C75A4 /* NITAudio.h in Headers */,
 				135CD7791E94F71E005C75A4 /* NITEvent.h in Headers */,
 				1327D8A81E83BE3100C6689E /* NITInstallation.h in Headers */,
+				260827AE1F3D8CFE00820CB8 /* NITTrackingInfo.h in Headers */,
 				1352CA831E78294E00C0E98E /* NITManager.h in Headers */,
 				264F851D1F346EB500241376 /* NITTimestampsManager.h in Headers */,
 				1327D89F1E82A99600C6689E /* NITPulseBundle.h in Headers */,
@@ -1486,6 +1504,7 @@
 				2643E3951F3B0CFA00D2A47F /* NITTriggerRequest.m in Sources */,
 				135A707A1E851F1F00D4C9EC /* NITSimpleNotificationReaction.m in Sources */,
 				13423EE41E7BCB07008CAAC8 /* NITGeofenceNode.m in Sources */,
+				260827AF1F3D8CFE00820CB8 /* NITTrackingInfo.m in Sources */,
 				130FB37F1EEE8E78008B24C1 /* NITRecipeHistory.m in Sources */,
 				135CD7D11E9F7A1F005C75A4 /* NITLog.m in Sources */,
 				1349EEA31E79325E000B0666 /* NITJSONAPI.m in Sources */,
@@ -1561,6 +1580,7 @@
 				137E38B11E8A9569008E83E6 /* NITRecipesManagerTest.m in Sources */,
 				135BB64F1EFA5DF0005DB5C9 /* NITReactionModelTest.m in Sources */,
 				137E38A71E8A4AA6008E83E6 /* NITCacheManagerTest.m in Sources */,
+				260827B21F3D8ED500820CB8 /* NITTrackingInfoTest.m in Sources */,
 				135359061EEFD8CE0056AF7C /* NITRecipeValidationFilterTest.m in Sources */,
 				1374E0FC1EAA305A00D613A5 /* NITTrackManagerTest.m in Sources */,
 				1374E0D71EA8C00200D613A5 /* NITLogTest.m in Sources */,
