@@ -10,6 +10,8 @@
 #import "NITRecipeRepository.h"
 #import "NITTriggerRequest.h"
 
+static NSString *const processQueueLock = @"processQueue.lock";
+
 @interface NITTriggerRequestQueue()
 
 @property (nonatomic, strong) NITRecipeRepository *repository;
@@ -37,15 +39,18 @@
 }
 
 - (void)processQueue {
-    if (self.isBusy) {
-        return;
+    @synchronized (processQueueLock) {
+        if (self.isBusy) {
+            return;
+        }
+        
+        if ([self.requests count] == 0) {
+            return;
+        }
+        
+        self.isBusy = YES;
     }
     
-    if ([self.requests count] == 0) {
-        return;
-    }
-    
-    self.isBusy = YES;
     [self.repository syncWithCompletionHandler:^(NSError * _Nullable error, BOOL isUpdated) {
         NSArray<NITTriggerRequest*>* queuedRequests = [self.requests copy];
         if (isUpdated) {
