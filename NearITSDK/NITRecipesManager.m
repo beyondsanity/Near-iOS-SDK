@@ -175,7 +175,7 @@
     [self.api onlinePulseEvaluationWithPlugin:request.pulsePlugin action:request.pulseAction bundle:request.pulseBundle completionHandler:^(NITRecipe * _Nullable recipe, NSError * _Nullable error) {
         if (recipe) {
             [self.repository addRecipe:recipe];
-            [self gotRecipe:recipe];
+            [self gotRecipe:recipe trackingInfo:request.trackingInfo];
         }
     }];
 }
