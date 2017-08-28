@@ -175,4 +175,11 @@ NSString* const RecipePulseOnlineAvailable = @"RecipePulseOnlineAvailable";
     return self.pulseEvaluationOnline;
 }
 
+- (void)addRecipe:(NITRecipe *)recipe {
+    NSMutableArray *mutRecipes = [NSMutableArray arrayWithArray:self.recipes];
+    [mutRecipes addObject:recipe];
+    self.recipes = [NSArray arrayWithArray:mutRecipes];
+    [self.cacheManager saveWithObject:self.recipes forKey:RecipesCacheKey];
+}
+
 @end

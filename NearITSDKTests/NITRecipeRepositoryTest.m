@@ -219,4 +219,17 @@ typedef void (^ProcessRecipesBlock)(NSArray<NITRecipe*>*, BOOL, NSError*);
     XCTAssertFalse(check);
 }
 
+- (void)testAddRecipe {
+    NITRecipeRepository *repository = [[NITRecipeRepository alloc] initWithCacheManager:self.cacheManager dateManager:self.dateManager configuration:self.configuration recipeHistory:self.recipeHistory timestampsManager:self.timestampsManager api:self.recipesApi];
+    
+    XCTAssertTrue(repository.recipesCount == 0);
+    
+    NITRecipe *aRecipe = [[NITRecipe alloc] init];
+    aRecipe.ID = @"recipeId";
+    [repository addRecipe:aRecipe];
+    
+    XCTAssertTrue(repository.recipesCount == 1);
+    [verifyCount(self.cacheManager, times(1)) saveWithObject:anything() forKey:RecipesCacheKey];
+}
+
 @end

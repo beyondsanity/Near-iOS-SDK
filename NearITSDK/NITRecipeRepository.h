@@ -30,6 +30,7 @@ extern NSString* _Nonnull const RecipesLastEditedTimeCacheKey;
 - (void)recipesWithCompletionHandler:(void (^_Nullable)(NSArray<NITRecipe *> * _Nullable, NSError * _Nullable))completionHandler;
 - (NSInteger)recipesCount;
 - (BOOL)isPulseOnlineEvaluationAvaialble;
+- (void)addRecipe:(NITRecipe* _Nonnull)recipe;
 - (NSArray<NITRecipe*>* _Nonnull)matchingRecipesWithPulsePlugin:(NSString* _Nonnull)pulsePlugin pulseAction:(NSString * _Nonnull)pulseAction pulseBundle:(NSString * _Nonnull)pulseBundle;
 - (NSArray<NITRecipe*>* _Nonnull)matchingRecipesWithPulsePlugin:(NSString* _Nonnull)pulsePlugin pulseAction:(NSString * _Nonnull)pulseAction tags:(NSArray<NSString *>* _Nullable)tags;
 
