@@ -173,6 +173,7 @@
 - (void)onlinePulseEvaluationWithPlugin:(NSString*)plugin action:(NSString*)action bundle:(NSString*)bundle {
     [self.api onlinePulseEvaluationWithPlugin:plugin action:action bundle:bundle completionHandler:^(NITRecipe * _Nullable recipe, NSError * _Nullable error) {
         if (recipe) {
+            [self.repository addRecipe:recipe];
             [self gotRecipe:recipe];
         }
     }];
