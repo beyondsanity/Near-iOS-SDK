@@ -88,36 +88,32 @@ After the process the `eventWithContent` method will be called with the actual r
 
 NearIT analytics on recipes are built from trackings describing the status of user engagement with a recipe. The two recipe states are "Notified" and "Engaged" to represent a recipe delivered to the user and a recipe that the user responded to.
 
-Push notifications recipes track themselves as notified, but you should track it yourself for any other case.
+Push and local notifications recipes track themselves as notified and engaged, but you should track it yourself for any other case.
 You should be able to catch the event when `eventWithContent` is called, there you decide to display or not a notification to the user:
 ```swift
 // Swift
-manager.sendTracking(recipe.id(), event: NITRecipeNotified)
+manager.sendTracking(trackingInfo, event: NearRecipeTracking.notified.rawValue)
 ```
 
 ```objective-c
 // Objective-C
-[manager sendTrackingWithRecipeId:recipe.ID event:NITRecipeNotified];
+[manager sendTrackingWithTrackingInfo:trackingInfo event:NITRecipeNotified];
 ```
 
 After `eventWithContent` is called and you decided to show a notification and then the user is engaged you can track the event calling:
 ```swift
 // Swift
-manager.sendTracking(recipe.id(), event: NITRecipeEngaged)
+manager.sendTracking(trackingInfo, event: NearRecipeTracking.engaged.rawValue)
 ```
 
 ```objective-c
 // Objective-C
-[manager sendTrackingWithRecipeId:recipe.ID event:NITRecipeEngaged];
+[manager sendTrackingWithTrackingInfo:trackingInfo event:NITRecipeEngaged];
 ```
 
 ## Recipe and content objects
 
-When `eventWithContent` gets called you will obtain the recipe and the content by the passed arguments. This is how a recipe is composed:
-
-- `ID` returns the id of the recipe
-- `notificationTitle` returns the notification title if any
-- `notificationBody` returns the notificaiton text if any
+When `eventWithContent` gets called you will obtain the tracking info and the content by the passed arguments. 
 
 Content is an object which contains the useful data, it could have several class types:
 
