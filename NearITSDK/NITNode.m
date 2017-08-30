@@ -48,4 +48,8 @@
     return NO;
 }
 
+- (NSString *)typeName {
+    return @"Node";
+}
+
 @end

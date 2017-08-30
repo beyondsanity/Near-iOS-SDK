@@ -41,4 +41,8 @@
     return [NSString stringWithFormat:@"Node (Beacon) ID: %@", self.ID];
 }
 
+- (NSString *)typeName {
+    return @"BeaconNode";
+}
+
 @end

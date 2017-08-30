@@ -20,5 +20,6 @@
 - (CLRegion* _Nullable)createRegion;
 - (BOOL)isLeaf;
 - (NSInteger)parentsCount;
+- (NSString* _Nonnull)typeName;
 
 @end

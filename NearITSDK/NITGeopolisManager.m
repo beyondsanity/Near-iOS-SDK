@@ -172,7 +172,7 @@ NSString* const NodeLastEditedTimeCacheKey = @"GeopolisNodesLastEditedTime";
 - (NITTrackingInfo*)buildTrackingInfoWithNode:(NITNode*)node {
     NITTrackingInfo *trackingInfo = [[NITTrackingInfo alloc] init];
     [trackingInfo addExtraWithObject:node.identifier key:@"node_id"];
-    [trackingInfo addExtraWithObject:NSStringFromClass([node class]) key:@"node_type"];
+    [trackingInfo addExtraWithObject:node.typeName key:@"node_type"];
     if (node.tags) {
         [trackingInfo addExtraWithObject:node.tags key:@"tags"];
     }

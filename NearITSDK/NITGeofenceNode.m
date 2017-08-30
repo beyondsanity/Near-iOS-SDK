@@ -23,4 +23,8 @@
     return [NSString stringWithFormat:@"Node (Geofence) - lat:lng (%.4f, %.4f)", self.latitude.floatValue, self.longitude.floatValue];
 }
 
+- (NSString *)typeName {
+    return @"GeofenceNode";
+}
+
 @end
