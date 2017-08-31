@@ -19,7 +19,7 @@
 #import "NITLog.h"
 
 #define LOGTAG @"Installation"
-#define SDK_VERSION @"1.0.8"
+#define SDK_VERSION @"2.2"
 
 @interface NITInstallation()
 

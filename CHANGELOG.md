@@ -1,3 +1,18 @@
+2.2 Release notes (2017-08-31)
+=============================================================
+
+### API Breaking Changes
+
+* Changed Near manager "sendTracking" method.
+
+### Enhancements
+
+* Better responsiveness.
+
+### Bugfixes
+
+* None.
+
 1.0.8 Release notes (2017-08-02)
 =============================================================
 
