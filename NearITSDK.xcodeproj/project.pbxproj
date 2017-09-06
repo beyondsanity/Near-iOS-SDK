@@ -231,6 +231,9 @@
 		264F85221F346FCC00241376 /* NITTimestamp.h in Headers */ = {isa = PBXBuildFile; fileRef = 264F85201F346FCC00241376 /* NITTimestamp.h */; };
 		264F85231F346FCC00241376 /* NITTimestamp.m in Sources */ = {isa = PBXBuildFile; fileRef = 264F85211F346FCC00241376 /* NITTimestamp.m */; };
 		264F85251F34738600241376 /* NITTimestampsManagerTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 264F85241F34738600241376 /* NITTimestampsManagerTest.m */; };
+		26DD77331F6028190069B5CC /* NITTreeLevel.h in Headers */ = {isa = PBXBuildFile; fileRef = 26DD77311F6028190069B5CC /* NITTreeLevel.h */; };
+		26DD77341F6028190069B5CC /* NITTreeLevel.m in Sources */ = {isa = PBXBuildFile; fileRef = 26DD77321F6028190069B5CC /* NITTreeLevel.m */; };
+		26DD77381F602F4D0069B5CC /* NITTreeLevelTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 26DD77371F602F4D0069B5CC /* NITTreeLevelTest.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -526,6 +529,9 @@
 		264F85201F346FCC00241376 /* NITTimestamp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NITTimestamp.h; sourceTree = "<group>"; };
 		264F85211F346FCC00241376 /* NITTimestamp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITTimestamp.m; sourceTree = "<group>"; };
 		264F85241F34738600241376 /* NITTimestampsManagerTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITTimestampsManagerTest.m; sourceTree = "<group>"; };
+		26DD77311F6028190069B5CC /* NITTreeLevel.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NITTreeLevel.h; sourceTree = "<group>"; };
+		26DD77321F6028190069B5CC /* NITTreeLevel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NITTreeLevel.m; sourceTree = "<group>"; };
+		26DD77371F602F4D0069B5CC /* NITTreeLevelTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NITTreeLevelTest.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -737,6 +743,7 @@
 		1349EEB51E796FF3000B0666 /* Geopolis */ = {
 			isa = PBXGroup;
 			children = (
+				26DD77301F6028040069B5CC /* Tree */,
 				134F998C1F0B9D9800B464B4 /* Radar */,
 				1327D8931E82823300C6689E /* Beacon */,
 				1349EEBD1E7A9264000B0666 /* Nodes */,
@@ -863,6 +870,7 @@
 				1378386A1E816ADF001C8CDE /* Classes */,
 				1349EEAA1E7948CD000B0666 /* Fixtures */,
 				130FB3891EEEA258008B24C1 /* Test Recipes */,
+				26DD77351F602B9D0069B5CC /* Geopolis */,
 				13423EE71E7BE15D008CAAC8 /* Constants.h */,
 				260827B01F3D8EA900820CB8 /* Trackings */,
 				1352CA721E7807FE00C0E98E /* NearITSDKTests.m */,
@@ -1207,6 +1215,31 @@
 			name = Timestamps;
 			sourceTree = "<group>";
 		};
+		26DD77301F6028040069B5CC /* Tree */ = {
+			isa = PBXGroup;
+			children = (
+				26DD77311F6028190069B5CC /* NITTreeLevel.h */,
+				26DD77321F6028190069B5CC /* NITTreeLevel.m */,
+			);
+			name = Tree;
+			sourceTree = "<group>";
+		};
+		26DD77351F602B9D0069B5CC /* Geopolis */ = {
+			isa = PBXGroup;
+			children = (
+				26DD77361F602BA50069B5CC /* Tree */,
+			);
+			name = Geopolis;
+			sourceTree = "<group>";
+		};
+		26DD77361F602BA50069B5CC /* Tree */ = {
+			isa = PBXGroup;
+			children = (
+				26DD77371F602F4D0069B5CC /* NITTreeLevelTest.m */,
+			);
+			name = Tree;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -1253,6 +1286,7 @@
 				1352CA751E7807FE00C0E98E /* NearITSDK.h in Headers */,
 				2638E4041F39C65F00D3B194 /* NITEvaluationBodyBuilder.h in Headers */,
 				1322970E1E8E351C00AE6EFC /* NITCustomJSON.h in Headers */,
+				26DD77331F6028190069B5CC /* NITTreeLevel.h in Headers */,
 				1319CED81EA0BDA0009046C5 /* NITGeopolisNodesManager.h in Headers */,
 				1374E1101EB0D23A00D613A5 /* NITDateManager.h in Headers */,
 				1349EEA21E79325E000B0666 /* NITJSONAPI.h in Headers */,
@@ -1546,6 +1580,7 @@
 				132296F51E8D09D400AE6EFC /* NITCoupon.m in Sources */,
 				1349EEA71E793413000B0666 /* NITJSONAPIResource.m in Sources */,
 				2638E3FF1F39B6EB00D3B194 /* NITRecipeTrackSender.m in Sources */,
+				26DD77341F6028190069B5CC /* NITTreeLevel.m in Sources */,
 				2638E4051F39C65F00D3B194 /* NITEvaluationBodyBuilder.m in Sources */,
 				2639DA7E1F3C5D8800422BA3 /* NITTriggerRequestQueue.m in Sources */,
 				130FB3881EEE9FD6008B24C1 /* NITCooldownValidator.m in Sources */,
@@ -1613,6 +1648,7 @@
 				13423EE61E7BD451008CAAC8 /* NITGeopolisManagerTest.m in Sources */,
 				137838691E816AD5001C8CDE /* NITGeopolisManager+Tests.m in Sources */,
 				130FB3951EEEC4FF008B24C1 /* NITSchedulerValidatorTest.m in Sources */,
+				26DD77381F602F4D0069B5CC /* NITTreeLevelTest.m in Sources */,
 				135A70811E8525F700D4C9EC /* NITReactionTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
