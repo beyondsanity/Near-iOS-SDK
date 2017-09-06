@@ -7,7 +7,7 @@
 //
 
 import UIKit
-import HEXColor
+import Hex
 
 class NearButton: UIButton {
 
@@ -20,7 +20,7 @@ class NearButton: UIButton {
     */
     
     override func awakeFromNib() {
-        backgroundColor = UIColor("#333333")
+        backgroundColor = UIColor(hex:"#333333")
         layer.cornerRadius = 18
         contentEdgeInsets = UIEdgeInsetsMake(0, 10, 0, 10)
     }
