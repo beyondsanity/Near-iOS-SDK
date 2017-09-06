@@ -18,6 +18,6 @@
 - (instancetype _Nonnull)initWithCacheManager:(NITCacheManager * _Nonnull)cacheManager timestampsManager:(NITTimestampsManager * _Nonnull)timestampsManager api:(NITNodeApi * _Nonnull)api;
 
 - (void)syncWithCompletionHandler:(void (^_Nonnull)(NSError * _Nullable, BOOL))completionHandler;
-- (NSArray<NITRecipe *> * _Nullable)nodes;
+- (NSArray<NITNode *> * _Nullable)nodes;
 
 @end
