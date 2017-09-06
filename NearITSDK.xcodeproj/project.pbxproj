@@ -206,6 +206,10 @@
 		260827AE1F3D8CFE00820CB8 /* NITTrackingInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 260827AC1F3D8CFE00820CB8 /* NITTrackingInfo.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		260827AF1F3D8CFE00820CB8 /* NITTrackingInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 260827AD1F3D8CFE00820CB8 /* NITTrackingInfo.m */; };
 		260827B21F3D8ED500820CB8 /* NITTrackingInfoTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 260827B11F3D8ED500820CB8 /* NITTrackingInfoTest.m */; };
+		2615FDB11F5FFE3300A6F7B0 /* NITNodeApi.h in Headers */ = {isa = PBXBuildFile; fileRef = 2615FDAF1F5FFE3300A6F7B0 /* NITNodeApi.h */; };
+		2615FDB21F5FFE3300A6F7B0 /* NITNodeApi.m in Sources */ = {isa = PBXBuildFile; fileRef = 2615FDB01F5FFE3300A6F7B0 /* NITNodeApi.m */; };
+		2615FDB51F60007100A6F7B0 /* NITNodeRepository.h in Headers */ = {isa = PBXBuildFile; fileRef = 2615FDB31F60007100A6F7B0 /* NITNodeRepository.h */; };
+		2615FDB61F60007100A6F7B0 /* NITNodeRepository.m in Sources */ = {isa = PBXBuildFile; fileRef = 2615FDB41F60007100A6F7B0 /* NITNodeRepository.m */; };
 		2638E3F81F399E4600D3B194 /* NITRecipeRepository.h in Headers */ = {isa = PBXBuildFile; fileRef = 2638E3F61F399E4600D3B194 /* NITRecipeRepository.h */; };
 		2638E3F91F399E4600D3B194 /* NITRecipeRepository.m in Sources */ = {isa = PBXBuildFile; fileRef = 2638E3F71F399E4600D3B194 /* NITRecipeRepository.m */; };
 		2638E3FB1F39A56E00D3B194 /* NITRecipeRepositoryTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 2638E3FA1F39A56E00D3B194 /* NITRecipeRepositoryTest.m */; };
@@ -497,6 +501,10 @@
 		260827AC1F3D8CFE00820CB8 /* NITTrackingInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NITTrackingInfo.h; sourceTree = "<group>"; };
 		260827AD1F3D8CFE00820CB8 /* NITTrackingInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITTrackingInfo.m; sourceTree = "<group>"; };
 		260827B11F3D8ED500820CB8 /* NITTrackingInfoTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITTrackingInfoTest.m; sourceTree = "<group>"; };
+		2615FDAF1F5FFE3300A6F7B0 /* NITNodeApi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NITNodeApi.h; sourceTree = "<group>"; };
+		2615FDB01F5FFE3300A6F7B0 /* NITNodeApi.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITNodeApi.m; sourceTree = "<group>"; };
+		2615FDB31F60007100A6F7B0 /* NITNodeRepository.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NITNodeRepository.h; sourceTree = "<group>"; };
+		2615FDB41F60007100A6F7B0 /* NITNodeRepository.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITNodeRepository.m; sourceTree = "<group>"; };
 		2638E3F61F399E4600D3B194 /* NITRecipeRepository.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NITRecipeRepository.h; sourceTree = "<group>"; };
 		2638E3F71F399E4600D3B194 /* NITRecipeRepository.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITRecipeRepository.m; sourceTree = "<group>"; };
 		2638E3FA1F39A56E00D3B194 /* NITRecipeRepositoryTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NITRecipeRepositoryTest.m; sourceTree = "<group>"; };
@@ -751,6 +759,7 @@
 		1349EEBD1E7A9264000B0666 /* Nodes */ = {
 			isa = PBXGroup;
 			children = (
+				2615FDAE1F5FFD9300A6F7B0 /* Repository */,
 				1349EEBE1E7A9272000B0666 /* NITNode.h */,
 				1349EEBF1E7A9272000B0666 /* NITNode.m */,
 				1349EEC21E7A95E3000B0666 /* NITNodesManager.h */,
@@ -1176,6 +1185,17 @@
 			name = Trackings;
 			sourceTree = "<group>";
 		};
+		2615FDAE1F5FFD9300A6F7B0 /* Repository */ = {
+			isa = PBXGroup;
+			children = (
+				2615FDAF1F5FFE3300A6F7B0 /* NITNodeApi.h */,
+				2615FDB01F5FFE3300A6F7B0 /* NITNodeApi.m */,
+				2615FDB31F60007100A6F7B0 /* NITNodeRepository.h */,
+				2615FDB41F60007100A6F7B0 /* NITNodeRepository.m */,
+			);
+			name = Repository;
+			sourceTree = "<group>";
+		};
 		264F851F1F346F0000241376 /* Timestamps */ = {
 			isa = PBXGroup;
 			children = (
@@ -1239,6 +1259,7 @@
 				135A708C1E85448E00D4C9EC /* NITContent.h in Headers */,
 				2638E3F81F399E4600D3B194 /* NITRecipeRepository.h in Headers */,
 				132296F81E8D140B00AE6EFC /* NITClaim.h in Headers */,
+				2615FDB51F60007100A6F7B0 /* NITNodeRepository.h in Headers */,
 				1322970A1E8E350500AE6EFC /* NITCustomJSONReaction.h in Headers */,
 				135CD7D01E9F7A1F005C75A4 /* NITLog.h in Headers */,
 				2643E3941F3B0CFA00D2A47F /* NITTriggerRequest.h in Headers */,
@@ -1249,6 +1270,7 @@
 				137838651E800EC1001C8CDE /* NITRecipesManager.h in Headers */,
 				1349EEC91E7AA1E3000B0666 /* NITResource.h in Headers */,
 				1374E0F91EAA194800D613A5 /* NITTrackRequest.h in Headers */,
+				2615FDB11F5FFE3300A6F7B0 /* NITNodeApi.h in Headers */,
 				2639DA771F3C381800422BA3 /* NITRecipesApi.h in Headers */,
 				135A707E1E85210300D4C9EC /* NITSimpleNotification.h in Headers */,
 				135A70751E8503D900D4C9EC /* NITReaction.h in Headers */,
@@ -1499,6 +1521,7 @@
 				1374E0F21EA9FE1D00D613A5 /* NITReachability.m in Sources */,
 				2638E3F91F399E4600D3B194 /* NITRecipeRepository.m in Sources */,
 				2639DA781F3C381800422BA3 /* NITRecipesApi.m in Sources */,
+				2615FDB61F60007100A6F7B0 /* NITNodeRepository.m in Sources */,
 				264F85231F346FCC00241376 /* NITTimestamp.m in Sources */,
 				1352CA841E78294E00C0E98E /* NITManager.m in Sources */,
 				2643E3951F3B0CFA00D2A47F /* NITTriggerRequest.m in Sources */,
@@ -1512,6 +1535,7 @@
 				130FB3931EEEC1BA008B24C1 /* NITScheduleValidator.m in Sources */,
 				132296F91E8D140B00AE6EFC /* NITClaim.m in Sources */,
 				1374E1111EB0D23A00D613A5 /* NITDateManager.m in Sources */,
+				2615FDB21F5FFE3300A6F7B0 /* NITNodeApi.m in Sources */,
 				135A708D1E85448E00D4C9EC /* NITContent.m in Sources */,
 				1322970F1E8E351C00AE6EFC /* NITCustomJSON.m in Sources */,
 				1374E0EE1EA9FBFF00D613A5 /* NITTrackManager.m in Sources */,
