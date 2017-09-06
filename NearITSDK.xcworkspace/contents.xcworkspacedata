@@ -7,4 +7,7 @@
    <FileRef
       location = "group:iOS-Near-Swift/iOS Near Swift.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:Pods/Pods.xcodeproj">
+   </FileRef>
 </Workspace>
