@@ -22,13 +22,6 @@ Once the settings are configured, **everyone** - even people without technical s
 
 **NearIT SDK** synchronizes with servers and behaves accordingly to the settings and the recipes. Any content will be delivered at the right time, you just need to handle its presentation.
 
-## Features
-* User Segmentation
-* Beacon monitoring and ranging
-* Geofence monitoring
-* Notifications and in-app content
-* Analytics
-
 ## Integration guide
 
-For information on how to integrate all NearIT feautures in your app, visit the [documentation website](http://nearit-ios.readthedocs.io/en/latest/)
+For information on how to integrate all NearIT features in your app, follow the [integration guide](http://nearit-ios.readthedocs.io/en/latest/)

@@ -1,4 +1,4 @@
-# Handle recipe content
+# Handle In-app content
 
 NearIT takes care of delivering content at the right time, you will just need to handle content presentation. 
 
@@ -54,9 +54,9 @@ class NearSDKManager<NITManagerDelegate> {
 }
 ```
 
-## Push Notifications
+## Push Notifications Content
 
-Once you have properly setted up push notifications ([learn more](enable-triggers.md)) you will start receiving push notifications from NearIT, to get the recive you must do the following:
+Once you have properly setted up push notifications ([learn more](push-notifications.md)) you will start receiving push notifications from NearIT, to get the recipe you must do the following:
 
 ```swift
 // Swift

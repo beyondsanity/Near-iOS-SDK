@@ -43,7 +43,11 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 
 You can find the API key on [NearIT web interface](https://go.nearit.com/), under the "SDK Integration" section.
 
-Whenever you want you can sync the recipes with our servers by calling this method:
+<br>
+##Manual Configuration Refresh##
+
+The SDK **initialization is done automatically** and handles the task of syncing the recipes with our servers when your app starts up.
+<br>However, if you need to sync the recipes configuration more often, you can call this method:
 
 ```swift
 // Swift
